@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using HarmonyLib;
+using JumpKingMod.Patching;
 using Logging;
 using Logging.API;
 
@@ -16,9 +17,10 @@ namespace JumpKingMod
     public class JumpKingModEntry
     {
         public static ILogger Logger;
-        private static bool freeFlying = false;
-        private static bool freeFlyingToggleCooldown = false;
 
+        /// <summary>
+        /// Entry point for our mod, initiates all of the patching
+        /// </summary>
         public static void Init()
         {
             Logger = new ConsoleLogger();
@@ -28,9 +30,9 @@ namespace JumpKingMod
                 Harmony harmony = new Harmony("com.phantombadger.jumpkingmod");
                 harmony.PatchAll();
 
-                var method = AccessTools.Method("JumpKing.Player.BodyComp:Update");
-                var prefixMethod = AccessTools.Method("JumpKingMod.JumpKingModEntry:TestUpdatePatch");
-                harmony.Patch(method, new HarmonyMethod(prefixMethod));
+                // Free Fly Patch
+                IManualPatch freeFlyPatch = new FreeFlyManualPatch(Logger);
+                freeFlyPatch.SetUpManualPatch(harmony);
             }
             catch (Exception e)
             {
@@ -38,81 +40,6 @@ namespace JumpKingMod
             }
 
             Logger.Information("Init Called!");
-        }
-
-        public static void TestUpdatePatch(object __instance, float p_delta)
-        {
-            try
-            {
-                if (Keyboard.IsKeyDown(Key.P) && !freeFlyingToggleCooldown)
-                {
-                    freeFlying = !freeFlying;
-                    Logger.Information($"Setting Free Flying to {freeFlying}");
-
-                    freeFlyingToggleCooldown = true;
-                }
-                else if (Keyboard.IsKeyUp(Key.P) && freeFlyingToggleCooldown)
-                {
-                    freeFlyingToggleCooldown = false;
-                }
-
-                // We are free flying
-                if (freeFlying)
-                {
-                    FieldInfo velocityField = AccessTools.Field(__instance.GetType(), "velocity");
-                    object velocity = velocityField.GetValue(__instance);
-                    FieldInfo yField = AccessTools.Field(velocityField.FieldType, "Y");
-                    FieldInfo xField = AccessTools.Field(velocityField.FieldType, "X");
-                    float curX = (float)xField.GetValue(velocity);
-                    float curY = (float)yField.GetValue(velocity);
-
-                    curX = 0;
-                    curY = 0;
-                    
-                    // Modify velocity if key is held
-                    if (Keyboard.IsKeyDown(Key.W))
-                    {
-                        curY -= 5;   
-                    }
-                    if (Keyboard.IsKeyDown(Key.A))
-                    {
-                        curX -= 5;
-                    }
-                    if (Keyboard.IsKeyDown(Key.D))
-                    {
-                        curX += 5;
-                    }
-                    if (Keyboard.IsKeyDown(Key.S))
-                    {
-                        curY += 5;
-                    }
-
-                    yField.SetValue(velocity, curY);
-                    xField.SetValue(velocity, curX);
-                    velocityField.SetValue(__instance, velocity);
-                    Logger.Information($"Setting velocity to {velocity.ToString()}");
-                }
-            } 
-            catch (Exception e)
-            {
-                Logger.Error($"Exception on UpdatePatch {e.ToString()}");
-            }
-        }
-    }
-
-    [HarmonyPatch(typeof(JumpKing.Game1))]
-    [HarmonyPatch("Initialize")]
-    public class GamePatch
-    {
-        static bool Prefix(JumpKing.Game1 __instance)
-        {
-            JumpKingModEntry.Logger.Information($"Prefix Called!");
-            return true;
-        }
-
-        static void Postfix()
-        {
-            JumpKingModEntry.Logger.Information($"Postfix Called!");
         }
     }
 }
