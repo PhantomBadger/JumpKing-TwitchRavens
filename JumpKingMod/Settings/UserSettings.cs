@@ -1,0 +1,119 @@
+﻿using Logging.API;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace JumpKingMod.Settings
+{
+    /// <summary>
+    /// A simple settings file implementation which can read and write JSON settings from a file
+    /// </summary>
+    public class UserSettings
+    {
+        private readonly string settingsFilePath;
+        private readonly Dictionary<string, string> defaultSettings;
+        private readonly ILogger logger;
+
+        private Dictionary<string, string> currentSettings;
+
+        /// <summary>
+        /// Ctor for creating a <see cref="UserSettings"/>
+        /// </summary>
+        /// <param name="settingsFilePath">The file path to store and read the settings from. Can be a partial path or a full path</param>
+        /// <param name="defaultSettings">The default settings to populate the file with in the event of a fatal event</param>
+        /// <param name="logger">An <see cref="ILogger"/> implementation to use for logging</param>
+        public UserSettings(string settingsFilePath, Dictionary<string, string> defaultSettings, ILogger logger)
+        {
+            this.settingsFilePath = settingsFilePath ?? throw new ArgumentNullException(nameof(settingsFilePath));
+            this.defaultSettings = defaultSettings ?? throw new ArgumentNullException(nameof(defaultSettings));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            currentSettings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            if (File.Exists(settingsFilePath))
+            {
+                // Load the current settings
+                LoadSettings();
+            }
+            else
+            {
+                // Save the default settings
+                currentSettings = defaultSettings;
+                SaveSettings();
+            }
+        }
+
+        /// <summary>
+        /// Get the value of the setting with the given key, or the default value if the key is not present
+        /// </summary>
+        /// <param name="key">The key for the setting, not case sensitive</param>
+        /// <param name="defaultValue">The default value to return if the key isnt present</param>
+        /// <remarks>Sets the setting if it is not present</remarks>
+        public string GetSettingOrDefault(string key, string defaultValue)
+        {
+            if (currentSettings.ContainsKey(key))
+            {
+                return currentSettings[key];
+            }
+            else
+            {
+                SetOrCreateSetting(key, defaultValue);
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
+        /// Sets the setting, creating it if it isn't already present
+        /// </summary>
+        /// <param name="key">The key for the setting, not case sensitive</param>
+        /// <param name="value">The value to use for the setting</param>
+        public void SetOrCreateSetting(string key, string value)
+        {
+            if (currentSettings.ContainsKey(key))
+            {
+                currentSettings[key] = value;
+            }
+            else
+            {
+                currentSettings.Add(key, value);
+            }
+            SaveSettings();
+        }
+
+        /// <summary>
+        /// Save the settings to the file
+        /// </summary>
+        private void SaveSettings()
+        {
+            try
+            {
+                string jsonString = JsonConvert.SerializeObject(currentSettings);
+                File.WriteAllText(settingsFilePath, jsonString);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Encountered Exception when saving settings: {e.ToString()}\nSettings have not been saved out!");
+            }
+        }
+
+        /// <summary>
+        /// Load the settings from the file
+        /// </summary>
+        private void LoadSettings()
+        {
+            try
+            {
+                string jsonString = File.ReadAllText(settingsFilePath);
+                currentSettings = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonString);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Encountered Exception when loading settings: {e.ToString()}\nSetting them to the defaults instead");
+                currentSettings = defaultSettings;
+            }
+        }
+    }
+}

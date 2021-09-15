@@ -20,52 +20,40 @@ namespace JumpKingMod.Entities
     /// </summary>
     public class UITextEntity : Entity, IDisposable
     {
-        private readonly Func<Vector2> screenSpacePositionGetter;
-        private readonly Vector2? screenSpacePosition;
-        private readonly Func<string> textValueGetter;
-        private readonly string textValue;
-        private readonly Color textColor;
-        private readonly SpriteFont textFont;
+        public Vector2 ScreenSpacePosition { get; set; }
+        public string TextValue { get; set; }
+        public Color TextColor { get; set; }
+        public SpriteFont TextFont { get; set; }
+        public UITextEntityAnchor AnchorPoint { get; set; }
 
         /// <summary>
-        /// Ctor for creating a <see cref="UITextEntity"/> with a dynamic position and text value, and the default font
+        /// Ctor for creating a <see cref="UITextEntity"/> with a position and text value, and the default font
         /// </summary>
-        /// <param name="screenSpacePositionGetter">A Function which returns the screen space position to draw the text</param>
-        /// <param name="textValueGetter">A function which returns the string to draw on the screen</param>
+        /// <param name="screenSpacePosition">The position to draw the text at</param>
+        /// <param name="textValue">The value to display as text</param>
         /// <param name="textColor">The <see cref="Color"/> to draw the text in</param>
-        public UITextEntity(Func<Vector2> screenSpacePositionGetter, Func<string> textValueGetter, Color textColor)
-            : this(screenSpacePositionGetter, textValueGetter, textColor, JKContentManager.Font.MenuFontSmall)
+        /// <param name="anchorPoint">An enum of possible anchor points of where the position is relative to the text</param>
+        public UITextEntity(Vector2 screenSpacePosition, string textValue, Color textColor, UITextEntityAnchor anchorPoint)
+            : this(screenSpacePosition, textValue, textColor, anchorPoint, JKContentManager.Font.MenuFont)
         {
-
         }
 
-        /// <summary>
-        /// Ctor for creating a <see cref="UITextEntity"/> with a dynamic position and text value, and a specified font
-        /// </summary>
-        /// <param name="screenSpacePositionGetter">A Function which returns the screen space position to draw the text</param>
-        /// <param name="textValueGetter">A function which returns the string to draw on the screen</param>
-        /// <param name="textColor">The <see cref="Color"/> to draw the text in</param>
-        /// <param name="textFont">The <see cref="SpriteFont"/> to use for drawing the text</param>
-        public UITextEntity(Func<Vector2> screenSpacePositionGetter, Func<string> textValueGetter, Color textColor, SpriteFont textFont) :
-            this(screenSpacePosition: null, textValue: null, textColor, textFont)
-        {
-            this.screenSpacePositionGetter = screenSpacePositionGetter ?? throw new ArgumentNullException(nameof(screenSpacePositionGetter));
-            this.textValueGetter = textValueGetter ?? throw new ArgumentNullException(nameof(textValueGetter));
-        }
 
         /// <summary>
-        /// Ctor for creating a <see cref="UITextEntity"/> with a static position and text value, and a specified font
+        /// Ctor for creating a <see cref="UITextEntity"/> with a position and text value, and a specified font
         /// </summary>
-        /// <param name="screenSpacePosition">The static position to draw the text at</param>
-        /// <param name="textValue">The static value to display as text</param>
+        /// <param name="screenSpacePosition">The position to draw the text at</param>
+        /// <param name="textValue">The value to display as text</param>
         /// <param name="textColor">The <see cref="Color"/> to draw the text in</param>
         /// <param name="textFont">The <see cref="SpriteFont"/> to use for drawing the text</param>
-        public UITextEntity(Vector2? screenSpacePosition, string textValue, Color textColor, SpriteFont textFont)
+        /// <param name="anchorPoint">An enum of possible anchor points of where the position is relative to the text</param>
+        public UITextEntity(Vector2 screenSpacePosition, string textValue, Color textColor, UITextEntityAnchor anchorPoint, SpriteFont textFont)
         {
-            this.screenSpacePosition = screenSpacePosition;
-            this.textValue = textValue;
-            this.textColor = textColor;
-            this.textFont = textFont ?? throw new ArgumentNullException(nameof(textFont));
+            ScreenSpacePosition = screenSpacePosition;
+            TextValue = textValue;
+            TextColor = textColor;
+            AnchorPoint = anchorPoint;
+            TextFont = textFont ?? throw new ArgumentNullException(nameof(textFont));
 
             EntityManager.instance.AddObject(this);
         }
@@ -86,11 +74,28 @@ namespace JumpKingMod.Entities
         /// </summary>
         public override void Draw()
         {
-            TextHelper.DrawString(textFont,
-                                  textValue ?? textValueGetter.Invoke(),
-                                  screenSpacePosition ?? screenSpacePositionGetter.Invoke(),
-                                  textColor,
-                                  new Vector2(0.5f, -0.5f));
+            TextHelper.DrawString(TextFont, TextValue, ScreenSpacePosition, TextColor, GetAnchorVector());
+        }
+
+        /// <summary>
+        /// Gets the appropriate anchor position based on the set <see cref="AnchorPoint"/>
+        /// </summary>
+        private Vector2 GetAnchorVector()
+        {
+            switch (AnchorPoint)
+            {
+                default:
+                case UITextEntityAnchor.Center:
+                    return new Vector2(0.5f, -0.5f);
+                case UITextEntityAnchor.BottomLeft:
+                    return new Vector2(0, 0);
+                case UITextEntityAnchor.BottomRight:
+                    return new Vector2(1, 0);
+                case UITextEntityAnchor.TopLeft:
+                    return new Vector2(0, -1);
+                case UITextEntityAnchor.TopRight:
+                    return new Vector2(1, -1);
+            }
         }
     }
 }

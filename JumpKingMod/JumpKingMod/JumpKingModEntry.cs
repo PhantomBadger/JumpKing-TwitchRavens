@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Input;
 using HarmonyLib;
 using JumpKingMod.Patching;
+using JumpKingMod.Twitch;
 using Logging;
 using Logging.API;
 
@@ -33,6 +34,9 @@ namespace JumpKingMod
                 // Free Fly Patch
                 IManualPatch freeFlyPatch = new FreeFlyManualPatch(Logger);
                 freeFlyPatch.SetUpManualPatch(harmony);
+
+                // Twitch Chat
+                TwitchChatRelay relay = new TwitchChatRelay(Logger);
             }
             catch (Exception e)
             {

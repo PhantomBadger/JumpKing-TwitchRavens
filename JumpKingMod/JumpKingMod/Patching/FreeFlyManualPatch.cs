@@ -20,7 +20,7 @@ namespace JumpKingMod.Patching
         private static bool freeFlying = false;
         private static bool freeFlyingToggleCooldown = false;
         private static ILogger logger;
-        private static List<UITextEntity> uiEntities;
+        private static UITextEntity uiEntity;
 
         /// <summary>
         /// Ctor for creating a <see cref="FreeFlyManualPatch"/>
@@ -28,7 +28,6 @@ namespace JumpKingMod.Patching
         public FreeFlyManualPatch(ILogger newLogger)
         {
             logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
-            uiEntities = new List<UITextEntity>();
         }
 
         /// <summary>
@@ -59,30 +58,13 @@ namespace JumpKingMod.Patching
                     if (freeFlying)
                     {
                         // Make a UI Object to display our position
-                        FieldInfo positionField = AccessTools.Field(__instance.GetType(), "position");
-                        uiEntities.Add(new UITextEntity(screenSpacePosition: new Vector2?(new Vector2(50, 10)), "Position Test", Color.Red, JKContentManager.Font.Tangerine));
-                        uiEntities.Add(new UITextEntity(
-                            () =>
-                            {
-                                Vector2 position = (Vector2)positionField.GetValue(__instance);
-                                return Camera.TransformVector2(position + new Vector2(0, -40f));
-                            },
-                            () =>
-                            {
-                                Vector2 position = (Vector2)positionField.GetValue(__instance);
-                                return $"({position.X}, {position.Y})";
-                            },
-                            Color.White));
+                        uiEntity = new UITextEntity(new Vector2(0, 0), "", Color.White, UITextEntityAnchor.Center);
                     }
                     else
                     {
                         // Clean up our UI Object
-                        for (int i = 0; i < uiEntities.Count; i++)
-                        {
-                            uiEntities[i]?.Dispose();
-                            uiEntities[i] = null;
-                        }
-                        uiEntities.Clear();
+                        uiEntity?.Dispose();
+                        uiEntity = null;
                     }
                 }
                 else if (Keyboard.IsKeyUp(Key.P) && freeFlyingToggleCooldown)
@@ -93,8 +75,10 @@ namespace JumpKingMod.Patching
                 // We are free flying
                 if (freeFlying)
                 {
+                    FieldInfo positionField = AccessTools.Field(__instance.GetType(), "position");
                     FieldInfo velocityField = AccessTools.Field(__instance.GetType(), "velocity");
                     Vector2 velocity = (Vector2)velocityField.GetValue(__instance);
+                    Vector2 position = (Vector2)positionField.GetValue(__instance);
                     float curX = velocity.X;
                     float curY = velocity.Y;
 
@@ -123,6 +107,9 @@ namespace JumpKingMod.Patching
                     velocity.Y = curY;
                     velocityField.SetValue(__instance, velocity);
                     logger.Information($"Setting velocity to {velocity.ToString()}");
+
+                    uiEntity.ScreenSpacePosition = Camera.TransformVector2(position + new Vector2(0, -50f));
+                    uiEntity.TextValue = $"({position.X}, {position.Y})";
                 }
             }
             catch (Exception e)

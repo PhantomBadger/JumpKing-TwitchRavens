@@ -1,4 +1,6 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using JumpKingMod.Settings;
+using Logging;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,15 +16,21 @@ namespace JumpKingMod.Install.UI
 {
     public partial class InstallerForm : Form
     {
-        private readonly UserSettings userSettings;
+        private readonly UserSettings installerSettings;
 
         private const string ExpectedModDllName = "JumpKingMod.dll";
         private const string ExpectedFrameworkDllName = "MonoGame.Framework.dll";
+        private const string InstallerSettingsFileName = "JumpKingInstaller.settings";
+        private readonly Dictionary<string, string> DefaultUserSettings = new Dictionary<string, string>()
+        {
+            { "InstallDir", "" },
+            { "ModDir", "" }
+        };
 
         public InstallerForm()
         {
             InitializeComponent();
-            userSettings = new UserSettings();
+            installerSettings = new UserSettings(InstallerSettingsFileName, DefaultUserSettings, new ConsoleLogger());
         }
 
         /// <summary>
@@ -52,7 +60,7 @@ namespace JumpKingMod.Install.UI
             txtModDir.TextChanged += CheckValidDirectories;
 
             // Load the settings
-            string lastInstallDir = userSettings.GetSetting("InstallDir", string.Empty);
+            string lastInstallDir = installerSettings.GetSettingOrDefault("InstallDir", string.Empty);
 
             if (string.IsNullOrWhiteSpace(lastInstallDir))
             {
@@ -69,7 +77,7 @@ namespace JumpKingMod.Install.UI
                 txtInstallDir.Text = lastInstallDir;
             }
 
-            string lastModDir = userSettings.GetSetting("ModDir", string.Empty);
+            string lastModDir = installerSettings.GetSettingOrDefault("ModDir", string.Empty);
             txtModDir.Text = lastModDir;
         }
 
@@ -80,8 +88,8 @@ namespace JumpKingMod.Install.UI
         /// <param name="e"></param>
         private void InstallerForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            userSettings.SetSetting("InstallDir", txtInstallDir.Text);
-            userSettings.SetSetting("ModDir", txtModDir.Text);
+            installerSettings.SetOrCreateSetting("InstallDir", txtInstallDir.Text);
+            installerSettings.SetOrCreateSetting("ModDir", txtModDir.Text);
         }
 
         /// <summary>

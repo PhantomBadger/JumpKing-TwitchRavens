@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingMod.Install.UI", "J
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer", "Installer", "{EB64DA4F-F368-4172-9BA1-13557860005A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Settings", "Settings\Settings.csproj", "{D9C89840-A346-4334-99F2-CF323015C206}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{CE83A7E4-4352-413E-8027-D69BB18E5EED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE83A7E4-4352-413E-8027-D69BB18E5EED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE83A7E4-4352-413E-8027-D69BB18E5EED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9C89840-A346-4334-99F2-CF323015C206}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9C89840-A346-4334-99F2-CF323015C206}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9C89840-A346-4334-99F2-CF323015C206}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9C89840-A346-4334-99F2-CF323015C206}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
