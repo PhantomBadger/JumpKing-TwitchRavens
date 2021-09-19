@@ -2,6 +2,7 @@
 using HarmonyLib;
 using JumpKing;
 using JumpKing.Util;
+using JumpKing.Util.Tags;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -18,13 +19,22 @@ namespace JumpKingMod.Entities
     /// registers itself with the entity manager, and draws a set piece of text to the screen
     /// every draw call
     /// </summary>
-    public class UITextEntity : Entity, IDisposable
+    public class UITextEntity : Entity, IDisposable, IForeground
     {
         public Vector2 ScreenSpacePosition { get; set; }
         public string TextValue { get; set; }
         public Color TextColor { get; set; }
         public SpriteFont TextFont { get; set; }
         public UITextEntityAnchor AnchorPoint { get; set; }
+        public Vector2 Size
+        {
+            get
+            {
+                return TextFont?.MeasureString(TextValue) ?? new Vector2(0, 0);
+            }
+        }
+
+        private readonly ModEntityManager modEntityManager;
 
         /// <summary>
         /// Ctor for creating a <see cref="UITextEntity"/> with a position and text value, and the default font
@@ -33,8 +43,8 @@ namespace JumpKingMod.Entities
         /// <param name="textValue">The value to display as text</param>
         /// <param name="textColor">The <see cref="Color"/> to draw the text in</param>
         /// <param name="anchorPoint">An enum of possible anchor points of where the position is relative to the text</param>
-        public UITextEntity(Vector2 screenSpacePosition, string textValue, Color textColor, UITextEntityAnchor anchorPoint)
-            : this(screenSpacePosition, textValue, textColor, anchorPoint, JKContentManager.Font.MenuFont)
+        public UITextEntity(ModEntityManager modEntityManager, Vector2 screenSpacePosition, string textValue, Color textColor, UITextEntityAnchor anchorPoint)
+            : this(modEntityManager, screenSpacePosition, textValue, textColor, anchorPoint, JKContentManager.Font.MenuFont)
         {
         }
 
@@ -47,15 +57,17 @@ namespace JumpKingMod.Entities
         /// <param name="textColor">The <see cref="Color"/> to draw the text in</param>
         /// <param name="textFont">The <see cref="SpriteFont"/> to use for drawing the text</param>
         /// <param name="anchorPoint">An enum of possible anchor points of where the position is relative to the text</param>
-        public UITextEntity(Vector2 screenSpacePosition, string textValue, Color textColor, UITextEntityAnchor anchorPoint, SpriteFont textFont)
+        public UITextEntity(ModEntityManager modEntityManager, Vector2 screenSpacePosition, string textValue, Color textColor, UITextEntityAnchor anchorPoint, SpriteFont textFont)
         {
+            this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
+
             ScreenSpacePosition = screenSpacePosition;
             TextValue = textValue;
             TextColor = textColor;
             AnchorPoint = anchorPoint;
             TextFont = textFont ?? throw new ArgumentNullException(nameof(textFont));
 
-            EntityManager.instance.AddObject(this);
+            modEntityManager.AddForegroundEntity(this);
         }
 
         /// <summary>
@@ -64,17 +76,8 @@ namespace JumpKingMod.Entities
         /// </summary>
         public void Dispose()
         {
-            EntityManager.instance.RemoveObject(this);
+            modEntityManager.RemoveForegroundEntity(this);
             this.Destroy();
-        }
-
-        /// <summary>
-        /// Called by the Entity Manager in the draw loop, uses <see cref="TextHelper.DrawString(SpriteFont, string, Vector2, Color, Vector2)"/> to render
-        /// text to the screen
-        /// </summary>
-        public override void Draw()
-        {
-            TextHelper.DrawString(TextFont, TextValue, ScreenSpacePosition, TextColor, GetAnchorVector());
         }
 
         /// <summary>
@@ -96,6 +99,15 @@ namespace JumpKingMod.Entities
                 case UITextEntityAnchor.TopRight:
                     return new Vector2(1, -1);
             }
+        }
+
+        /// <summary>
+        /// Called by the Entity Manager in the draw loop, uses <see cref="TextHelper.DrawString(SpriteFont, string, Vector2, Color, Vector2)"/> to render
+        /// text to the screen
+        /// </summary>
+        public void ForegroundDraw()
+        {
+            TextHelper.DrawString(TextFont, TextValue, ScreenSpacePosition, TextColor, GetAnchorVector());
         }
     }
 }

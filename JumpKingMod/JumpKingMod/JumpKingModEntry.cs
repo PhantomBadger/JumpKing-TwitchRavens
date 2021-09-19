@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using HarmonyLib;
+using JumpKingMod.Entities;
 using JumpKingMod.Patching;
 using JumpKingMod.Twitch;
 using Logging;
@@ -31,12 +32,21 @@ namespace JumpKingMod
                 Harmony harmony = new Harmony("com.phantombadger.jumpkingmod");
                 harmony.PatchAll();
 
+                // Set up observer
+                GameStateObserverManualPatch gameStateObserver = new GameStateObserverManualPatch(Logger);
+                gameStateObserver.SetUpManualPatch(harmony);
+
+                // Make our Mod Entity Manager and patch it
+                ModEntityManager modEntityManager = new ModEntityManager();
+                IManualPatch modEntityManagerPatch = new ModEntityManagerManualPatch(modEntityManager);
+                modEntityManagerPatch.SetUpManualPatch(harmony);
+                
                 // Free Fly Patch
-                IManualPatch freeFlyPatch = new FreeFlyManualPatch(Logger);
+                IManualPatch freeFlyPatch = new FreeFlyManualPatch(modEntityManager, Logger);
                 freeFlyPatch.SetUpManualPatch(harmony);
 
                 // Twitch Chat
-                TwitchChatRelay relay = new TwitchChatRelay(Logger);
+                TwitchChatRelay relay = new TwitchChatRelay(modEntityManager, gameStateObserver, Logger);
             }
             catch (Exception e)
             {

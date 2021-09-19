@@ -21,13 +21,15 @@ namespace JumpKingMod.Patching
         private static bool freeFlyingToggleCooldown = false;
         private static ILogger logger;
         private static UITextEntity uiEntity;
+        private static ModEntityManager modEntityManager;
 
         /// <summary>
         /// Ctor for creating a <see cref="FreeFlyManualPatch"/>
         /// </summary>
-        public FreeFlyManualPatch(ILogger newLogger)
+        public FreeFlyManualPatch(ModEntityManager newModEntityManager, ILogger newLogger)
         {
             logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
+            modEntityManager = newModEntityManager ?? throw new ArgumentNullException(nameof(newModEntityManager));
         }
 
         /// <summary>
@@ -58,7 +60,7 @@ namespace JumpKingMod.Patching
                     if (freeFlying)
                     {
                         // Make a UI Object to display our position
-                        uiEntity = new UITextEntity(new Vector2(0, 0), "", Color.White, UITextEntityAnchor.Center);
+                        uiEntity = new UITextEntity(modEntityManager, new Vector2(0, 0), "", Color.White, UITextEntityAnchor.Center);
                     }
                     else
                     {
