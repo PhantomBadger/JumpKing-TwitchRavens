@@ -18,7 +18,7 @@ namespace JumpKingMod.Install.UI
     {
         private readonly UserSettings installerSettings;
 
-        private const string ExpectedModDllName = "JumpKingMod.dll";
+        private const string ExpectedModDllName = "JumpKingModLoader.dll";
         private const string ExpectedFrameworkDllName = "MonoGame.Framework.dll";
         private const string InstallerSettingsFileName = "JumpKingInstaller.settings";
         private readonly Dictionary<string, string> DefaultUserSettings = new Dictionary<string, string>()
@@ -129,7 +129,7 @@ namespace JumpKingMod.Install.UI
             string modDllPath = Path.Combine(txtModDir.Text, ExpectedModDllName);
             ModEntrySettings modEntrySettings = new ModEntrySettings()
             {
-                EntryClassTypeName = "JumpKingMod.JumpKingModEntry",
+                EntryClassTypeName = "JumpKingModLoader.Loader",
                 EntryMethodName = "Init"
             };
             bool result = installer.InstallMod(frameworkDllPath, modDllPath, modEntrySettings, out string error);

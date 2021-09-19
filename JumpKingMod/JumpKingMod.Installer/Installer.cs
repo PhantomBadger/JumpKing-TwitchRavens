@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,38 +48,65 @@ namespace JumpKingMod.Install
                         return false;
                     }
 
-                    // And also a reference to the function we want to call for our mod entry
-                    ModuleDefinition entryModule = ModuleDefinition.ReadModule(modDLLPath);
-                    TypeDefinition entryType = entryModule?.GetType(modEntrySettings.EntryClassTypeName);
-                    MethodDefinition entryMethodDef = entryType?.Methods.FirstOrDefault((MethodDefinition md) => md.Name.Equals(modEntrySettings.EntryMethodName));
-                    if (entryMethodDef == null)
+                    // Get a reference to the assembly load function we want to use
+                    ModuleDefinition runtimeModule = ModuleDefinition.ReadModule(typeof(Assembly).Assembly.Location);
+                    ModuleDefinition systemModule = ModuleDefinition.ReadModule(typeof(Type).Assembly.Location);
+                    TypeDefinition assemblyType = runtimeModule?.GetType(typeof(Assembly).FullName);
+                    TypeDefinition typeType = systemModule?.GetType(typeof(Type).FullName);
+                    TypeDefinition methodBaseType = runtimeModule?.GetType(typeof(MethodBase).FullName);
+                    MethodDefinition loadFromMethodDef = assemblyType?.Methods.FirstOrDefault((MethodDefinition md) => md.Name.Equals("LoadFrom") && md.Parameters.Count == 1);
+                    MethodDefinition getTypeMethodDef = assemblyType?.Methods.FirstOrDefault((MethodDefinition md) => md.Name.Equals("GetType") && md.Parameters.Count == 1);
+                    MethodDefinition getMethodMethodDef = typeType?.Methods.FirstOrDefault((MethodDefinition md) => md.Name.Equals("GetMethod") && md.Parameters.Count == 1);
+                    MethodDefinition invokeMethodDef = methodBaseType?.Methods.FirstOrDefault((MethodDefinition md) => md.Name.Equals("Invoke") && md.Parameters.Count == 2);
+                    if (loadFromMethodDef == null || getTypeMethodDef == null)
                     {
-                        error = $"Unable to find the Mod Entry Method '{modEntrySettings.EntryMethodName}' in the '{modEntrySettings.EntryClassTypeName}' class within the provided '{modDLLPath}' DLL";
+                        error = $"Unable to find the Assembly.LoadFrom method within the System.Runtime.dll";
                         return false;
                     }
 
                     // We need to tell the Framework DLL to import a reference to our Entry Method, otherwise it won't be able to call it
-                    var entryMethodRef = module.ImportReference(entryMethodDef);
+                    var loadFromMethodRef = module.ImportReference(loadFromMethodDef);
+                    var getTypeMethodRef = module.ImportReference(getTypeMethodDef);
+                    var getMethodMethodRef = module.ImportReference(getMethodMethodDef);
+                    var invokeMethodRef = module.ImportReference(invokeMethodDef);
 
-                    // Create the IL code we need to run our entry method
+                    // Create the IL code we need to load our DLL at a specified location then call our entry method
                     ILProcessor ilProcessor = methodDef.Body.GetILProcessor();
-                    Instruction callInstruction = ilProcessor.Create(OpCodes.Call, entryMethodRef);
+                    Instruction loadFromArgInstruction = ilProcessor.Create(OpCodes.Ldstr, modDLLPath);
+                    Instruction loadFromCallInstruction = ilProcessor.Create(OpCodes.Call, loadFromMethodRef);
+                    Instruction getTypeArgInstruction = ilProcessor.Create(OpCodes.Ldstr, modEntrySettings.EntryClassTypeName);
+                    Instruction getTypeCallInstruction = ilProcessor.Create(OpCodes.Call, getTypeMethodRef);
+                    Instruction getMethodArgInstruction = ilProcessor.Create(OpCodes.Ldstr, modEntrySettings.EntryMethodName);
+                    Instruction getMethodCallInstruction = ilProcessor.Create(OpCodes.Call, getMethodMethodRef);
+                    Instruction invokeArgInstruction = ilProcessor.Create(OpCodes.Ldnull);
+                    Instruction invokeCallInstruction = ilProcessor.Create(OpCodes.Call, invokeMethodRef);
+                    Instruction popInstruction = ilProcessor.Create(OpCodes.Pop);
+                    //Instruction entryCallInstruction = ilProcessor.Create(OpCodes.Call, entryCallMethod);
 
                     // Get a reference to the first instruction in the function and add our method call to just before it.
                     Instruction firstInstruction = methodDef.Body.Instructions[0];
-                    if (firstInstruction.OpCode.Equals(callInstruction.OpCode))
+                    if (firstInstruction.OpCode.Equals(loadFromArgInstruction.OpCode))
                     {
-                        MethodReference firstOperand = firstInstruction.Operand as MethodReference;
-                        MethodReference callOperand = callInstruction.Operand as MethodReference;
+                        string firstOperand = firstInstruction.Operand as string;
+                        string callOperand = loadFromArgInstruction.Operand as string;
 
-                        if (firstOperand.FullName.Equals(callOperand.FullName, StringComparison.OrdinalIgnoreCase))
+                        if (firstOperand.Equals(callOperand, StringComparison.OrdinalIgnoreCase))
                         {
                             // The mod is already installed!
                             error = "Unable to Install Mod - The mod has already been installed!";
                             return false;
                         }
                     }
-                    ilProcessor.InsertBefore(firstInstruction, callInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, loadFromArgInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, loadFromCallInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, getTypeArgInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, getTypeCallInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, getMethodArgInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, getMethodCallInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, invokeArgInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, invokeArgInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, invokeCallInstruction);
+                    ilProcessor.InsertBefore(firstInstruction, popInstruction);
 
                     // Recompute any offsets required for methods in the framework DLL
                     ComputeOffsets(methodDef.Body);
