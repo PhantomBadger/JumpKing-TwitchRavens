@@ -3,6 +3,7 @@ using HarmonyLib;
 using JumpKing;
 using JumpKing.Util;
 using JumpKing.Util.Tags;
+using JumpKingMod.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -19,7 +20,7 @@ namespace JumpKingMod.Entities
     /// registers itself with the entity manager, and draws a set piece of text to the screen
     /// every draw call
     /// </summary>
-    public class UITextEntity : Entity, IDisposable, IForeground
+    public class UITextEntity : IDisposable, IForegroundModEntity
     {
         public Vector2 ScreenSpacePosition { get; set; }
         public string TextValue { get; set; }
@@ -77,7 +78,6 @@ namespace JumpKingMod.Entities
         public void Dispose()
         {
             modEntityManager.RemoveForegroundEntity(this);
-            this.Destroy();
         }
 
         /// <summary>

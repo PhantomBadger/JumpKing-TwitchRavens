@@ -9,6 +9,7 @@ using JumpKing;
 using EntityComponent;
 using JumpKingMod.Entities;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JumpKingMod.Patching
 {
@@ -22,6 +23,10 @@ namespace JumpKingMod.Patching
         private static ILogger logger;
         private static UITextEntity uiEntity;
         private static ModEntityManager modEntityManager;
+        private static Random random;
+        private static DateTime lastSpawnedTime;
+
+        private const int millisecondTimeout = 50;
 
         /// <summary>
         /// Ctor for creating a <see cref="FreeFlyManualPatch"/>
@@ -30,6 +35,8 @@ namespace JumpKingMod.Patching
         {
             logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
             modEntityManager = newModEntityManager ?? throw new ArgumentNullException(nameof(newModEntityManager));
+            random = new Random();
+            lastSpawnedTime = DateTime.Now;
         }
 
         /// <summary>
@@ -86,6 +93,22 @@ namespace JumpKingMod.Patching
 
                     curX = 0;
                     curY = 0;
+
+                    // Dumb joke code that insults you whenever you go down
+                    //if (curY > 0.5)
+                    //{
+                    //    DateTime curTime = DateTime.Now;
+                    //    if ((curTime - lastSpawnedTime).TotalMilliseconds > millisecondTimeout)
+                    //    {
+                    //        UITextEntity tempEntity = new UITextEntity(modEntityManager, new Vector2(random.Next(10, 400), random.Next(10, 400)), "OMEGADOWN", Color.White, UITextEntityAnchor.BottomLeft);
+                    //        Task.Run(() =>
+                    //        {
+                    //            Task.Delay(1000).Wait();
+                    //            tempEntity.Dispose();
+                    //        });
+                    //        lastSpawnedTime = curTime;
+                    //    }
+                    //}
 
                     // Modify velocity if key is held
                     if (Keyboard.IsKeyDown(Key.W))

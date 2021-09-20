@@ -1,5 +1,6 @@
 ﻿using EntityComponent;
 using JumpKing.Util.Tags;
+using JumpKingMod.API;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,30 +17,30 @@ namespace JumpKingMod.Entities
     /// </summary>
     public class ModEntityManager
     {
-        private readonly ConcurrentDictionary<Entity, byte> entities;
-        private readonly ConcurrentDictionary<IForeground, byte> foregroundEntities;
+        private readonly ConcurrentDictionary<IModEntity, byte> entities;
+        private readonly ConcurrentDictionary<IForegroundModEntity, byte> foregroundEntities;
 
         /// <summary>
         /// Default ctor for creating a <see cref="ModEntityManager"/>
         /// </summary>
         public ModEntityManager()
         {
-            entities = new ConcurrentDictionary<Entity, byte>();
-            foregroundEntities = new ConcurrentDictionary<IForeground, byte>();
+            entities = new ConcurrentDictionary<IModEntity, byte>();
+            foregroundEntities = new ConcurrentDictionary<IForegroundModEntity, byte>();
         }
 
         /// <summary>
-        /// Registers an <see cref="Entity"/> with this entity manager
+        /// Registers an <see cref="IModEntity"/> with this entity manager
         /// </summary>
-        public bool AddEntity(Entity entity)
+        public bool AddEntity(IModEntity entity)
         {
             return entities.TryAdd(entity, 0);
         }
 
         /// <summary>
-        /// Registers a <see cref="IForeground"/> entity with this entity manager
+        /// Registers a <see cref="IForegroundModEntity"/> entity with this entity manager
         /// </summary>
-        public bool AddForegroundEntity(IForeground foregroundEntity)
+        public bool AddForegroundEntity(IForegroundModEntity foregroundEntity)
         {
             return foregroundEntities.TryAdd(foregroundEntity, 0);
         }
@@ -47,15 +48,15 @@ namespace JumpKingMod.Entities
         /// <summary>
         /// Tries to remove an <see cref="Entity"/> from this entity manager
         /// </summary>
-        public bool RemoveEntity(Entity entity)
+        public bool RemoveEntity(IModEntity entity)
         {
             return entities.TryRemove(entity, out _);
         }
 
         /// <summary>
-        /// Tries to remove an <see cref="IForeground"/> entity from this entity manager
+        /// Tries to remove an <see cref="IForegroundModEntity"/> entity from this entity manager
         /// </summary>
-        public bool RemoveForegroundEntity(IForeground foregroundEntity)
+        public bool RemoveForegroundEntity(IForegroundModEntity foregroundEntity)
         {
             return foregroundEntities.TryRemove(foregroundEntity, out _);
         }
@@ -65,9 +66,10 @@ namespace JumpKingMod.Entities
         /// </summary>
         public void Draw()
         {
-            foreach(var entity in entities)
+            var enumerator = entities.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-                entity.Key.Draw();
+                enumerator.Current.Key?.Draw();
             }
         }
 
@@ -76,9 +78,10 @@ namespace JumpKingMod.Entities
         /// </summary>
         public void DrawForeground()
         {
-            foreach (var foregroundEntity in foregroundEntities)
+            var enumerator = foregroundEntities.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-                foregroundEntity.Key.ForegroundDraw();
+                enumerator.Current.Key?.ForegroundDraw();
             }
         }
     }
