@@ -23,10 +23,10 @@ namespace JumpKingMod.Patching
         private static ILogger logger;
         private static UITextEntity uiEntity;
         private static ModEntityManager modEntityManager;
-        private static Random random;
-        private static DateTime lastSpawnedTime;
+        //private static Random random;
+        //private static DateTime lastSpawnedTime;
 
-        private const int millisecondTimeout = 50;
+        //private const int millisecondTimeout = 50;
 
         /// <summary>
         /// Ctor for creating a <see cref="FreeFlyManualPatch"/>
@@ -91,16 +91,29 @@ namespace JumpKingMod.Patching
                     float curX = velocity.X;
                     float curY = velocity.Y;
 
-                    curX = 0;
-                    curY = 0;
-
-                    // Dumb joke code that insults you whenever you go down
+                    //Dumb joke code that insults you whenever you go down
                     //if (curY > 0.5)
                     //{
+                    //    string[] insults = new string[]
+                    //    {
+                    //        "lmao",
+                    //        "OMEGADOWN",
+                    //        "LOL",
+                    //        "Fall King",
+                    //        "fucking idiot",
+                    //        "lmfao",
+                    //        "back to the old man",
+                    //        "LETS GOOOO",
+                    //        "stop playing",
+                    //        "you suck",
+                    //        "KEKW",
+                    //        ":(",
+                    //        "YEP FALL",
+                    //    };
                     //    DateTime curTime = DateTime.Now;
                     //    if ((curTime - lastSpawnedTime).TotalMilliseconds > millisecondTimeout)
                     //    {
-                    //        UITextEntity tempEntity = new UITextEntity(modEntityManager, new Vector2(random.Next(10, 400), random.Next(10, 400)), "OMEGADOWN", Color.White, UITextEntityAnchor.BottomLeft);
+                    //        UITextEntity tempEntity = new UITextEntity(modEntityManager, new Vector2(random.Next(10, 400), random.Next(10, 400)), insults[random.Next(0, insults.Length)], Color.White, UITextEntityAnchor.BottomLeft);
                     //        Task.Run(() =>
                     //        {
                     //            Task.Delay(1000).Wait();
@@ -109,6 +122,9 @@ namespace JumpKingMod.Patching
                     //        lastSpawnedTime = curTime;
                     //    }
                     //}
+
+                    curX = 0;
+                    curY = 0;
 
                     // Modify velocity if key is held
                     if (Keyboard.IsKeyDown(Key.W))
