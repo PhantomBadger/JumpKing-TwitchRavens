@@ -13,6 +13,7 @@ namespace JumpKingMod.API
     public interface IGameStateObserver
     {
         ManualResetEvent GameInitializedLatch { get; }
+        ManualResetEvent AssetsLoadedLatch { get; }
 
         /// <summary>
         /// Returns true if the game has initialised it's core systems
@@ -23,5 +24,10 @@ namespace JumpKingMod.API
         /// Returns true if the game loop is running (ie, we're not in the menu)
         /// </summary>
         bool IsGameLoopRunning();
+
+        /// <summary>
+        /// Returns true if the games assets have been loaded
+        /// </summary>
+        bool AreGameAssetsLoaded();
     }
 }

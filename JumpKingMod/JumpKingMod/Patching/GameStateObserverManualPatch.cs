@@ -19,11 +19,15 @@ namespace JumpKingMod.Patching
     /// </summary>
     public class GameStateObserverManualPatch : IManualPatch, IGameStateObserver
     {
-        private readonly ILogger logger;
+        private static ILogger logger;
         private static bool isGameInitialized;
+        private static bool areGameAssetsLoaded;
         private static object gameLoopObject;
         private static MethodInfo gameLoopIsRunningMethodInfo;
 
+        /// <summary>
+        /// A latch which lets you wait until the game has been initialised
+        /// </summary>
         public ManualResetEvent GameInitializedLatch
         {
             get
@@ -34,13 +38,27 @@ namespace JumpKingMod.Patching
         private static ManualResetEvent gameInitializedLatch;
 
         /// <summary>
+        /// A latch which lets you wait until the game has loaded assets
+        /// </summary>
+        public ManualResetEvent AssetsLoadedLatch
+        {
+            get
+            {
+                return assetsLoadedLatch;
+            }
+        }
+        private static ManualResetEvent assetsLoadedLatch;
+
+        /// <summary>
         /// Default ctor for creating a <see cref="GameStateObserverManualPatch"/>, initialises the states
         /// </summary>
-        public GameStateObserverManualPatch(ILogger logger)
+        public GameStateObserverManualPatch(ILogger newLogger)
         {
             gameInitializedLatch = new ManualResetEvent(false);
+            assetsLoadedLatch = new ManualResetEvent(false);
             isGameInitialized = false;
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            areGameAssetsLoaded = false;
+            logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
         }
 
         /// <summary>
@@ -60,15 +78,28 @@ namespace JumpKingMod.Patching
         }
 
         /// <summary>
+        /// Returns true if the game has loaded its assets
+        /// </summary>
+        /// <returns></returns>
+        public bool AreGameAssetsLoaded()
+        {
+            return areGameAssetsLoaded;
+        }
+
+        /// <summary>
         /// Sets up the manual patch to query the game states
         /// </summary>
         public void SetUpManualPatch(Harmony harmony)
         {
             try
             {
-                var method = AccessTools.Method("JumpKing.JumpGame:MakeBT");
-                var prefixMethod = AccessTools.Method($"JumpKingMod.Patching.{this.GetType().Name}:PostfixPatchMethod");
-                harmony.Patch(method, postfix: new HarmonyMethod(prefixMethod));
+                var makeBTMethod = AccessTools.Method("JumpKing.JumpGame:MakeBT");
+                var postfixBTPatchMethod = AccessTools.Method($"JumpKingMod.Patching.{this.GetType().Name}:PostfixMakeBTPatchMethod");
+                harmony.Patch(makeBTMethod, postfix: new HarmonyMethod(postfixBTPatchMethod));
+
+                var loadAssetsMethod = AccessTools.Method("JumpKing.JKContentManager:LoadAssets");
+                var postfixLoadAssetsMethod = AccessTools.Method($"JumpKingMod.Patching.{this.GetType().Name}:PostfixLoadAssetsPatchMethod");
+                harmony.Patch(loadAssetsMethod, postfix: new HarmonyMethod(postfixLoadAssetsMethod));
             }
             catch (Exception e)
             {
@@ -77,9 +108,11 @@ namespace JumpKingMod.Patching
         }
 
         /// <summary>
-        /// Called after the JumpGame ctor
+        /// Called after the JumpGame.MakeBT
+        /// Sets the latch and local var
+        /// Gets a reference to the game loop for querying
         /// </summary>
-        public static void PostfixPatchMethod(object __instance)
+        public static void PostfixMakeBTPatchMethod(object __instance)
         {
             isGameInitialized = true;
             gameInitializedLatch?.Set();
@@ -87,6 +120,20 @@ namespace JumpKingMod.Patching
             var gameLoopField = AccessTools.Field(__instance.GetType(), "m_game_loop");
             gameLoopObject = gameLoopField.GetValue(__instance);
             gameLoopIsRunningMethodInfo = gameLoopObject?.GetType().GetMethod("IsRunning");
+
+            logger.Information($"Base Game has finished calling JumpGame.MakeBT!");
+        }
+
+        /// <summary>
+        /// Called after JKContentManager.LoadAssets
+        /// Sets the latch and local var
+        /// </summary>
+        public static void PostfixLoadAssetsPatchMethod(object __instance)
+        {
+            areGameAssetsLoaded = true;
+            assetsLoadedLatch?.Set();
+
+            logger.Information($"Base Game has finished calling JKContentManager.LoadAssets!");
         }
     }
 }
