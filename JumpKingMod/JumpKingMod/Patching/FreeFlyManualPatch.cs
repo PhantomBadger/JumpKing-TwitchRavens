@@ -36,6 +36,9 @@ namespace JumpKingMod.Patching
         {
             logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
             modEntityManager = newModEntityManager ?? throw new ArgumentNullException(nameof(newModEntityManager));
+
+            //random = new Random();
+            //lastSpawnedTime = DateTime.Now;
         }
 
         /// <summary>
@@ -111,6 +114,15 @@ namespace JumpKingMod.Patching
                     //        "KEKW",
                     //        ":(",
                     //        "YEP FALL",
+                    //        "Imagine being EU",
+                    //        "Deez Nuts",
+                    //        "Get got",
+                    //        "kek wow",
+                    //        "Almost as bad as Fost",
+                    //        "THIS DUDE",
+                    //        "ravenJAM",
+                    //        "CinnaMoment",
+                    //        "Hi YouTube",
                     //    };
                     //    DateTime curTime = DateTime.Now;
                     //    if ((curTime - lastSpawnedTime).TotalMilliseconds > millisecondTimeout)
@@ -127,7 +139,6 @@ namespace JumpKingMod.Patching
 
                     curX = 0;
                     curY = 0;
-
 
                     // Modify velocity if key is held
                     if (Keyboard.IsKeyDown(Key.W))
