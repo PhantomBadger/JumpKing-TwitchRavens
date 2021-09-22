@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 namespace JumpKingMod.API
 {
     /// <summary>
-    /// An interface representing a custom entity used by the mod
+    /// An interface representing a component attached to an <see cref="IModEntity"/>
     /// </summary>
-    public interface IModEntity
+    public interface IModComponent
     {
-        void Draw();
-
-        void Update(float p_delta);
+        void Update(float delta);
     }
 }

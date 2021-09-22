@@ -84,5 +84,23 @@ namespace JumpKingMod.Entities
                 enumerator.Current.Key?.ForegroundDraw();
             }
         }
+
+        /// <summary>
+        /// Calls the update method on each entity
+        /// </summary>
+        public void Update(float delta)
+        {
+            var entityEnumerator = entities.GetEnumerator();
+            while (entityEnumerator.MoveNext())
+            {
+                entityEnumerator.Current.Key?.Update(delta);
+            }
+
+            var foregroundEntityEnumerator = foregroundEntities.GetEnumerator();
+            while (foregroundEntityEnumerator.MoveNext())
+            {
+                foregroundEntityEnumerator.Current.Key?.Update(delta);
+            }
+        }
     }
 }

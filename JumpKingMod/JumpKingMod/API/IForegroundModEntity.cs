@@ -12,5 +12,7 @@ namespace JumpKingMod.API
     public interface IForegroundModEntity
     {
         void ForegroundDraw();
+
+        void Update(float p_delta);
     }
 }

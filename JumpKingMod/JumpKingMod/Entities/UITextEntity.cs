@@ -109,5 +109,13 @@ namespace JumpKingMod.Entities
         {
             TextHelper.DrawString(TextFont, TextValue, ScreenSpacePosition, TextColor, GetAnchorVector());
         }
+
+        /// <summary>
+        /// Update method, do nothing
+        /// </summary>
+        public void Update(float delta)
+        {
+            // Do Nothing
+        }
     }
 }

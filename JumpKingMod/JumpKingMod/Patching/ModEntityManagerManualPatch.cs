@@ -24,12 +24,16 @@ namespace JumpKingMod.Patching
         public void SetUpManualPatch(Harmony harmony)
         {
             var entityManagerDrawMethod = AccessTools.Method("EntityComponent.EntityManager:Draw");
-            var modEntityManageDrawMethod = this.GetType().GetMethod("DrawWrapper");
+            var modEntityDrawMethod = this.GetType().GetMethod("DrawWrapper");
 
             var jumpKingGameDrawMethod = AccessTools.Method("JumpKing.JumpGame:Draw");
             var modEntityForegroundDrawMethod = this.GetType().GetMethod("ForegroundDrawWrapper");
 
-            harmony.Patch(entityManagerDrawMethod, postfix: new HarmonyMethod(modEntityManageDrawMethod));
+            var entityManagerUpdateMethod = AccessTools.Method("EntityComponent.EntityManager:Update");
+            var modEntityUpdateMethod = this.GetType().GetMethod("UpdateWrapper");
+
+            harmony.Patch(entityManagerDrawMethod, postfix: new HarmonyMethod(modEntityDrawMethod));
+            harmony.Patch(entityManagerUpdateMethod, postfix: new HarmonyMethod(modEntityUpdateMethod));
             harmony.Patch(jumpKingGameDrawMethod, postfix: new HarmonyMethod(modEntityForegroundDrawMethod));
         }
 
@@ -41,6 +45,11 @@ namespace JumpKingMod.Patching
         public static void ForegroundDrawWrapper()
         {
             modEntityManager?.DrawForeground();
+        }
+
+        public static void UpdateWrapper(float p_delta)
+        {
+            modEntityManager?.Update(p_delta);
         }
     }
 }

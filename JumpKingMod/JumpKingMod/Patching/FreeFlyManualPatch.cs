@@ -23,6 +23,7 @@ namespace JumpKingMod.Patching
         private static ILogger logger;
         private static UITextEntity uiEntity;
         private static ModEntityManager modEntityManager;
+        private static RavenEntity ravenEntity;
         //private static Random random;
         //private static DateTime lastSpawnedTime;
 
@@ -35,8 +36,6 @@ namespace JumpKingMod.Patching
         {
             logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
             modEntityManager = newModEntityManager ?? throw new ArgumentNullException(nameof(newModEntityManager));
-            random = new Random();
-            lastSpawnedTime = DateTime.Now;
         }
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace JumpKingMod.Patching
         {
             try
             {
-                if (Keyboard.IsKeyDown(Key.P) && !freeFlyingToggleCooldown)
+                if (Keyboard.IsKeyDown(Key.F1) && !freeFlyingToggleCooldown)
                 {
                     freeFlying = !freeFlying;
                     logger.Information($"Setting Free Flying to {freeFlying}");
@@ -68,11 +67,14 @@ namespace JumpKingMod.Patching
                     {
                         // Make a UI Object to display our position
                         uiEntity = new UITextEntity(modEntityManager, new Vector2(0, 0), "", Color.White, UITextEntityAnchor.Center);
+
+                        ravenEntity = new RavenEntity(modEntityManager, logger);
                     }
                     else
                     {
                         // Clean up our UI Object
                         uiEntity?.Dispose();
+                        ravenEntity?.Dispose();
                         uiEntity = null;
                     }
                 }
@@ -126,30 +128,35 @@ namespace JumpKingMod.Patching
                     curX = 0;
                     curY = 0;
 
+
                     // Modify velocity if key is held
                     if (Keyboard.IsKeyDown(Key.W))
                     {
                         curY -= 5;
+                        ravenEntity.Velocity.Y -= 3f;
                     }
                     if (Keyboard.IsKeyDown(Key.A))
                     {
                         curX -= 5;
+                        ravenEntity.Velocity.X -= 3f;
                     }
                     if (Keyboard.IsKeyDown(Key.D))
                     {
                         curX += 5;
+                        ravenEntity.Velocity.X += 3f;
                     }
                     if (Keyboard.IsKeyDown(Key.S))
                     {
                         curY += 5;
+                        ravenEntity.Velocity.Y += 3f;
                     }
 
                     velocity.X = curX;
                     velocity.Y = curY;
-                    velocityField.SetValue(__instance, velocity);
+                    //velocityField.SetValue(__instance, velocity);
                     logger.Information($"Setting velocity to {velocity.ToString()}");
 
-                    uiEntity.ScreenSpacePosition = Camera.TransformVector2(position + new Vector2(0, -50f));
+                    //uiEntity.ScreenSpacePosition = Camera.TransformVector2(position + new Vector2(0, -50f));
                     uiEntity.TextValue = $"({position.X}, {position.Y})";
                 }
             }
