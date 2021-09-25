@@ -16,8 +16,7 @@ namespace JumpKingMod.Entities.Raven.States
     {
         private readonly RavenEntity raven;
         private readonly LoopingAnimationComponent idleAnimation;
-
-        public RavenStateKey Key => RavenStateKey.Idle;
+        public IModEntityState TransitionToState;
 
         /// <summary>
         /// Constructor for creating a <see cref="RavenIdleState"/>
@@ -26,6 +25,27 @@ namespace JumpKingMod.Entities.Raven.States
         {
             this.raven = raven ?? throw new ArgumentNullException(nameof(raven));
             this.idleAnimation = idleAnimation ?? throw new ArgumentNullException(nameof(idleAnimation));
+        }
+
+        /// <summary>
+        /// Evlauates the current state, returning a new state if it changes
+        /// </summary>
+        /// <returns></returns>
+        public bool EvaluateState(out IModEntityState nextState)
+        {
+            nextState = null;
+            if (TransitionToState == null)
+            {
+                return false;
+            }
+
+            if (raven.Velocity.Length() > float.Epsilon)
+            {
+                nextState = TransitionToState;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

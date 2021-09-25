@@ -28,14 +28,13 @@ namespace JumpKingMod.Entities
         private readonly ModEntityManager modEntityManager;
         private readonly ILogger logger;
         private readonly JKContentManager.RavenSprites.RavenContent ravenContent;
-        private readonly IReadOnlyDictionary<RavenStateKey, IModEntityState> ravenStates;
         private readonly IRavenLandingPositionsCache landingPositionsCache;
 
         private LoopingAnimationComponent activeAnimation;
         private float width;
         private float height;
         private SpriteEffects spriteEffects;
-        private RavenStateKey activeState;
+        private IModEntityState activeState;
 
         /// <summary>
         /// Ctor for creating a <see cref="RavenEntity"/>
@@ -50,25 +49,11 @@ namespace JumpKingMod.Entities
             var settings = JKContentManager.RavenSprites.raven_settings;
             ravenContent = JKContentManager.RavenSprites.GetRavenContent(settings["raven"]) ?? throw new ArgumentNullException($"Unable to load animations for raven");
 
-            // Set up states
-            var idleAnimation = new LoopingAnimationComponent(ravenContent.IdleSprites, 0.1f);
-            IModEntityState idleState = new RavenIdleState(this, idleAnimation);
-
-            var flyingAnimation = new LoopingAnimationComponent(ravenContent.Fly, 0.05f);
-            IModEntityState flyingState = new RavenFlyingState(this, flyingAnimation);
+            // Initialise the state machine for the raven
+            InitialiseRavenStates();
 
             width = ravenContent.Blink.source.Width;
             height = ravenContent.Blink.source.Height;
-
-            ravenStates = new Dictionary<RavenStateKey, IModEntityState>()
-            {
-                { RavenStateKey.Idle, idleState },
-                { RavenStateKey.Flying, flyingState },
-            };
-
-            // Set the starting state
-            SetState(RavenStateKey.Idle);
-            idleState.Enter();
             spriteEffects = SpriteEffects.None;
 
             Transform = transform;
@@ -108,11 +93,12 @@ namespace JumpKingMod.Entities
                 {
                     spriteEffects &= ~SpriteEffects.FlipHorizontally;
                 }
-                SetState(RavenStateKey.Flying);
             }
-            else
+
+            // Update the states
+            if (activeState != null && activeState.EvaluateState(out IModEntityState nextState))
             {
-                SetState(RavenStateKey.Idle);
+                SetState(nextState);
             }
 
             // Update the animations
@@ -165,27 +151,35 @@ namespace JumpKingMod.Entities
         }
 
         /// <summary>
-        /// Sets the active state based on the <see cref="RavenStateKey"/>
-        /// Handles the <see cref="IModEntityState.Exit"/> and <see cref="IModEntityState.Enter"/>
-        /// calls as appropriate
+        /// Initialises the states used by the raven
         /// </summary>
-        private void SetState(RavenStateKey key)
+        private void InitialiseRavenStates()
         {
-            if (ravenStates.ContainsKey(key))
-            {
-                if (activeState != key)
-                {
-                    // Call the Enter/Exit code for the appropriate state
-                    IModEntityState newState = ravenStates[key];
-                    if (ravenStates.ContainsKey(activeState))
-                    {
-                        ravenStates[activeState].Exit();
-                    }
-                    newState.Enter();
+            // Set up states
+            var idleAnimation = new LoopingAnimationComponent(ravenContent.IdleSprites, 0.1f);
+            RavenIdleState idleState = new RavenIdleState(this, idleAnimation);
 
-                    // Update our active state
-                    activeState = key;
-                }
+            var flyingAnimation = new LoopingAnimationComponent(ravenContent.Fly, 0.05f);
+            RavenFlyingState flyingState = new RavenFlyingState(this, flyingAnimation);
+
+            idleState.TransitionToState = flyingState;
+            flyingState.TransitionToState = idleState;
+
+            SetState(idleState);
+        }
+
+        /// <summary>
+        /// Sets the active state to the one provided
+        /// </summary>
+        private void SetState(IModEntityState state)
+        {
+            if (activeState == null || activeState != state)
+            {
+                state.Enter();
+                activeState?.Exit();
+
+                // Update our active state
+                activeState = state;
             }
         }
 

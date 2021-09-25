@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace JumpKingMod.API
 {
-    interface IModEntityState
+    public interface IModEntityState
     {
-        RavenStateKey Key { get; }
-
+        bool EvaluateState(out IModEntityState nextState);
         void Enter();
         void Exit();
     }

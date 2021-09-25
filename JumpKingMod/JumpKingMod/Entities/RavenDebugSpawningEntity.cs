@@ -62,6 +62,7 @@ namespace JumpKingMod.Entities
         /// </summary>
         public void Update(float p_delta)
         {
+            // Add Raven
             if (Keyboard.GetState().IsKeyDown(Keys.F2))
             {
                 if (!addEntityCooldown)
@@ -76,13 +77,17 @@ namespace JumpKingMod.Entities
                 addEntityCooldown = false;
             }
 
+            // Remove Raven
             if (Keyboard.GetState().IsKeyDown(Keys.F3))
             {
                 if (!removeEntityCooldown)
                 {
                     removeEntityCooldown = true;
-                    RavenEntity ravenEntity = ravenEntities.Dequeue();
-                    ravenEntity?.Dispose();
+                    if (ravenEntities.Count > 0)
+                    {
+                        RavenEntity ravenEntity = ravenEntities.Dequeue();
+                        ravenEntity?.Dispose();
+                    }
                 }
             }
             else

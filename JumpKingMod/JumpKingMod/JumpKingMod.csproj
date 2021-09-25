@@ -83,7 +83,6 @@
     <Compile Include="Entities\Raven\RavenEntity.cs" />
     <Compile Include="Entities\Raven\States\RavenFlyingState.cs" />
     <Compile Include="Entities\Raven\States\RavenIdleState.cs" />
-    <Compile Include="Entities\Raven\States\RavenStateKey.cs" />
     <Compile Include="Entities\UITextEntity.cs" />
     <Compile Include="Entities\UITextEntityAnchor.cs" />
     <Compile Include="Entities\Raven\RavenLandingPositionsCache.cs" />
