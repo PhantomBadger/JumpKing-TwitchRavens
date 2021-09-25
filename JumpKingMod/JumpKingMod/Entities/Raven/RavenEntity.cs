@@ -7,13 +7,13 @@ using JumpKingMod.Entities.Raven.States;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace JumpKingMod.Entities
 {
@@ -29,26 +29,24 @@ namespace JumpKingMod.Entities
         private readonly ILogger logger;
         private readonly JKContentManager.RavenSprites.RavenContent ravenContent;
         private readonly IReadOnlyDictionary<RavenStateKey, IModEntityState> ravenStates;
+        private readonly IRavenLandingPositionsCache landingPositionsCache;
 
         private LoopingAnimationComponent activeAnimation;
         private float width;
         private float height;
         private SpriteEffects spriteEffects;
         private RavenStateKey activeState;
-        private Type collisionInfoType;
-        private MethodInfo checkCollisionMethod;
-
-        private const float MinimimXPollingValue = 30;
-        private const float MaximumXPollingValue = 470;
 
         /// <summary>
         /// Ctor for creating a <see cref="RavenEntity"/>
         /// Adds itself to the entity manager
         /// </summary>
-        public RavenEntity(ModEntityManager modEntityManager, ILogger logger)
+        public RavenEntity(Vector2 transform, ModEntityManager modEntityManager, IRavenLandingPositionsCache landingPositionsCache,
+            ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
+            this.landingPositionsCache = landingPositionsCache ?? throw new ArgumentNullException(nameof(landingPositionsCache));
             var settings = JKContentManager.RavenSprites.raven_settings;
             ravenContent = JKContentManager.RavenSprites.GetRavenContent(settings["raven"]) ?? throw new ArgumentNullException($"Unable to load animations for raven");
 
@@ -73,14 +71,8 @@ namespace JumpKingMod.Entities
             idleState.Enter();
             spriteEffects = SpriteEffects.None;
 
-            Transform = new Vector2(100, 100);
+            Transform = transform;
             Velocity = new Vector2(0, 0);
-
-            // Set up reflection references
-            collisionInfoType = AccessTools.TypeByName("JumpKing.Level.LevelScreen+CollisionInfo") 
-                ?? throw new InvalidOperationException($"Cannot find 'JumpKing.Level.LevelScreen+CollisionInfo' type in Jump King");
-            checkCollisionMethod = AccessTools.Method("JumpKing.Level.LevelManager:CheckCollision") 
-                ?? throw new InvalidOperationException($"Cannot find 'JumpKing.Level.LevelManager:CheckCollision' method in Jump King");
 
             modEntityManager.AddEntity(this);
         }
@@ -99,6 +91,9 @@ namespace JumpKingMod.Entities
         /// </summary>
         public void Update(float delta)
         {
+            // Manual Control
+            DebugControl();
+
             // Update the transform based on the velocity
             Transform += Velocity;
 
@@ -144,9 +139,9 @@ namespace JumpKingMod.Entities
             activeSprite.Draw(Camera.TransformVector2(Transform), spriteEffects);
 
             // Debug render possible floor positions
-            if (Keyboard.IsKeyDown(Key.F2))
+            if (Keyboard.GetState().IsKeyDown(Keys.P))
             {
-                TryFindValidGround(5, 5, out List<Vector2> hitPositions);
+                List<Vector2> hitPositions = landingPositionsCache.GetPossibleFloorPositions(Camera.CurrentScreen);
                 if (hitPositions.Count > 0)
                 {
                     for (int i = 0; i < hitPositions.Count; i++)
@@ -154,6 +149,10 @@ namespace JumpKingMod.Entities
                         ravenContent.BlinkTreasure.Draw(Camera.TransformVector2(hitPositions[i]));
                     }
                 }
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Delete))
+            {
+                landingPositionsCache.InvalidateCache(Camera.CurrentScreen);
             }
         }
 
@@ -191,88 +190,27 @@ namespace JumpKingMod.Entities
         }
 
         /// <summary>
-        /// Gets the hitbox of the raven at a predetermined location
+        /// Allows manual control of the raven
         /// </summary>
-        private Rectangle GetHitbox(Vector2 transform)
+        private void DebugControl()
         {
-            Vector2 bottomLeft = transform;
-            bottomLeft.X -= width / 2;
-            bottomLeft.Y -= width / 2;
-            return new Rectangle(bottomLeft.ToPoint(), new Point((int)width, (int)height));
-        }
-
-        /// <summary>
-        /// Attempts to find valid ground placement on the current screen below the raven's current Y position
-        /// </summary>
-        private bool TryFindValidGround(float verticalPollingIncrement, float horizontalPollingIncrement, out List<Vector2> hitPositions)
-        {
-            // Initialise hit positions
-            hitPositions = new List<Vector2>();
-
-            // The max length of the ray is until the bottom of the screen, this will ensure we
-            // don't accidentally go to a different screen 
-            float maxDownRayLength = Math.Abs(Transform.Y - (Camera.Offset.Y - height));
-
-            // Start marching rays downwards moving horizontally across the screen
-            float leftMax = MinimimXPollingValue + width;
-            float rightMax = MaximumXPollingValue - width;
-            for (float x = leftMax; x < rightMax; x += horizontalPollingIncrement)
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyDown(Keys.A))
             {
-                // Get the start of our downward rays
-                Vector2 verticalRayStartPosition = new Vector2(x, Transform.Y);
-
-                // Keep track of whether we have hit anything that isnt collision on this
-                // ray yet, this will ensure we dont get any false positives inside a wall or something similar
-                bool hasNotCollidedYet = false;
-
-                // March down the ray until we hit the end
-                for (float y = 0; y < maxDownRayLength; y += verticalPollingIncrement)
-                {
-                    // Create a new test position along our ray
-                    Vector2 testPosition = verticalRayStartPosition + ((new Vector2(0, 1) * y));
-
-                    // Check to see if we hit anything
-                    // Providing null in the parameters array will allow the reflection
-                    // method info to properly populate it with the out parameters when we invoke
-                    Rectangle testHitbox = GetHitbox(testPosition);
-                    object[] parameters = new object[] { testHitbox, null, null };
-                    bool result = (bool)checkCollisionMethod.Invoke(null, parameters);
-
-                    // If we've collided with something
-                    if (result)
-                    {
-                        // And we have already not collided with something on this ray
-                        // (ie, we're not stuck inside ONLY collision)
-                        if (hasNotCollidedYet)
-                        {
-                            Rectangle outOverlap = (Rectangle)parameters[1];
-                            object outCollisionInfo = parameters[2];
-
-                            // March back up in smaller increments until we are not colliding with anything
-                            // which will mean we're at the 'floor'
-                            Vector2 hitLocation = outOverlap.Location.ToVector2();
-                            object[] floorTestParameters;
-                            do
-                            {
-                                hitLocation.Y -= 1;
-                                floorTestParameters = new object[] { new Rectangle(hitLocation.ToPoint(), new Point(1, 1)), null, null };
-                            } while ((bool)checkCollisionMethod.Invoke(null, floorTestParameters));
-
-                            // Add our adjusted position to the list
-                            hitPositions.Add(hitLocation);
-
-                            // No need to query this ray anymore
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        hasNotCollidedYet = true;
-                    }
-                }
+                Velocity.X -= 3f;
             }
-
-            return hitPositions.Count > 0;
+            if (keyboardState.IsKeyDown(Keys.S))
+            {
+                Velocity.Y += 3f;
+            }
+            if (keyboardState.IsKeyDown(Keys.D))
+            {
+                Velocity.X += 3f;
+            }
+            if (keyboardState.IsKeyDown(Keys.W))
+            {
+                Velocity.Y -= 3f;
+            }
         }
     }
 }

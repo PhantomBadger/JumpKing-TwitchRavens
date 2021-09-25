@@ -23,7 +23,6 @@ namespace JumpKingMod.Patching
         private static ILogger logger;
         private static UITextEntity uiEntity;
         private static ModEntityManager modEntityManager;
-        private static RavenEntity ravenEntity;
         //private static Random random;
         //private static DateTime lastSpawnedTime;
 
@@ -70,14 +69,11 @@ namespace JumpKingMod.Patching
                     {
                         // Make a UI Object to display our position
                         uiEntity = new UITextEntity(modEntityManager, new Vector2(0, 0), "", Color.White, UITextEntityAnchor.Center);
-
-                        ravenEntity = new RavenEntity(modEntityManager, logger);
                     }
                     else
                     {
                         // Clean up our UI Object
                         uiEntity?.Dispose();
-                        ravenEntity?.Dispose();
                         uiEntity = null;
                     }
                 }
@@ -147,31 +143,27 @@ namespace JumpKingMod.Patching
                     if (Keyboard.IsKeyDown(Key.W))
                     {
                         curY -= 5;
-                        ravenEntity.Velocity.Y -= 3f;
                     }
                     if (Keyboard.IsKeyDown(Key.A))
                     {
                         curX -= 5;
-                        ravenEntity.Velocity.X -= 3f;
                     }
                     if (Keyboard.IsKeyDown(Key.D))
                     {
                         curX += 5;
-                        ravenEntity.Velocity.X += 3f;
                     }
                     if (Keyboard.IsKeyDown(Key.S))
                     {
                         curY += 5;
-                        ravenEntity.Velocity.Y += 3f;
                     }
 
                     velocity.X = curX;
                     velocity.Y = curY;
-                    //velocityField.SetValue(__instance, velocity);
+                    velocityField.SetValue(__instance, velocity);
                     logger.Information($"Setting velocity to {velocity.ToString()}");
 
-                    uiEntity.ScreenSpacePosition = Camera.TransformVector2(ravenEntity.Transform + new Vector2(0, -50f));
-                    uiEntity.TextValue = $"({ravenEntity.Transform.X}, {ravenEntity.Transform.Y})";
+                    uiEntity.ScreenSpacePosition = Camera.TransformVector2(position + new Vector2(0, -50f));
+                    uiEntity.TextValue = $"({position.X}, {position.Y})";
                 }
             }
             catch (Exception e)

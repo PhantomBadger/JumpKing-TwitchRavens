@@ -36,17 +36,28 @@ namespace JumpKingMod
                 GameStateObserverManualPatch gameStateObserver = new GameStateObserverManualPatch(Logger);
                 gameStateObserver.SetUpManualPatch(harmony);
 
-                // Make our Mod Entity Manager and patch it
-                ModEntityManager modEntityManager = new ModEntityManager();
-                IManualPatch modEntityManagerPatch = new ModEntityManagerManualPatch(modEntityManager);
-                modEntityManagerPatch.SetUpManualPatch(harmony);
-                
-                // Free Fly Patch
-                IManualPatch freeFlyPatch = new FreeFlyManualPatch(modEntityManager, Logger);
-                freeFlyPatch.SetUpManualPatch(harmony);
+                Task.Run(() =>
+                {
+                    while (!gameStateObserver.IsGameLoopRunning())
+                    {
+                        Task.Delay(100).Wait();
+                    }
 
-                // Twitch Chat
-                TwitchChatRelay relay = new TwitchChatRelay(modEntityManager, gameStateObserver, Logger);
+                    // Make our Mod Entity Manager and patch it
+                    ModEntityManager modEntityManager = new ModEntityManager();
+                    IManualPatch modEntityManagerPatch = new ModEntityManagerManualPatch(modEntityManager);
+                    modEntityManagerPatch.SetUpManualPatch(harmony);
+
+                    // Free Fly Patch
+                    IManualPatch freeFlyPatch = new FreeFlyManualPatch(modEntityManager, Logger);
+                    freeFlyPatch.SetUpManualPatch(harmony);
+
+                    // Twitch Chat
+                    TwitchChatRelay relay = new TwitchChatRelay(modEntityManager, gameStateObserver, Logger);
+
+                    // Ravens
+                    RavenDebugSpawningEntity ravenSpawner = new RavenDebugSpawningEntity(modEntityManager, Logger);
+                });
             }
             catch (Exception e)
             {

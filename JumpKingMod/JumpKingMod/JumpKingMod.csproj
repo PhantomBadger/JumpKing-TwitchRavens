@@ -71,6 +71,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\IRavenLandingPositionsCache.cs" />
     <Compile Include="API\IModComponent.cs" />
     <Compile Include="API\IForegroundModEntity.cs" />
     <Compile Include="API\IGameStateObserver.cs" />
@@ -78,12 +79,14 @@
     <Compile Include="API\IModEntityState.cs" />
     <Compile Include="Components\LoopingAnimationComponent.cs" />
     <Compile Include="Entities\ModEntityManager.cs" />
+    <Compile Include="Entities\RavenDebugSpawningEntity.cs" />
     <Compile Include="Entities\Raven\RavenEntity.cs" />
     <Compile Include="Entities\Raven\States\RavenFlyingState.cs" />
     <Compile Include="Entities\Raven\States\RavenIdleState.cs" />
     <Compile Include="Entities\Raven\States\RavenStateKey.cs" />
     <Compile Include="Entities\UITextEntity.cs" />
     <Compile Include="Entities\UITextEntityAnchor.cs" />
+    <Compile Include="Entities\Raven\RavenLandingPositionsCache.cs" />
     <Compile Include="Patching\GameStateObserverManualPatch.cs" />
     <Compile Include="JumpKingModEntry.cs" />
     <Compile Include="API\IManualPatch.cs" />
