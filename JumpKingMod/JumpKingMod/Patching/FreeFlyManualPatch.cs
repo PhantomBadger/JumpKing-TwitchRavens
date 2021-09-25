@@ -81,7 +81,7 @@ namespace JumpKingMod.Patching
                         uiEntity = null;
                     }
                 }
-                else if (Keyboard.IsKeyUp(Key.P) && freeFlyingToggleCooldown)
+                else if (Keyboard.IsKeyUp(Key.F1) && freeFlyingToggleCooldown)
                 {
                     freeFlyingToggleCooldown = false;
                 }
@@ -124,6 +124,8 @@ namespace JumpKingMod.Patching
                     //        "CinnaMoment",
                     //        "Hi YouTube",
                     //        "Go back to chess",
+                    //        "L",
+                    //        "It's like you don't even try",
                     //    };
                     //    DateTime curTime = DateTime.Now;
                     //    if ((curTime - lastSpawnedTime).TotalMilliseconds > millisecondTimeout)
@@ -168,8 +170,8 @@ namespace JumpKingMod.Patching
                     //velocityField.SetValue(__instance, velocity);
                     logger.Information($"Setting velocity to {velocity.ToString()}");
 
-                    //uiEntity.ScreenSpacePosition = Camera.TransformVector2(position + new Vector2(0, -50f));
-                    uiEntity.TextValue = $"({position.X}, {position.Y})";
+                    uiEntity.ScreenSpacePosition = Camera.TransformVector2(ravenEntity.Transform + new Vector2(0, -50f));
+                    uiEntity.TextValue = $"({ravenEntity.Transform.X}, {ravenEntity.Transform.Y})";
                 }
             }
             catch (Exception e)
