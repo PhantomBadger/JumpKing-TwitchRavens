@@ -22,35 +22,45 @@ namespace JumpKingMod.Entities
     /// </summary>
     public class RavenEntity : IModEntity, IDisposable
     {
+        public enum RavenLogicState
+        {
+            Starting,
+            FlyingToPoint,
+            Messaging,
+            FlyingAway,
+            Ending
+        }
+
         public Vector2 Transform;
         public Vector2 Velocity;
+        public bool ReadyToBeDestroyed;
 
-        private readonly ModEntityManager modEntityManager;
-        private readonly ILogger logger;
-        private readonly JKContentManager.RavenSprites.RavenContent ravenContent;
-        private readonly IRavenLandingPositionsCache landingPositionsCache;
+        protected readonly ModEntityManager modEntityManager;
+        protected readonly ILogger logger;
+        protected readonly JKContentManager.RavenSprites.RavenContent ravenContent;
+        protected readonly Random random;
 
-        private LoopingAnimationComponent activeAnimation;
-        private float width;
-        private float height;
-        private SpriteEffects spriteEffects;
-        private IModEntityState activeState;
+        protected IModEntityState activeAnimationState;
+        protected LoopingAnimationComponent activeAnimation;
+        protected float width;
+        protected float height;
+        protected SpriteEffects spriteEffects;
 
         /// <summary>
         /// Ctor for creating a <see cref="RavenEntity"/>
         /// Adds itself to the entity manager
         /// </summary>
-        public RavenEntity(Vector2 transform, ModEntityManager modEntityManager, IRavenLandingPositionsCache landingPositionsCache,
-            ILogger logger)
+        public RavenEntity(Vector2 transform, ModEntityManager modEntityManager, ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
-            this.landingPositionsCache = landingPositionsCache ?? throw new ArgumentNullException(nameof(landingPositionsCache));
+            
+            this.random = new Random();
             var settings = JKContentManager.RavenSprites.raven_settings;
             ravenContent = JKContentManager.RavenSprites.GetRavenContent(settings["raven"]) ?? throw new ArgumentNullException($"Unable to load animations for raven");
 
-            // Initialise the state machine for the raven
-            InitialiseRavenStates();
+            // Initialise the animation state machine for the raven
+            InitialiseRavenAnimationStates();
 
             width = ravenContent.Blink.source.Width;
             height = ravenContent.Blink.source.Height;
@@ -66,7 +76,7 @@ namespace JumpKingMod.Entities
         /// Implementation of <see cref="IDisposable.Dispose"/>
         /// Removes itself from the entity managera
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
             modEntityManager?.RemoveEntity(this);
         }
@@ -74,10 +84,10 @@ namespace JumpKingMod.Entities
         /// <summary>
         /// Called by the entity manager to update the logic of this entity
         /// </summary>
-        public void Update(float delta)
+        public virtual void Update(float delta)
         {
             // Manual Control
-            DebugControl();
+            //DebugControl();
 
             // Update the transform based on the velocity
             Transform += Velocity;
@@ -96,7 +106,7 @@ namespace JumpKingMod.Entities
             }
 
             // Update the states
-            if (activeState != null && activeState.EvaluateState(out IModEntityState nextState))
+            if (activeAnimationState != null && activeAnimationState.EvaluateState(out IModEntityState nextState))
             {
                 SetState(nextState);
             }
@@ -111,7 +121,7 @@ namespace JumpKingMod.Entities
         /// <summary>
         /// Called by the entity manager to draw this entity
         /// </summary>
-        public void Draw()
+        public virtual void Draw()
         {
             // If we have no active animation - there's nothing to draw!
             if (activeAnimation == null)
@@ -123,23 +133,6 @@ namespace JumpKingMod.Entities
             // positions and effects
             Sprite activeSprite = activeAnimation.GetActiveSprite();
             activeSprite.Draw(Camera.TransformVector2(Transform), spriteEffects);
-
-            // Debug render possible floor positions
-            if (Keyboard.GetState().IsKeyDown(Keys.P))
-            {
-                List<Vector2> hitPositions = landingPositionsCache.GetPossibleFloorPositions(Camera.CurrentScreen);
-                if (hitPositions.Count > 0)
-                {
-                    for (int i = 0; i < hitPositions.Count; i++)
-                    {
-                        ravenContent.BlinkTreasure.Draw(Camera.TransformVector2(hitPositions[i]));
-                    }
-                }
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Delete))
-            {
-                landingPositionsCache.InvalidateCache(Camera.CurrentScreen);
-            }
         }
 
         /// <summary>
@@ -153,7 +146,7 @@ namespace JumpKingMod.Entities
         /// <summary>
         /// Initialises the states used by the raven
         /// </summary>
-        private void InitialiseRavenStates()
+        private void InitialiseRavenAnimationStates()
         {
             // Set up states
             var idleAnimation = new LoopingAnimationComponent(ravenContent.IdleSprites, 0.1f);
@@ -173,13 +166,13 @@ namespace JumpKingMod.Entities
         /// </summary>
         private void SetState(IModEntityState state)
         {
-            if (activeState == null || activeState != state)
+            if (activeAnimationState == null || activeAnimationState != state)
             {
                 state.Enter();
-                activeState?.Exit();
+                activeAnimationState?.Exit();
 
                 // Update our active state
-                activeState = state;
+                activeAnimationState = state;
             }
         }
 

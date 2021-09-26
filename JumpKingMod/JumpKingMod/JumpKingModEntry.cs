@@ -46,7 +46,7 @@ namespace JumpKingMod
                 freeFlyPatch.SetUpManualPatch(harmony);
 
                 // Twitch Chat
-                TwitchChatRelay relay = new TwitchChatRelay(modEntityManager, gameStateObserver, Logger);
+                //TwitchChatRelay relay = new TwitchChatRelay(modEntityManager, gameStateObserver, Logger);
 
                 Task.Run(() =>
                 {
@@ -56,7 +56,11 @@ namespace JumpKingMod
                     }
 
                     // Ravens
-                    RavenDebugSpawningEntity ravenSpawner = new RavenDebugSpawningEntity(modEntityManager, Logger);
+                    //RavenDebugSpawningEntity ravenSpawner = new RavenDebugSpawningEntity(modEntityManager, Logger);
+                    TwitchChatMessengerRavenTrigger twitchTrigger = new TwitchChatMessengerRavenTrigger(Logger);
+                    PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(Logger);
+                    fallTrigger.SetUpManualPatch(harmony);
+                    MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(modEntityManager, twitchTrigger, Logger);
                 });
             }
             catch (Exception e)

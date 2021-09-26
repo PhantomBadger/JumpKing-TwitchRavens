@@ -23,10 +23,6 @@ namespace JumpKingMod.Patching
         private static ILogger logger;
         private static UITextEntity uiEntity;
         private static ModEntityManager modEntityManager;
-        //private static Random random;
-        //private static DateTime lastSpawnedTime;
-
-        //private const int millisecondTimeout = 50;
 
         /// <summary>
         /// Ctor for creating a <see cref="FreeFlyManualPatch"/>
@@ -35,9 +31,6 @@ namespace JumpKingMod.Patching
         {
             logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
             modEntityManager = newModEntityManager ?? throw new ArgumentNullException(nameof(newModEntityManager));
-
-            //random = new Random();
-            //lastSpawnedTime = DateTime.Now;
         }
 
         /// <summary>
@@ -91,50 +84,6 @@ namespace JumpKingMod.Patching
                     Vector2 position = (Vector2)positionField.GetValue(__instance);
                     float curX = velocity.X;
                     float curY = velocity.Y;
-
-                    //Dumb joke code that insults you whenever you go down
-                    //if (curY > 0.5)
-                    //{
-                    //    string[] insults = new string[]
-                    //    {
-                    //        "lmao",
-                    //        "OMEGADOWN",
-                    //        "LOL",
-                    //        "Fall King",
-                    //        "fucking idiot",
-                    //        "lmfao",
-                    //        "back to the old man",
-                    //        "LETS GOOOO",
-                    //        "stop playing",
-                    //        "you suck",
-                    //        "KEKW",
-                    //        ":(",
-                    //        "YEP FALL",
-                    //        "Imagine being EU",
-                    //        "Deez Nuts",
-                    //        "Get got",
-                    //        "kek wow",
-                    //        "Almost as bad as Fost",
-                    //        "THIS DUDE",
-                    //        "ravenJAM",
-                    //        "CinnaMoment",
-                    //        "Hi YouTube",
-                    //        "Go back to chess",
-                    //        "L",
-                    //        "It's like you don't even try",
-                    //    };
-                    //    DateTime curTime = DateTime.Now;
-                    //    if ((curTime - lastSpawnedTime).TotalMilliseconds > millisecondTimeout)
-                    //    {
-                    //        UITextEntity tempEntity = new UITextEntity(modEntityManager, new Vector2(random.Next(10, 400), random.Next(10, 400)), insults[random.Next(0, insults.Length)], Color.White, UITextEntityAnchor.BottomLeft);
-                    //        Task.Run(() =>
-                    //        {
-                    //            Task.Delay(1000).Wait();
-                    //            tempEntity.Dispose();
-                    //        });
-                    //        lastSpawnedTime = curTime;
-                    //    }
-                    //}
 
                     curX = 0;
                     curY = 0;

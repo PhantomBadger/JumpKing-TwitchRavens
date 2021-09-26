@@ -19,8 +19,7 @@ namespace JumpKingMod.Entities
     {
         private readonly ILogger logger;
         private readonly ModEntityManager modEntityManager;
-        private readonly IRavenLandingPositionsCache ravenLandingPositionsCache;
-        private readonly Queue<RavenEntity> ravenEntities;
+        private readonly List<RavenEntity> ravenEntities;
 
         private bool addEntityCooldown;
         private bool removeEntityCooldown;
@@ -34,8 +33,8 @@ namespace JumpKingMod.Entities
         {
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            ravenLandingPositionsCache = new RavenLandingPositionsCache(logger);
-            ravenEntities = new Queue<RavenEntity>();
+            
+            ravenEntities = new List<RavenEntity>();
 
             addEntityCooldown = false;
             removeEntityCooldown = false;
@@ -52,8 +51,9 @@ namespace JumpKingMod.Entities
             modEntityManager.RemoveEntity(this);
             while (ravenEntities.Count > 0)
             {
-                RavenEntity raven = ravenEntities.Dequeue();
+                RavenEntity raven = ravenEntities[ravenEntities.Count - 1];
                 raven?.Dispose();
+                ravenEntities.RemoveAt(ravenEntities.Count - 1);
             }
         }
 
@@ -68,8 +68,8 @@ namespace JumpKingMod.Entities
                 if (!addEntityCooldown)
                 {
                     addEntityCooldown = true;
-                    Vector2 spawnPos = new Vector2(100, -((Camera.CurrentScreen - 1) * 360));
-                    ravenEntities.Enqueue(new RavenEntity(spawnPos, modEntityManager, ravenLandingPositionsCache, logger));
+                    Vector2 spawnPos = new Vector2(-50, (-((Camera.CurrentScreen - 1) * 360) - 350));
+                    ravenEntities.Add(new RavenEntity(spawnPos, modEntityManager, logger));
                 }
             }
             else
@@ -84,15 +84,36 @@ namespace JumpKingMod.Entities
                 {
                     removeEntityCooldown = true;
                     if (ravenEntities.Count > 0)
-                    {
-                        RavenEntity ravenEntity = ravenEntities.Dequeue();
+                    { 
+                        RavenEntity ravenEntity = ravenEntities[ravenEntities.Count - 1];
                         ravenEntity?.Dispose();
+                        ravenEntities.Remove(ravenEntity);
                     }
                 }
             }
             else
             {
                 removeEntityCooldown = false;
+            }
+
+            // Identify ravens we wanna destroy
+            List<RavenEntity> ravensToDestroy = new List<RavenEntity>();
+            foreach (var raven in ravenEntities)
+            {
+                if (raven.ReadyToBeDestroyed)
+                {
+                    ravensToDestroy.Add(raven);
+                }
+            }
+
+            // Destroy the ravens
+            foreach (var raven in ravensToDestroy)
+            {
+                if (raven != null)
+                {
+                    raven.Dispose();
+                    ravenEntities.Remove(raven);
+                }
             }
         }
 
