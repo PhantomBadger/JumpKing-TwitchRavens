@@ -95,9 +95,9 @@
     <Compile Include="API\IManualPatch.cs" />
     <Compile Include="Patching\FreeFlyManualPatch.cs" />
     <Compile Include="Patching\ModEntityManagerManualPatch.cs" />
-    <Compile Include="Patching\PlayerFallMessengerRavenTrigger.cs" />
+    <Compile Include="Entities\Raven\Triggers\PlayerFallMessengerRavenTrigger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Twitch\TwitchChatMessengerRavenTrigger.cs" />
+    <Compile Include="Entities\Raven\Triggers\TwitchChatMessengerRavenTrigger.cs" />
     <Compile Include="Twitch\TwitchChatRelay.cs" />
   </ItemGroup>
   <ItemGroup>

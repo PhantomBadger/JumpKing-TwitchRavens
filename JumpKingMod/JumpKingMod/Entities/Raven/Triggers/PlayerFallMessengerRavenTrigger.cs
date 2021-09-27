@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace JumpKingMod.Patching
 {
+    /// <summary>
+    /// An implementation of <see cref="IMessengerRavenTrigger"/> which triggers when the player falls
+    /// </summary>
     public class PlayerFallMessengerRavenTrigger : IMessengerRavenTrigger, IManualPatch
     {
         public event MessengerRavenTriggerArgs OnMessengerRavenTrigger;
@@ -20,6 +23,10 @@ namespace JumpKingMod.Patching
 
         private readonly Random random;
 
+        /// <summary>
+        /// Constructor for creating a <see cref="PlayerFallMessengerRavenTrigger"/>
+        /// </summary>
+        /// <param name="logger">an <see cref="ILogger"/> implementation for logging</param>
         public PlayerFallMessengerRavenTrigger(ILogger logger)
         {
             instance = this;
@@ -55,6 +62,9 @@ namespace JumpKingMod.Patching
             };
         }
 
+        /// <summary>
+        /// Sets up the patching required for this trigger
+        /// </summary>
         public void SetUpManualPatch(Harmony harmony)
         {
             var onPlayerFallMethod = AccessTools.Method("JumpKing.MiscSystems.Achievements.AchievementManager:OnPlayerFall");
@@ -62,6 +72,9 @@ namespace JumpKingMod.Patching
             harmony.Patch(onPlayerFallMethod, postfix: new HarmonyMethod(postfixMethod));
         }
 
+        /// <summary>
+        /// Called by harmony after <see cref="JumpKing.MiscSystems.Achievements.AchievementManager"/> 'OnPlayerFall' private method
+        /// </summary>
         public static void PostfixTriggerMethod(object __instance)
         {
             Task.Run(() =>

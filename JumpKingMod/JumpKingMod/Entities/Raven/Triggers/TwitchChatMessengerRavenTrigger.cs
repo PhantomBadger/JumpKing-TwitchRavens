@@ -17,6 +17,10 @@ using TwitchLib.Communication.Models;
 
 namespace JumpKingMod.Twitch
 {
+    /// <summary>
+    /// An implementation of <see cref="IMessengerRavenTrigger"/>
+    /// which triggers whenever a message is received in Twitch Chat
+    /// </summary>
     public class TwitchChatMessengerRavenTrigger : IMessengerRavenTrigger
     {
         public event MessengerRavenTriggerArgs OnMessengerRavenTrigger;
@@ -35,6 +39,10 @@ namespace JumpKingMod.Twitch
             { "OAuth", "" },
         };
 
+        /// <summary>
+        /// Constructor for creating a <see cref="TwitchChatMessengerRavenTrigger"/>
+        /// </summary>
+        /// <param name="logger">An <see cref="ILogger"/> implementation to use for logging</param>
         public TwitchChatMessengerRavenTrigger(ILogger logger)
         {
             // Keep track of the logger
