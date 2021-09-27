@@ -1,6 +1,8 @@
-﻿using Logging;
+﻿using JumpKingMod.Settings;
+using Logging;
 using Logging.API;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Settings;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -64,6 +66,7 @@ namespace JumpKingMod.Install.UI
         public DelegateCommand InstallCommand { get; private set; }
 
         private readonly ILogger logger;
+        private readonly UserSettings modSettings;
 
         private const string ExpectedFrameworkDllName = "MonoGame.Framework.dll";
         private const string ExpectedModDllName = "JumpKingModLoader.dll";
@@ -74,7 +77,21 @@ namespace JumpKingMod.Install.UI
         public InstallerViewModel()
         {
             logger = new ConsoleLogger();
+            modSettings = new UserSettings(JumpKingModSettingsContext.SettingsFileName, JumpKingModSettingsContext.GetDefaultSettings(), logger);
+
             InitialiseCommands();
+
+            GameDirectory = modSettings.GetSettingOrDefault(JumpKingModSettingsContext.GameDirectoryKey, string.Empty);
+            ModDirectory = modSettings.GetSettingOrDefault(JumpKingModSettingsContext.ModDirectoryKey, string.Empty);
+        }
+
+        /// <summary>
+        /// Called when the window is closing
+        /// Updates the settings
+        /// </summary>
+        public void OnWindowClosing(object sender, CancelEventArgs e)
+        {
+            UpdateSettings();
         }
 
         /// <summary>
@@ -118,45 +135,74 @@ namespace JumpKingMod.Install.UI
         {
             // Copy over local mods to destination mods
             string expectedRemoteModFolder = Path.Combine(GameDirectory, "Content", "Mods");
-            bool result = true;
+            bool success = true;
             string errorText = string.Empty;
             if (Directory.Exists(ModDirectory))
             {
                 try
                 {
-                    Directory.CreateDirectory(expectedRemoteModFolder);
-
-                    string[] dllFiles = Directory.GetFiles(ModDirectory);
-                    if (dllFiles.Length > 0)
+                    // If the local and destination directories match, then we're golden!
+                    if (!expectedRemoteModFolder.Equals(ModDirectory, StringComparison.OrdinalIgnoreCase))
                     {
-                        for (int i = 0; i < dllFiles.Length; i++)
+                        Directory.CreateDirectory(expectedRemoteModFolder);
+                        string[] dllFiles = Directory.GetFiles(ModDirectory);
+                        if (dllFiles.Length > 0)
                         {
-                            string dstFilePath = Path.Combine(expectedRemoteModFolder, Path.GetFileName(dllFiles[i]));
-                            File.Copy(dllFiles[i], dstFilePath, true);
+                            for (int i = 0; i < dllFiles.Length; i++)
+                            {
+                                string dstFilePath = Path.Combine(expectedRemoteModFolder, Path.GetFileName(dllFiles[i]));
+                                File.Copy(dllFiles[i], dstFilePath, true);
+                            }
                         }
-                    }
-                    else
-                    {
-                        errorText = $"Failed to identify any files in our Install Directory at '{ModDirectory}'";
-                        result = false;
-                        logger.Error(errorText);
+                        else
+                        {
+                            errorText = $"Failed to identify any files in our Install Directory at '{ModDirectory}'";
+                            success = false;
+                            logger.Error(errorText);
+                        }
                     }
                 }
                 catch (Exception e)
                 {
                     errorText = $"Failed to Install Mod due to Exception: {e.ToString()}";
-                    result = false;
+                    success = false;
                     logger.Error(errorText);
                 }
             }
             else
             {
-                result = false;
+                success = false;
                 errorText = $"Failed to Install Mod as we couldn't find our local install media in '{ModDirectory}'!";
             }
 
+            // Copy over the settings
+            if (success)
+            {
+                try
+                {
+                    string localSettingsFilePath = JumpKingModSettingsContext.SettingsFileName;
+                    string destinationSettingsFilePath = Path.Combine(expectedRemoteModFolder, JumpKingModSettingsContext.SettingsFileName);
+                    if (File.Exists(localSettingsFilePath))
+                    {
+                        File.Copy(localSettingsFilePath, destinationSettingsFilePath, true);
+                    }
+                    else
+                    {
+                        errorText = $"Failed to copy the Settings File to the mod folder, local settings file doesnt exist at {localSettingsFilePath}";
+                        success = false;
+                        logger.Error(errorText);
+                    }
+                }
+                catch (Exception e)
+                {
+                    errorText = $"Failed to copy the Settings File to the mod folder, Exception occurred: {e.ToString()}";
+                    success = false;
+                    logger.Error(errorText);
+                }
+            }
+
             // Do the Install
-            if (result)
+            if (success)
             {
                 Installer installer = new Installer();
 
@@ -167,12 +213,12 @@ namespace JumpKingMod.Install.UI
                     EntryClassTypeName = "JumpKingModLoader.Loader",
                     EntryMethodName = "Init"
                 };
-                result = installer.InstallMod(frameworkDllPath, expectedModDllPath, modEntrySettings, out string error);
+                success = installer.InstallMod(frameworkDllPath, expectedModDllPath, modEntrySettings, out string error);
                 errorText = error;
             }
 
             // Report the result
-            if (result)
+            if (success)
             {
                 MessageBox.Show("JumpKingMod Installed Correctly!");
             }
@@ -229,6 +275,15 @@ namespace JumpKingMod.Install.UI
                 return openDialog.FileName;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Updates the settings from the current values in the ViewModel
+        /// </summary>
+        private void UpdateSettings()
+        {
+            modSettings.SetOrCreateSetting(JumpKingModSettingsContext.GameDirectoryKey, gameDirectory);
+            modSettings.SetOrCreateSetting(JumpKingModSettingsContext.ModDirectoryKey, modDirectory);
         }
 
         /// <summary>

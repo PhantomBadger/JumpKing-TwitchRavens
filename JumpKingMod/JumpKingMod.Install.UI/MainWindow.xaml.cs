@@ -26,6 +26,7 @@ namespace JumpKingMod.Install.UI
         {
             installerViewModel = new InstallerViewModel();
             this.DataContext = installerViewModel;
+            Closing += installerViewModel.OnWindowClosing;
 
             InitializeComponent();
         }
