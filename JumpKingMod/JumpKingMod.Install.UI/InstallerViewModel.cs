@@ -116,6 +116,8 @@ namespace JumpKingMod.Install.UI
                 modSettings = value;
                 RaisePropertyChanged(nameof(ModSettings));
                 RaisePropertyChanged(nameof(AreModSettingsLoaded));
+                UpdateSettingsCommand.RaiseCanExecuteChanged();
+                LoadSettingsCommand.RaiseCanExecuteChanged();
             }
         }
         private UserSettings modSettings;
@@ -165,7 +167,7 @@ namespace JumpKingMod.Install.UI
             BrowseGameDirectoryCommand = new DelegateCommand(_ => { BrowseForGameDirectory(); });
             BrowseModDirectoryCommand = new DelegateCommand(_ => { BrowseForModDirectory(); });
             InstallCommand = new DelegateCommand(_ => { InstallMod(); }, _ => { return CanInstallMod(); });
-            UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return CanUpdateModSettings(); });
+            UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return AreModSettingsLoaded && CanUpdateModSettings(); });
             LoadSettingsCommand = new DelegateCommand(_ => { LoadModSettings(createIfDoesntExist: true); }, _ => { return CanUpdateModSettings(); });
         }
 
