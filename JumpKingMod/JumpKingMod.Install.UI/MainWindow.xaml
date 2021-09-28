@@ -33,7 +33,29 @@
                     <Button Content="Install" MaxWidth="70" MinWidth="70" Margin="5" HorizontalAlignment="Right" Command="{Binding InstallCommand}"/>
                 </StackPanel>
             </GroupBox>
-            <TextBlock Text="{Binding InstallDirectory, Mode=TwoWay}"/>
+            <GroupBox Header="Settings">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- Twitch Account -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,2,10,2" Text="Twitch Account Name:" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,2,0,2" Text="{Binding TwitchAccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                    </Grid>
+                    <!-- Update Settings Button-->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Save Settings" MaxWidth="100" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding UpdateSettingsCommand}"/>
+                        <Button Content="Load Settings" MaxWidth="100" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding LoadSettingsCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
         </StackPanel>
     </Grid>
 </Window>

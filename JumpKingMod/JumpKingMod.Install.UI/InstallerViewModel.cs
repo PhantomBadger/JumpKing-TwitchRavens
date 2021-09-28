@@ -35,6 +35,8 @@ namespace JumpKingMod.Install.UI
                     gameDirectory = value;
                     RaisePropertyChanged(nameof(GameDirectory));
                     InstallCommand.RaiseCanExecuteChanged();
+                    UpdateSettingsCommand.RaiseCanExecuteChanged();
+                    LoadSettingsCommand.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -61,15 +63,75 @@ namespace JumpKingMod.Install.UI
         }
         private string modDirectory;
 
+        /// <summary>
+        /// The name of the twitch account to use
+        /// </summary>
+        public string TwitchAccountName
+        {
+            get
+            {
+                return twitchAccountName;
+            }
+            set
+            {
+                if (twitchAccountName != value)
+                {
+                    twitchAccountName = value;
+                    RaisePropertyChanged(nameof(TwitchAccountName));
+                }
+            }
+        }
+        private string twitchAccountName;
+
+        /// <summary>
+        /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
+        /// </summary>
+        public string ExpectedRemoteModDirectory
+        {
+            get
+            {
+                return Path.Combine(GameDirectory, RemoteModFolderSuffix);
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the mod settings are currently populated
+        /// </summary>
+        public bool AreModSettingsLoaded
+        {
+            get
+            {
+                return ModSettings != null;
+            }
+        }
+
+        public UserSettings ModSettings
+        {
+            get
+            {
+                return modSettings;
+            }
+            private set
+            {
+                modSettings = value;
+                RaisePropertyChanged(nameof(ModSettings));
+                RaisePropertyChanged(nameof(AreModSettingsLoaded));
+            }
+        }
+        private UserSettings modSettings;
+
         public ICommand BrowseGameDirectoryCommand { get; private set; }
         public ICommand BrowseModDirectoryCommand { get; private set; }
         public DelegateCommand InstallCommand { get; private set; }
+        public DelegateCommand UpdateSettingsCommand { get; private set; }
+        public DelegateCommand LoadSettingsCommand { get; private set; }
 
         private readonly ILogger logger;
-        private readonly UserSettings modSettings;
+        private readonly UserSettings installerSettings;
 
         private const string ExpectedFrameworkDllName = "MonoGame.Framework.dll";
         private const string ExpectedModDllName = "JumpKingModLoader.dll";
+        private const string RemoteModFolderSuffix = @"Content\Mods";
 
         /// <summary>
         /// Ctor for creating a <see cref="InstallerViewModel"/>
@@ -77,12 +139,13 @@ namespace JumpKingMod.Install.UI
         public InstallerViewModel()
         {
             logger = new ConsoleLogger();
-            modSettings = new UserSettings(JumpKingModSettingsContext.SettingsFileName, JumpKingModSettingsContext.GetDefaultSettings(), logger);
+            installerSettings = new UserSettings(JumpKingModInstallerSettingsContext.SettingsFileName, JumpKingModInstallerSettingsContext.GetDefaultSettings(), logger);
 
             InitialiseCommands();
 
-            GameDirectory = modSettings.GetSettingOrDefault(JumpKingModSettingsContext.GameDirectoryKey, string.Empty);
-            ModDirectory = modSettings.GetSettingOrDefault(JumpKingModSettingsContext.ModDirectoryKey, string.Empty);
+            GameDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.GameDirectoryKey, string.Empty);
+            ModDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.ModDirectoryKey, string.Empty);
+            
         }
 
         /// <summary>
@@ -91,7 +154,7 @@ namespace JumpKingMod.Install.UI
         /// </summary>
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
-            UpdateSettings();
+            UpdateInstallerSettings();
         }
 
         /// <summary>
@@ -102,6 +165,8 @@ namespace JumpKingMod.Install.UI
             BrowseGameDirectoryCommand = new DelegateCommand(_ => { BrowseForGameDirectory(); });
             BrowseModDirectoryCommand = new DelegateCommand(_ => { BrowseForModDirectory(); });
             InstallCommand = new DelegateCommand(_ => { InstallMod(); }, _ => { return CanInstallMod(); });
+            UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return CanUpdateModSettings(); });
+            LoadSettingsCommand = new DelegateCommand(_ => { LoadModSettings(createIfDoesntExist: true); }, _ => { return CanUpdateModSettings(); });
         }
 
         /// <summary>
@@ -134,7 +199,7 @@ namespace JumpKingMod.Install.UI
         private void InstallMod()
         {
             // Copy over local mods to destination mods
-            string expectedRemoteModFolder = Path.Combine(GameDirectory, "Content", "Mods");
+            string expectedRemoteModFolder = ExpectedRemoteModDirectory;
             bool success = true;
             string errorText = string.Empty;
             if (Directory.Exists(ModDirectory))
@@ -175,32 +240,6 @@ namespace JumpKingMod.Install.UI
                 errorText = $"Failed to Install Mod as we couldn't find our local install media in '{ModDirectory}'!";
             }
 
-            // Copy over the settings
-            if (success)
-            {
-                try
-                {
-                    string localSettingsFilePath = JumpKingModSettingsContext.SettingsFileName;
-                    string destinationSettingsFilePath = Path.Combine(expectedRemoteModFolder, JumpKingModSettingsContext.SettingsFileName);
-                    if (File.Exists(localSettingsFilePath))
-                    {
-                        File.Copy(localSettingsFilePath, destinationSettingsFilePath, true);
-                    }
-                    else
-                    {
-                        errorText = $"Failed to copy the Settings File to the mod folder, local settings file doesnt exist at {localSettingsFilePath}";
-                        success = false;
-                        logger.Error(errorText);
-                    }
-                }
-                catch (Exception e)
-                {
-                    errorText = $"Failed to copy the Settings File to the mod folder, Exception occurred: {e.ToString()}";
-                    success = false;
-                    logger.Error(errorText);
-                }
-            }
-
             // Do the Install
             if (success)
             {
@@ -215,6 +254,12 @@ namespace JumpKingMod.Install.UI
                 };
                 success = installer.InstallMod(frameworkDllPath, expectedModDllPath, modEntrySettings, out string error);
                 errorText = error;
+            }
+
+            // Load in any settings at the mod location
+            if (success)
+            {
+                LoadModSettings(createIfDoesntExist: true);
             }
 
             // Report the result
@@ -233,14 +278,6 @@ namespace JumpKingMod.Install.UI
         /// </summary>
         private bool CanInstallMod()
         {
-            return CheckValidDirectories();
-        }
-
-        /// <summary>
-        /// Checks if the install directory exists and contains the expected .dll
-        /// </summary>
-        private bool CheckValidDirectories()
-        {
             bool validGameDir = false;
             if (Directory.Exists(GameDirectory))
             {
@@ -256,6 +293,16 @@ namespace JumpKingMod.Install.UI
             }
 
             return validGameDir && validModDir;
+        }
+
+        /// <summary>
+        /// Called by <see cref="UpdateSettingsCommand"/> to determine whether the command can execute
+        /// </summary>
+        private bool CanUpdateModSettings()
+        {
+            string expectedSettingsFilePath = Path.Combine(ExpectedRemoteModDirectory, JumpKingModSettingsContext.SettingsFileName);
+            bool fileExists = File.Exists(expectedSettingsFilePath);
+            return fileExists;
         }
 
         /// <summary>
@@ -280,10 +327,36 @@ namespace JumpKingMod.Install.UI
         /// <summary>
         /// Updates the settings from the current values in the ViewModel
         /// </summary>
-        private void UpdateSettings()
+        private void UpdateInstallerSettings()
         {
-            modSettings.SetOrCreateSetting(JumpKingModSettingsContext.GameDirectoryKey, gameDirectory);
-            modSettings.SetOrCreateSetting(JumpKingModSettingsContext.ModDirectoryKey, modDirectory);
+            installerSettings.SetOrCreateSetting(JumpKingModInstallerSettingsContext.GameDirectoryKey, gameDirectory);
+            installerSettings.SetOrCreateSetting(JumpKingModInstallerSettingsContext.ModDirectoryKey, modDirectory);
+            
+        }
+
+        /// <summary>
+        /// Updates the settings that the mod will use based on the current values in the ViewModel
+        /// </summary>
+        private void UpdateModSettings()
+        {
+            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchAccountName);
+        }
+
+        /// <summary>
+        /// Creates or loads the mod settings from the given install directory
+        /// </summary>
+        private void LoadModSettings(bool createIfDoesntExist)
+        {
+            // Load in the settings
+            string expectedRemoteModFolder = ExpectedRemoteModDirectory;
+            string expectedSettingsFilePath = Path.Combine(expectedRemoteModFolder, JumpKingModSettingsContext.SettingsFileName);
+            if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
+            {
+                ModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModSettingsContext.GetDefaultSettings(), logger);
+
+                // Load the initial data
+                TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+            }
         }
 
         /// <summary>
