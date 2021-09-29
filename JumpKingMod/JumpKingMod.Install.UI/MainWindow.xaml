@@ -79,7 +79,7 @@
                                     <Italic>
                                         You shouldn't show this to anyone!
                                         To generate an OAuth Token,
-                                        <Hyperlink>click here</Hyperlink>
+                                        <Hyperlink NavigateUri="https://twitchapps.com/tmi/" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
                                     </Italic>
                                 </TextBlock>
                                 <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchOAuth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource oAuthTooltip}"/>
