@@ -83,6 +83,23 @@ namespace JumpKingMod.Install.UI
         }
         private string twitchAccountName;
 
+        public string TwitchOAuth
+        {
+            get
+            {
+                return twitchOAuth;
+            }
+            set
+            {
+                if (twitchOAuth != value)
+                {
+                    twitchOAuth = value;
+                    RaisePropertyChanged(nameof(TwitchOAuth));
+                }
+            }
+        }
+        private string twitchOAuth;
+
         /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
         /// </summary>
@@ -147,7 +164,6 @@ namespace JumpKingMod.Install.UI
 
             GameDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.GameDirectoryKey, string.Empty);
             ModDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.ModDirectoryKey, string.Empty);
-            
         }
 
         /// <summary>
@@ -342,6 +358,7 @@ namespace JumpKingMod.Install.UI
         private void UpdateModSettings()
         {
             ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchAccountName);
+            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchOAuth);
         }
 
         /// <summary>
@@ -358,6 +375,7 @@ namespace JumpKingMod.Install.UI
 
                 // Load the initial data
                 TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
             }
         }
 

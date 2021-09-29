@@ -29,6 +29,10 @@ namespace JumpKingMod.Install.UI
             Closing += installerViewModel.OnWindowClosing;
 
             InitializeComponent();
+
+            ToolTipService.InitialShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(2000));
+            ToolTipService.BetweenShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(0));
+            ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(10000));
         }
     }
 }

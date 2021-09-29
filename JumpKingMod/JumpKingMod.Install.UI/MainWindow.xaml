@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JumpKingMod.Install.UI"
         mc:Ignorable="d"
-        Title="Jump King Mod Installer" Height="450" Width="800" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        Title="Jump King Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
     <Grid>
         <StackPanel Margin="5">
             <GroupBox Header="Install">
@@ -33,22 +33,64 @@
                     <Button Content="Install" MaxWidth="70" MinWidth="70" Margin="5" HorizontalAlignment="Right" Command="{Binding InstallCommand}"/>
                 </StackPanel>
             </GroupBox>
+            
+            <!-- Settings -->
             <GroupBox Header="Settings">
                 <StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <!-- Twitch Account -->
-                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,2,10,2" Text="Twitch Account Name:" />
-                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,2,0,2" Text="{Binding TwitchAccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}"/>
-                    </Grid>
+                    <TabControl Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Padding="5" SelectedIndex="0">
+                        <TabItem Header="Twitch">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <ToolTip x:Key="twitchAccountTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <StackPanel>
+                                            <TextBlock>
+                                            The Twitch Account to use for listening to the chat.
+                                            <LineBreak/>
+                                            This will only allow us to read messages using this account, not send them.
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </ToolTip>
+                                    <ToolTip x:Key="oAuthTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <StackPanel>
+                                            <TextBlock>
+                                                This OAuth token gives us permission to use the account. 
+                                                <LineBreak/>
+                                                This token should not be shared with anyone else.
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </ToolTip>
+                                </Grid.Resources>
+                                <!-- Twitch Account -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource twitchAccountTooltip}" Text="Twitch Account Name:" />
+                                <TextBox Grid.Row="1" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchAccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource twitchAccountTooltip}"/>
+                                <!-- OAuth -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource oAuthTooltip}" Text="Twitch OAuth:" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,0,10,0" FontSize="9" ToolTip="{StaticResource oAuthTooltip}">
+                                    <Italic>
+                                        You shouldn't show this to anyone!
+                                        To generate an OAuth Token,
+                                        <Hyperlink>click here</Hyperlink>
+                                    </Italic>
+                                </TextBlock>
+                                <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchOAuth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource oAuthTooltip}"/>
+                            </Grid>
+                    </TabItem>
+                        <TabItem Header="Ravens">
+                            <TextBlock>
+                                TODO!
+                            </TextBlock>
+                        </TabItem>
+                    </TabControl>
                     <!-- Update Settings Button-->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="Save Settings" MaxWidth="100" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding UpdateSettingsCommand}"/>
