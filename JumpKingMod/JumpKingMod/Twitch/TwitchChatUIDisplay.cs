@@ -20,7 +20,7 @@ namespace JumpKingMod.Twitch
     /// <summary>
     /// A class responsible for relaying the twitch chat and acting on incoming messages
     /// </summary>
-    public class TwitchChatRelay : IDisposable
+    public class TwitchChatUIDisplay : IDisposable
     {
         private readonly ILogger logger;
         private readonly IGameStateObserver gameStateObserver;
@@ -42,9 +42,9 @@ namespace JumpKingMod.Twitch
         private readonly Vector2 ChatBoxBottomLeft = new Vector2(10, 100);
 
         /// <summary>
-        /// Ctor for creating a <see cref="TwitchChatRelay"/>
+        /// Ctor for creating a <see cref="TwitchChatUIDisplay"/>
         /// </summary>
-        public TwitchChatRelay(ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, ILogger logger)
+        public TwitchChatUIDisplay(ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, ILogger logger)
         {
             // Keep track of the logger
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));

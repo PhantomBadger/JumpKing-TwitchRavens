@@ -46,6 +46,9 @@
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Jump King\MonoGame.Framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -87,6 +90,7 @@
     <Compile Include="Entities\Raven\RavenEntity.cs" />
     <Compile Include="Entities\Raven\States\RavenFlyingState.cs" />
     <Compile Include="Entities\Raven\States\RavenIdleState.cs" />
+    <Compile Include="Entities\Raven\Triggers\TwitchChannelPointMessengerRavenTrigger.cs" />
     <Compile Include="Entities\UITextEntity.cs" />
     <Compile Include="Entities\UITextEntityAnchor.cs" />
     <Compile Include="Entities\Raven\RavenLandingPositionsCache.cs" />
@@ -98,7 +102,9 @@
     <Compile Include="Entities\Raven\Triggers\PlayerFallMessengerRavenTrigger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\Raven\Triggers\TwitchChatMessengerRavenTrigger.cs" />
-    <Compile Include="Twitch\TwitchChatRelay.cs" />
+    <Compile Include="Twitch\TwitchClientFactory.cs" />
+    <Compile Include="Twitch\TwitchChatUIDisplay.cs" />
+    <Compile Include="Twitch\TwitchHexColourParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Logging\Logging.csproj">

@@ -83,6 +83,9 @@ namespace JumpKingMod.Install.UI
         }
         private string twitchAccountName;
 
+        /// <summary>
+        /// The OAuth token to use for Twitch Chat
+        /// </summary>
         public string TwitchOAuth
         {
             get
@@ -99,6 +102,46 @@ namespace JumpKingMod.Install.UI
             }
         }
         private string twitchOAuth;
+
+        /// <summary>
+        /// Whether the Raven system is enabled or not
+        /// </summary>
+        public bool RavenEnabled
+        {
+            get
+            {
+                return ravenEnabled;
+            }
+            set
+            {
+                if (ravenEnabled != value)
+                {
+                    ravenEnabled = value;
+                    RaisePropertyChanged(nameof(RavenEnabled));
+                }
+            }
+        }
+        private bool ravenEnabled;
+
+        /// <summary>
+        /// The trigger type we want to use for the ravens
+        /// </summary>
+        public RavenTriggerTypes RavenTriggerType
+        {
+            get
+            {
+                return ravenTriggerType;
+            }
+            set
+            {
+                if (ravenTriggerType != value)
+                {
+                    ravenTriggerType = value;
+                    RaisePropertyChanged(nameof(RavenTriggerType));
+                }
+            }
+        }
+        private RavenTriggerTypes ravenTriggerType;
 
         /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
@@ -349,7 +392,6 @@ namespace JumpKingMod.Install.UI
         {
             installerSettings.SetOrCreateSetting(JumpKingModInstallerSettingsContext.GameDirectoryKey, gameDirectory);
             installerSettings.SetOrCreateSetting(JumpKingModInstallerSettingsContext.ModDirectoryKey, modDirectory);
-            
         }
 
         /// <summary>
@@ -359,6 +401,8 @@ namespace JumpKingMod.Install.UI
         {
             ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchAccountName);
             ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchOAuth);
+            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, RavenEnabled.ToString());
+            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerType.ToString());
         }
 
         /// <summary>
@@ -376,6 +420,18 @@ namespace JumpKingMod.Install.UI
                 // Load the initial data
                 TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                 TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
+
+                string rawRavenType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage.ToString());
+                if (Enum.TryParse(rawRavenType, out RavenTriggerTypes ravenTriggerType))
+                {
+                    RavenTriggerType = ravenTriggerType;
+                }
+
+                string rawRavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true.ToString());
+                if (bool.TryParse(rawRavenEnabled, out bool ravenEnabled))
+                {
+                    RavenEnabled = ravenEnabled;
+                }
             }
         }
 

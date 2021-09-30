@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingMod.Patching
+namespace JumpKingMod.Entities.Raven.Triggers
 {
     /// <summary>
     /// An implementation of <see cref="IMessengerRavenTrigger"/> which triggers when the player falls
@@ -68,7 +68,7 @@ namespace JumpKingMod.Patching
         public void SetUpManualPatch(Harmony harmony)
         {
             var onPlayerFallMethod = AccessTools.Method("JumpKing.MiscSystems.Achievements.AchievementManager:OnPlayerFall");
-            var postfixMethod = AccessTools.Method($"JumpKingMod.Patching.{this.GetType().Name}:PostfixTriggerMethod");
+            var postfixMethod = AccessTools.Method($"JumpKingMod.Entities.Raven.Triggers.{this.GetType().Name}:PostfixTriggerMethod");
             harmony.Patch(onPlayerFallMethod, postfix: new HarmonyMethod(postfixMethod));
         }
 

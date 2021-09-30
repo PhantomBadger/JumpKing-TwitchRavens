@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="JumpKingModInstallerSettingsContext.cs" />
     <Compile Include="JumpKingModSettingsContext.cs" />
+    <Compile Include="RavenTriggerTypes.cs" />
     <Compile Include="UserSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

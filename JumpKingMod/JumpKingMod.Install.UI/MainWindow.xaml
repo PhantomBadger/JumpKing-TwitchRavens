@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JumpKingMod.Install.UI"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:settings="clr-namespace:Settings;assembly=Settings"
         mc:Ignorable="d"
         Title="Jump King Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
     <Grid>
@@ -86,9 +88,41 @@
                             </Grid>
                     </TabItem>
                         <TabItem Header="Ravens">
-                            <TextBlock>
-                                TODO!
-                            </TextBlock>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <ObjectDataProvider x:Key="ravenTriggerTypeEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+                                        <ObjectDataProvider.MethodParameters>
+                                            <x:Type TypeName="settings:RavenTriggerTypes"/>
+                                        </ObjectDataProvider.MethodParameters>
+                                    </ObjectDataProvider>
+                                    <ToolTip x:Key="ravenTriggerTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <StackPanel>
+                                            <TextBlock>
+                                                The trigger for spawning the ravens
+                                                <LineBreak/>
+                                                <Bold>ChatMessage:</Bold> Whenever a Message is typed in the Twitch Chat
+                                                <Bold>ChannelPointReward:</Bold> Whenever a specified Channel Point Reward is redeemed
+                                                <Bold>Insult:</Bold> Whenever you fall off screen
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </ToolTip>
+                                </Grid.Resources>
+                                <!-- Raven Enabled -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" Text="Enabled: " />
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" IsChecked="{Binding RavenEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                                <!-- Raven Trigger -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenTriggerTooltip}" Text="Trigger Type:" />
+                                <ComboBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Source={StaticResource ravenTriggerTypeEnumValues}}" SelectedItem="{Binding RavenTriggerType, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                            </Grid>
                         </TabItem>
                     </TabControl>
                     <!-- Update Settings Button-->
