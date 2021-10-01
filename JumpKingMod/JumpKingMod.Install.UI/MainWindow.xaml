@@ -3,11 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:JumpKingMod.Install.UI"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:Input="clr-namespace:Microsoft.Xna.Framework.Input;assembly=MonoGame.Framework"
+        xmlns:local="clr-namespace:JumpKingMod.Install.UI"
         xmlns:settings="clr-namespace:Settings;assembly=Settings"
         mc:Ignorable="d"
         Title="Jump King Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="boolToVisibilityConverter" />
+        <ObjectDataProvider x:Key="keysEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="Input:Keys"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
     <Grid>
         <StackPanel Margin="5">
             <GroupBox Header="Install">
@@ -54,22 +63,18 @@
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
                                     <ToolTip x:Key="twitchAccountTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
-                                        <StackPanel>
-                                            <TextBlock>
+                                        <TextBlock>
                                             The Twitch Account to use for listening to the chat.
                                             <LineBreak/>
                                             This will only allow us to read messages using this account, not send them.
-                                            </TextBlock>
-                                        </StackPanel>
+                                        </TextBlock>
                                     </ToolTip>
                                     <ToolTip x:Key="oAuthTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
-                                        <StackPanel>
-                                            <TextBlock>
-                                                This OAuth token gives us permission to use the account. 
-                                                <LineBreak/>
-                                                This token should not be shared with anyone else.
-                                            </TextBlock>
-                                        </StackPanel>
+                                        <TextBlock>
+                                            This OAuth token gives us permission to use the account. 
+                                            <LineBreak/>
+                                            This token should not be shared with anyone else.
+                                        </TextBlock>
                                     </ToolTip>
                                 </Grid.Resources>
                                 <!-- Twitch Account -->
@@ -90,10 +95,11 @@
                         <TabItem Header="Ravens">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
@@ -104,24 +110,69 @@
                                             <x:Type TypeName="settings:RavenTriggerTypes"/>
                                         </ObjectDataProvider.MethodParameters>
                                     </ObjectDataProvider>
+                                    <ToolTip x:Key="enabledRavenTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            If enabled, the mod will spawn ravens based on specific triggers
+                                        </TextBlock>
+                                    </ToolTip>
                                     <ToolTip x:Key="ravenTriggerTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
-                                        <StackPanel>
-                                            <TextBlock>
-                                                The trigger for spawning the ravens
-                                                <LineBreak/>
-                                                <Bold>ChatMessage:</Bold> Whenever a Message is typed in the Twitch Chat
-                                                <Bold>ChannelPointReward:</Bold> Whenever a specified Channel Point Reward is redeemed
-                                                <Bold>Insult:</Bold> Whenever you fall off screen
-                                            </TextBlock>
-                                        </StackPanel>
+                                        <TextBlock>
+                                            The trigger for spawning the ravens
+                                            <LineBreak/>
+                                            <Bold>ChatMessage:</Bold> Whenever a Message is typed in the Twitch Chat
+                                            <Bold>ChannelPointReward:</Bold> Whenever a specified Channel Point Reward is redeemed
+                                            <Bold>Insult:</Bold> Whenever you fall off screen
+                                        </TextBlock>
                                     </ToolTip>
                                 </Grid.Resources>
                                 <!-- Raven Enabled -->
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" Text="Enabled: " />
-                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" IsChecked="{Binding RavenEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding RavenEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                                <!-- Separator -->
+                                <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
                                 <!-- Raven Trigger -->
-                                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenTriggerTooltip}" Text="Trigger Type:" />
-                                <ComboBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Source={StaticResource ravenTriggerTypeEnumValues}}" SelectedItem="{Binding RavenTriggerType, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenTriggerTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Trigger Type:" />
+                                <ComboBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenTriggerTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource ravenTriggerTypeEnumValues}}" SelectedItem="{Binding RavenTriggerType, Mode=TwoWay}"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Chat Display">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <!-- Chat Display Enabled -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" Text="Enabled: " />
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding ChatDisplayEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Misc">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <ToolTip x:Key="freeFlyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            Allows you to make the Jump King Fly. Enabling this option will disable achievements.
+                                        </TextBlock>
+                                    </ToolTip>
+                                </Grid.Resources>
+                                <!-- Free Fly Enabled -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource freeFlyTooltip}" Text="Enable Free Flying Mod: " />
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource freeFlyTooltip}" IsChecked="{Binding FreeFlyingEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                                <!-- Debug Button -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource freeFlyTooltip}" Visibility="{Binding FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Key:" />
+                                <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" ToolTip="{StaticResource freeFlyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding FreeFlyToggleKey, Mode=TwoWay}"/>
                             </Grid>
                         </TabItem>
                     </TabControl>

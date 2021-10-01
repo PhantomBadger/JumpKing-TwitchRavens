@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace Settings
 {
@@ -8,7 +9,6 @@ namespace Settings
 
         // Twitch
         public const string ChatListenerTwitchAccountNameKey = "ChatListenerTwitchAccountName";
-        public const string TargetChatTwitchAccountNameKey = "TargetChatTwitchAccountName";
         public const string OAuthKey = "OAuth";
 
         // Twitch Relay
@@ -19,17 +19,22 @@ namespace Settings
         public const string RavenTriggerTypeKey = "RavenTriggerType";
         public const string RavenChannelPointRewardIDKey = "RavenChannelPointRewardID";
 
+        // Free Fly
+        public const string FreeFlyEnabledKey = "FreeFlyEnabled";
+        public const string FreeFlyToggleKeyKey = "FreeFlyToggleKey";
+
         public static Dictionary<string, string> GetDefaultSettings()
         {
             return new Dictionary<string, string>()
             {
                 { ChatListenerTwitchAccountNameKey, "" },
-                { TargetChatTwitchAccountNameKey, "" },
                 { OAuthKey, "" },
                 { TwitchRelayEnabledKey, false.ToString() },
                 { RavensEnabledKey, true.ToString() },
                 { RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage.ToString() },
                 { RavenChannelPointRewardIDKey, "" },
+                { FreeFlyEnabledKey, false.ToString() },
+                { FreeFlyToggleKeyKey, Keys.F1.ToString() }
             };
         }
     }

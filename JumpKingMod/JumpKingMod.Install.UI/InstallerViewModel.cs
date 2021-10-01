@@ -2,6 +2,7 @@
 using Logging;
 using Logging.API;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.Xna.Framework.Input;
 using Settings;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using MessageBox = System.Windows.MessageBox;
 
 namespace JumpKingMod.Install.UI
 {
@@ -142,6 +144,66 @@ namespace JumpKingMod.Install.UI
             }
         }
         private RavenTriggerTypes ravenTriggerType;
+
+        /// <summary>
+        /// Whether the chat display is enabled or not
+        /// </summary>
+        public bool ChatDisplayEnabled
+        {
+            get
+            {
+                return chatDisplayEnabled;
+            }
+            set
+            {
+                if (chatDisplayEnabled != value)
+                {
+                    chatDisplayEnabled = value;
+                    RaisePropertyChanged(nameof(ChatDisplayEnabled));
+                }
+            }
+        }
+        private bool chatDisplayEnabled;
+
+        /// <summary>
+        /// Whether the Free Flying Mod is enabled or not
+        /// </summary>
+        public bool FreeFlyingEnabled
+        {
+            get
+            {
+                return freeFlyingEnabled;
+            }
+            set
+            {
+                if (freeFlyingEnabled != value)
+                {
+                    freeFlyingEnabled = value;
+                    RaisePropertyChanged(nameof(FreeFlyingEnabled));
+                }
+            }
+        }
+        private bool freeFlyingEnabled;
+
+        /// <summary>
+        /// The key to use to toggle free flying
+        /// </summary>
+        public Keys FreeFlyToggleKey
+        {
+            get
+            {
+                return freeFlyToggleKey;
+            }
+            set
+            {
+                if (freeFlyToggleKey != value)
+                {
+                    freeFlyToggleKey = value;
+                    RaisePropertyChanged(nameof(FreeFlyToggleKey));
+                }
+            }
+        }
+        private Keys freeFlyToggleKey;
 
         /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
@@ -401,8 +463,17 @@ namespace JumpKingMod.Install.UI
         {
             ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchAccountName);
             ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchOAuth);
+
+            // Ravens
             ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, RavenEnabled.ToString());
             ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerType.ToString());
+
+            // Chat Display
+            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
+
+            // Free Fly
+            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
+            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
         }
 
         /// <summary>
@@ -417,19 +488,61 @@ namespace JumpKingMod.Install.UI
                 ModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModSettingsContext.GetDefaultSettings(), logger);
 
                 // Load the initial data
+                // Twitch Info
                 TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                 TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
 
+                // Raven Info
                 string rawRavenType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage.ToString());
                 if (Enum.TryParse(rawRavenType, out RavenTriggerTypes ravenTriggerType))
                 {
                     RavenTriggerType = ravenTriggerType;
+                }
+                else
+                {
+                    RavenTriggerType = RavenTriggerTypes.ChatMessage;
                 }
 
                 string rawRavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true.ToString());
                 if (bool.TryParse(rawRavenEnabled, out bool ravenEnabled))
                 {
                     RavenEnabled = ravenEnabled;
+                }
+                else
+                {
+                    RavenEnabled = true;
+                }
+
+                // Chat Display Info
+                string rawDisplayEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false.ToString());
+                if (bool.TryParse(rawDisplayEnabled, out bool displayEnabled))
+                {
+                    ChatDisplayEnabled = displayEnabled;
+                }
+                else
+                {
+                    ChatDisplayEnabled = false;
+                }
+
+                // Free Fly
+                string rawFreeFlyEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false.ToString());
+                if (bool.TryParse(rawFreeFlyEnabled, out bool freeFlyEnabled))
+                {
+                    FreeFlyingEnabled = freeFlyEnabled;
+                }
+                else
+                {
+                    FreeFlyingEnabled = false;
+                }
+
+                string rawFreeFlyToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1.ToString());
+                if (Enum.TryParse(rawFreeFlyToggleKey, out Keys toggleKey))
+                {
+                    FreeFlyToggleKey = toggleKey;
+                }
+                else
+                {
+                    FreeFlyToggleKey = Keys.F1;
                 }
             }
         }

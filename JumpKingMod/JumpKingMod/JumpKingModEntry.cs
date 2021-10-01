@@ -36,6 +36,9 @@ namespace JumpKingMod
                 Harmony harmony = new Harmony("com.phantombadger.jumpkingmod");
                 harmony.PatchAll();
 
+                // Load Settings
+                UserSettings userSettings = new UserSettings(JumpKingModSettingsContext.SettingsFileName, JumpKingModSettingsContext.GetDefaultSettings(), Logger);
+
                 // Set up observer
                 GameStateObserverManualPatch gameStateObserver = new GameStateObserverManualPatch(Logger);
                 gameStateObserver.SetUpManualPatch(harmony);
@@ -45,32 +48,45 @@ namespace JumpKingMod
                 IManualPatch modEntityManagerPatch = new ModEntityManagerManualPatch(modEntityManager);
                 modEntityManagerPatch.SetUpManualPatch(harmony);
 
-                // Free Fly Patch
-                IManualPatch freeFlyPatch = new FreeFlyManualPatch(modEntityManager, Logger);
-                freeFlyPatch.SetUpManualPatch(harmony);
-
-                UserSettings userSettings = new UserSettings(JumpKingModSettingsContext.SettingsFileName, JumpKingModSettingsContext.GetDefaultSettings(), Logger);
-
                 // Twitch Chat Client
                 TwitchClientFactory twitchClientFactory = new TwitchClientFactory(userSettings, Logger);
 
-                // Twitch Chat Relay
-                string relayEnabledRaw = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false.ToString());
-                if (bool.TryParse(relayEnabledRaw, out bool relayEnabled) && relayEnabled)
+                // Free Fly Patch
+                string freeFlyEnabledRaw = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false.ToString());
+                if (bool.TryParse(freeFlyEnabledRaw, out bool freeFlyEnabled))
                 {
-                    Logger.Information($"Initialising Twitch Chat UI Display");
-                    TwitchChatUIDisplay relay = new TwitchChatUIDisplay(modEntityManager, gameStateObserver, Logger);
-                }
-                else
-                {
-                    Logger.Error($"Failed to parse '{JumpKingModSettingsContext.TwitchRelayEnabledKey}' from the settings file");
+                    if (freeFlyEnabled)
+                    {
+                        Logger.Information($"Initialising Free Fly Mod");
+                        IManualPatch freeFlyPatch = new FreeFlyManualPatch(userSettings, modEntityManager, Logger);
+                        freeFlyPatch.SetUpManualPatch(harmony);
+
+                        IManualPatch achievementDisablePatch = new AchievementRegisterDisableManualPatch();
+                        achievementDisablePatch.SetUpManualPatch(harmony);
+                    }
                 }
 
+                // Run the rest after the game loop has started
                 Task.Run(() =>
                 {
                     while (!gameStateObserver.IsGameLoopRunning())
                     {
                         Task.Delay(100).Wait();
+                    }
+
+                    // Twitch Chat Relay
+                    string relayEnabledRaw = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false.ToString());
+                    if (bool.TryParse(relayEnabledRaw, out bool relayEnabled))
+                    {
+                        if (relayEnabled)
+                        {
+                            Logger.Information($"Initialising Twitch Chat UI Display");
+                            TwitchChatUIDisplay relay = new TwitchChatUIDisplay(modEntityManager, gameStateObserver, Logger);
+                        }
+                    }
+                    else
+                    {
+                        Logger.Warning($"Failed to parse '{JumpKingModSettingsContext.TwitchRelayEnabledKey}' from the settings file, read value of '{relayEnabledRaw}'");
                     }
 
                     // Ravens
@@ -113,7 +129,7 @@ namespace JumpKingMod
                     }
                     else
                     {
-                        Logger.Error($"Failed to parse '{JumpKingModSettingsContext.RavensEnabledKey}' from the settings file");
+                        Logger.Warning($"Failed to parse '{JumpKingModSettingsContext.RavensEnabledKey}' from the settings file");
                     }
                 });
             }

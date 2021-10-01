@@ -62,7 +62,7 @@ namespace JumpKingMod.Twitch
                     logger.Error($"No valid TwitchAccountName found in the {JumpKingModSettingsContext.SettingsFileName} file!");
                     return null;
                 }
-                logger.Information($"Setting up Twitch Relay for {twitchName}");
+                logger.Information($"Setting up Twitch Chat Client for {twitchName}");
 
                 var credentials = new ConnectionCredentials(twitchName, oAuthToken);
                 var clientOptions = new ClientOptions

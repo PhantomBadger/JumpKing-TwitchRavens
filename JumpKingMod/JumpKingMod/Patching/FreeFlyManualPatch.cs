@@ -2,7 +2,6 @@
 using Logging.API;
 using System;
 using System.Reflection;
-using System.Windows.Input;
 using JumpKing.Util;
 using Microsoft.Xna.Framework;
 using JumpKing;
@@ -10,6 +9,9 @@ using EntityComponent;
 using JumpKingMod.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using JumpKingMod.Settings;
+using Microsoft.Xna.Framework.Input;
+using Settings;
 
 namespace JumpKingMod.Patching
 {
@@ -23,14 +25,29 @@ namespace JumpKingMod.Patching
         private static ILogger logger;
         private static UITextEntity uiEntity;
         private static ModEntityManager modEntityManager;
+        private static Keys toggleKey;
+
+        private readonly UserSettings userSettings;
 
         /// <summary>
         /// Ctor for creating a <see cref="FreeFlyManualPatch"/>
         /// </summary>
-        public FreeFlyManualPatch(ModEntityManager newModEntityManager, ILogger newLogger)
+        public FreeFlyManualPatch(UserSettings userSettings, ModEntityManager newModEntityManager, ILogger newLogger)
         {
             logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
             modEntityManager = newModEntityManager ?? throw new ArgumentNullException(nameof(newModEntityManager));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
+
+            // Parse the key to use for toggling
+            string rawToggleKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1.ToString());
+            if (Enum.TryParse(rawToggleKey, out Keys parsedToggleKey))
+            {
+                toggleKey = parsedToggleKey;
+            }
+            else
+            {
+                toggleKey = Keys.F1;
+            }
         }
 
         /// <summary>
@@ -51,7 +68,7 @@ namespace JumpKingMod.Patching
         {
             try
             {
-                if (Keyboard.IsKeyDown(Key.F1) && !freeFlyingToggleCooldown)
+                if (Keyboard.GetState().IsKeyDown(toggleKey) && !freeFlyingToggleCooldown)
                 {
                     freeFlying = !freeFlying;
                     logger.Information($"Setting Free Flying to {freeFlying}");
@@ -70,7 +87,7 @@ namespace JumpKingMod.Patching
                         uiEntity = null;
                     }
                 }
-                else if (Keyboard.IsKeyUp(Key.F1) && freeFlyingToggleCooldown)
+                else if (Keyboard.GetState().IsKeyUp(toggleKey) && freeFlyingToggleCooldown)
                 {
                     freeFlyingToggleCooldown = false;
                 }
@@ -89,19 +106,19 @@ namespace JumpKingMod.Patching
                     curY = 0;
 
                     // Modify velocity if key is held
-                    if (Keyboard.IsKeyDown(Key.W))
+                    if (Keyboard.GetState().IsKeyDown(Keys.W))
                     {
                         curY -= 5;
                     }
-                    if (Keyboard.IsKeyDown(Key.A))
+                    if (Keyboard.GetState().IsKeyDown(Keys.A))
                     {
                         curX -= 5;
                     }
-                    if (Keyboard.IsKeyDown(Key.D))
+                    if (Keyboard.GetState().IsKeyDown(Keys.D))
                     {
                         curX += 5;
                     }
-                    if (Keyboard.IsKeyDown(Key.S))
+                    if (Keyboard.GetState().IsKeyDown(Keys.S))
                     {
                         curY += 5;
                     }
