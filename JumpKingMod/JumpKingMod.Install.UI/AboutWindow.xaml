@@ -1,0 +1,25 @@
+﻿<Window x:Class="JumpKingMod.Install.UI.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JumpKingMod.Install.UI"
+        mc:Ignorable="d"
+        Title="About" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+    <StackPanel>
+        <TextBlock Margin="10,10,10,20">
+            Created by Josh | PhantomBadger
+            <LineBreak/>
+            <LineBreak/>
+            To uninstall this mod, right click your game in Steam and select 
+            <LineBreak/>
+            'Properties->Local Files' then click 'Verify integrity of game files...'
+            <LineBreak/>
+            After a short moment Steam will uninstall the mod from the base game.
+            
+            <LineBreak/>
+            <LineBreak/>
+            <Hyperlink NavigateUri="https://twitter.com/PhantomBadger_" RequestNavigate="Hyperlink_RequestNavigate">Contact me on Twitter!</Hyperlink>
+        </TextBlock>
+    </StackPanel>
+</Window>

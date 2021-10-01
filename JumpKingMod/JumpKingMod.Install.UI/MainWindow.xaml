@@ -17,7 +17,14 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
-    <Grid>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Padding="2,0,0,2">
+            <MenuItem Header="_File">
+                <MenuItem Header="_About" Click="About_Click"/>
+                <Separator/>
+                <MenuItem Header="_Quit" Click="Quit_Click"/>
+            </MenuItem>
+        </Menu>
         <StackPanel Margin="5">
             <GroupBox Header="Install">
                 <StackPanel>
@@ -266,5 +273,5 @@
                 </StackPanel>
             </GroupBox>
         </StackPanel>
-    </Grid>
+    </DockPanel>
 </Window>
