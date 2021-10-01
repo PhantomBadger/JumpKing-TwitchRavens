@@ -10,29 +10,38 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JumpKingMod.Settings;
+using Settings;
 
 namespace JumpKingMod.Entities
 {
+    /// <summary>
+    /// An implementation of <see cref="IModEntity"/> which spawns racens based on a provided trigger
+    /// </summary>
     public class MessengerRavenSpawningEntity : IModEntity, IDisposable
     {
+        private readonly UserSettings userSettings;
         private readonly ModEntityManager modEntityManager;
         private readonly IMessengerRavenTrigger messengerRavenTrigger;
         private readonly ILogger logger;
         private readonly IRavenLandingPositionsCache ravenLandingPositionsCache;
         private readonly ConcurrentDictionary<MessengerRavenEntity, byte> messengerRavens;
         private readonly Random random;
+        private readonly int maxRavenCount;
+        private readonly Keys clearRavensKey;
+        private readonly Keys toggleRavenSpawningKey;
 
         private bool clearRavensCooldown;
         private bool toggleRavensCooldown;
         private bool isRavenSpawningActive;
 
-        private const int MaxRavenCount = 5;
-        private const Keys ClearRavensKey = Keys.F6;
-        private const Keys ToggleRavenSpawningKey = Keys.F7;
-
-        public MessengerRavenSpawningEntity(ModEntityManager modEntityManager, IMessengerRavenTrigger messengerRavenTrigger, 
-            ILogger logger)
+        /// <summary>
+        /// Ctor for creating a <see cref="MessengerRavenSpawningEntity"/>
+        /// </summary>
+        public MessengerRavenSpawningEntity(UserSettings userSettings, ModEntityManager modEntityManager, 
+            IMessengerRavenTrigger messengerRavenTrigger, ILogger logger)
         {
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.messengerRavenTrigger = messengerRavenTrigger ?? throw new ArgumentNullException(nameof(messengerRavenTrigger));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -44,20 +53,30 @@ namespace JumpKingMod.Entities
             toggleRavensCooldown = false;
             isRavenSpawningActive = true;
 
+            maxRavenCount = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5);
+            clearRavensKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
+            toggleRavenSpawningKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+
             messengerRavenTrigger.OnMessengerRavenTrigger += OnMessengerRavenTrigger;
             modEntityManager.AddEntity(this);
         }
 
+        /// <summary>
+        /// Implementation of <see cref="IDisposable.Dispose"/>
+        /// </summary>
         public void Dispose()
         {
             modEntityManager?.RemoveEntity(this);
             messengerRavenTrigger.OnMessengerRavenTrigger -= OnMessengerRavenTrigger;
         }
 
+        /// <summary>
+        /// Called by the Trigger implementation, spawns the raven
+        /// </summary>
         private void OnMessengerRavenTrigger(string ravenName, Color ravenNameColour, string ravenMessage)
         {
             // TODO: Object Pool
-            if (messengerRavens.Count >= MaxRavenCount)
+            if (messengerRavens.Count >= maxRavenCount)
             {
                 return;
             }
@@ -75,16 +94,19 @@ namespace JumpKingMod.Entities
                 modEntityManager, ravenLandingPositionsCache, logger), 0);
         }
 
+        /// <summary>
+        /// Called each frame by the Mod Entity Manager, allows debug controls and cleans up the ravens
+        /// </summary>
         public void Update(float p_delta)
         {
             // Debug controls
             KeyboardState keyboardState = Keyboard.GetState();
             // Clear all ravens from the screen
-            if (keyboardState.IsKeyDown(ClearRavensKey))
+            if (keyboardState.IsKeyDown(clearRavensKey))
             {
                 if (!clearRavensCooldown)
                 {
-                    logger.Information($"{ClearRavensKey.ToString()} Pressed - Clearing Ravens!");
+                    logger.Information($"{clearRavensKey.ToString()} Pressed - Clearing Ravens!");
                     foreach (var raven in messengerRavens)
                     {
                         if (raven.Key != null)
@@ -102,11 +124,11 @@ namespace JumpKingMod.Entities
             }
 
             // Toggle Ravens
-            if (keyboardState.IsKeyDown(ToggleRavenSpawningKey))
+            if (keyboardState.IsKeyDown(toggleRavenSpawningKey))
             {
                 if (!toggleRavensCooldown)
                 {
-                    logger.Information($"{ToggleRavenSpawningKey.ToString()} Pressed - {(isRavenSpawningActive ? "Disabling" : "Enabling")} Spawning of Ravens");
+                    logger.Information($"{toggleRavenSpawningKey.ToString()} Pressed - {(isRavenSpawningActive ? "Disabling" : "Enabling")} Spawning of Ravens");
                     isRavenSpawningActive = !isRavenSpawningActive;
 
                     toggleRavensCooldown = true;
@@ -138,6 +160,9 @@ namespace JumpKingMod.Entities
             }
         }
 
+        /// <summary>
+        /// Called each frame by the Mod Entity Manager, doesnt draw anything
+        /// </summary>
         public void Draw()
         {
             // Nothing

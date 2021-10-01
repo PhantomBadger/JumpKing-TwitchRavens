@@ -44,6 +44,10 @@ namespace JumpKingMod.Entities.Raven.Triggers
                 logger.Error($"Unable to identify a valid Channel Reward ID for Raven Spawning from the Settings File!");
                 return;
             }
+            else
+            {
+                logger.Information($"Listening for Channel Point ID '{channelRewardID}' to spawn Ravens");
+            }
 
             twitchClient.OnMessageReceived += OnMessageReceived;
         }

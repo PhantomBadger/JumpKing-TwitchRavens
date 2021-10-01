@@ -66,6 +66,61 @@ namespace JumpKingMod.Settings
         }
 
         /// <summary>
+        /// Gets an enum variation of the setting, or the default value if the key is not present
+        /// or the value is invalid
+        /// </summary>
+        public TEnum GetSettingOrDefault<TEnum>(string key, TEnum defaultValue)
+            where TEnum : struct
+        {
+            string rawValue = GetSettingOrDefault(key, defaultValue.ToString());
+            if (Enum.TryParse<TEnum>(rawValue, out TEnum parsedValue))
+            {
+                return parsedValue;
+            }
+            else
+            {
+                logger.Warning($"Unable to parse found setting for '{key}' into Enum, found value was '{rawValue}', using default of {defaultValue.ToString()} instead");
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets a bool variation of the setting, or the default value if the key is not present
+        /// or the value is invalid
+        /// </summary>
+        public bool GetSettingOrDefault(string key, bool defaultValue)
+        {
+            string rawValue = GetSettingOrDefault(key, defaultValue.ToString());
+            if (bool.TryParse(rawValue, out bool parsedValue))
+            {
+                return parsedValue;
+            }
+            else
+            {
+                logger.Warning($"Unable to parse found setting for '{key}' into bool, found value was '{rawValue}', using default of {defaultValue.ToString()} instead");
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets an int variation of the setting, or the default value if the key is not present
+        /// or the value is invalid
+        /// </summary>
+        public int GetSettingOrDefault(string key, int defaultValue)
+        {
+            string rawValue = GetSettingOrDefault(key, defaultValue.ToString());
+            if (int.TryParse(rawValue, out int parsedValue))
+            {
+                return parsedValue;
+            }
+            else
+            {
+                logger.Warning($"Unable to parse found setting for '{key}' into int, found value was '{rawValue}', using default of {defaultValue.ToString()} instead");
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
         /// Sets the setting, creating it if it isn't already present
         /// </summary>
         /// <param name="key">The key for the setting, not case sensitive</param>

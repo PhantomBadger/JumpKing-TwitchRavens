@@ -16,6 +16,9 @@ namespace Settings
 
         // Ravens
         public const string RavensEnabledKey = "RavensEnabled";
+        public const string RavensClearDebugKeyKey = "RavensClearDebugKey";
+        public const string RavensToggleDebugKeyKey = "RavensToggleDebugKey";
+        public const string RavensMaxCountKey = "RavensMaxCount";
         public const string RavenTriggerTypeKey = "RavenTriggerType";
         public const string RavenChannelPointRewardIDKey = "RavenChannelPointRewardID";
 
@@ -27,12 +30,26 @@ namespace Settings
         {
             return new Dictionary<string, string>()
             {
+                // Twitch Chat
                 { ChatListenerTwitchAccountNameKey, "" },
                 { OAuthKey, "" },
+
+                // Chat Display
                 { TwitchRelayEnabledKey, false.ToString() },
+
+                // Ravens
+                // General
                 { RavensEnabledKey, true.ToString() },
+                { RavensClearDebugKeyKey, Keys.F2.ToString() },
+                { RavensToggleDebugKeyKey, Keys.F3.ToString() },
+                { RavensMaxCountKey, 5.ToString() },
                 { RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage.ToString() },
+                // Message
+                // Channel Point
                 { RavenChannelPointRewardIDKey, "" },
+                // Insult
+
+                // Free Fly
                 { FreeFlyEnabledKey, false.ToString() },
                 { FreeFlyToggleKeyKey, Keys.F1.ToString() }
             };

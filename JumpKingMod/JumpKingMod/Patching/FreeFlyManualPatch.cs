@@ -39,15 +39,7 @@ namespace JumpKingMod.Patching
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
             // Parse the key to use for toggling
-            string rawToggleKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1.ToString());
-            if (Enum.TryParse(rawToggleKey, out Keys parsedToggleKey))
-            {
-                toggleKey = parsedToggleKey;
-            }
-            else
-            {
-                toggleKey = Keys.F1;
-            }
+            toggleKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
         }
 
         /// <summary>

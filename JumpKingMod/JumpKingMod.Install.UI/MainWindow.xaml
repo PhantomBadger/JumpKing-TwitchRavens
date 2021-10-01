@@ -95,13 +95,27 @@
                         <TabItem Header="Ravens">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="FirstColumn"/>
+                                    <ColumnDefinition Width="*" SharedSizeGroup="SecondColumn"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
+                                    <!-- Enabled -->
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Seperator -->
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Debug Toggle -->
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <!-- Debug Clear -->
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Max Count -->
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Trigger Type -->
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Trigger Settings -->
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
@@ -120,8 +134,22 @@
                                             The trigger for spawning the ravens
                                             <LineBreak/>
                                             <Bold>ChatMessage:</Bold> Whenever a Message is typed in the Twitch Chat
+                                            <LineBreak/>
                                             <Bold>ChannelPointReward:</Bold> Whenever a specified Channel Point Reward is redeemed
+                                            <LineBreak/>
                                             <Bold>Insult:</Bold> Whenever you fall off screen
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="ravenDebugToggleKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            Provides a key you can press to toggle the Ravens spawning during the game's run.
+                                            Useful in the event of a hate raid or if it's getting a bit much.
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="ravenDebugClearKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            Provides a key you can press to clear all Ravens currently on the screen.
+                                            Useful in case someone says something inappropriate.
                                         </TextBlock>
                                     </ToolTip>
                                 </Grid.Resources>
@@ -130,9 +158,54 @@
                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding RavenEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
                                 <!-- Separator -->
                                 <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
+                                <!-- Toggle Key -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Debug Toggle Key:" />
+                                <ComboBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavenToggleDebugKey, Mode=TwoWay}"/>
+                                <!-- Clear Key -->
+                                <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Debug Clear Key:" />
+                                <ComboBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavenClearDebugKey, Mode=TwoWay}"/>
+                                <!-- Trigger Settings: Chat Message -->
+                                <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Max Number of Ravens:" />
+                                <TextBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding MaxRavensCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <!-- Raven Trigger -->
-                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenTriggerTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Trigger Type:" />
-                                <ComboBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenTriggerTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource ravenTriggerTypeEnumValues}}" SelectedItem="{Binding RavenTriggerType, Mode=TwoWay}"/>
+                                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenTriggerTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Trigger Type:" />
+                                <ComboBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenTriggerTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource ravenTriggerTypeEnumValues}}" SelectedItem="{Binding RavenTriggerType, Mode=TwoWay}"/>
+                                <!-- Trigger Settings: Chat Message -->
+                                <Grid x:Name="grdChatPointSettings" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="FirstColumn"/>
+                                        <ColumnDefinition SharedSizeGroup="SharedColumn"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.Style>
+                                        <Style TargetType="{x:Type Grid}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RavenTriggerType}" Value="ChannelPointReward">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,10,10,5"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Channel Point Reward ID:" />
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" Grid.ColumnSpan="2" FontSize="9" TextWrapping="Wrap" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}">
+                                        <Italic>
+                                            If you're not sure how to get this, 
+                                            <Hyperlink NavigateUri="https://www.instafluff.tv/TwitchCustomRewardID/?channel=YOURNAME" RequestNavigate="Hyperlink_RequestNavigate">
+                                                click here 
+                                            </Hyperlink>
+                                            replace the 'YOURNAME' in the URL with your twitch username
+                                            and then redeem the reward in your chat.
+                                        </Italic>
+                                    </TextBlock>
+                                    <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding RavensChannelPointID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Chat Display">
@@ -149,13 +222,15 @@
                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding ChatDisplayEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="Misc">
+                        <TabItem Header="Fly">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
@@ -168,11 +243,18 @@
                                     </ToolTip>
                                 </Grid.Resources>
                                 <!-- Free Fly Enabled -->
-                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource freeFlyTooltip}" Text="Enable Free Flying Mod: " />
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource freeFlyTooltip}" Text="Enabled: " />
                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource freeFlyTooltip}" IsChecked="{Binding FreeFlyingEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" FontSize="9" TextWrapping="Wrap">
+                                    <Italic>
+                                        Enabling this option will disable Steam Achievements in the game!
+                                    </Italic>
+                                </TextBlock>
+                                <!-- Seperator -->
+                                <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
                                 <!-- Debug Button -->
-                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource freeFlyTooltip}" Visibility="{Binding FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Key:" />
-                                <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" ToolTip="{StaticResource freeFlyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding FreeFlyToggleKey, Mode=TwoWay}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource freeFlyTooltip}" Visibility="{Binding FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Key:" />
+                                <ComboBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource freeFlyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding FreeFlyToggleKey, Mode=TwoWay}"/>
                             </Grid>
                         </TabItem>
                     </TabControl>

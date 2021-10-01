@@ -36,6 +36,17 @@ namespace JumpKingMod
                 Harmony harmony = new Harmony("com.phantombadger.jumpkingmod");
                 harmony.PatchAll();
 
+                Logger.Information($"====================================");
+                Logger.Information($"Thanks for using PhantomBadger's Jump King Mod!");
+                Logger.Information($"You don't need to credit me for use of the mod, but a shoutout");
+                Logger.Information($"would be much appreciated!");
+                Logger.Information($"====================================");
+                Logger.Information($"Send me a tweet if you use my mod, I'd love to check out the VOD!");
+                Logger.Information($"====================================");
+                Logger.Information($"Twitter - @PhantomBadger_");
+                Logger.Information($"Twitch - PhantomBadger");
+                Logger.Information($"====================================");
+
                 // Load Settings
                 UserSettings userSettings = new UserSettings(JumpKingModSettingsContext.SettingsFileName, JumpKingModSettingsContext.GetDefaultSettings(), Logger);
 
@@ -52,18 +63,15 @@ namespace JumpKingMod
                 TwitchClientFactory twitchClientFactory = new TwitchClientFactory(userSettings, Logger);
 
                 // Free Fly Patch
-                string freeFlyEnabledRaw = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false.ToString());
-                if (bool.TryParse(freeFlyEnabledRaw, out bool freeFlyEnabled))
+                bool freeFlyEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false);
+                if (freeFlyEnabled)
                 {
-                    if (freeFlyEnabled)
-                    {
-                        Logger.Information($"Initialising Free Fly Mod");
-                        IManualPatch freeFlyPatch = new FreeFlyManualPatch(userSettings, modEntityManager, Logger);
-                        freeFlyPatch.SetUpManualPatch(harmony);
+                    Logger.Information($"Initialising Free Fly Mod");
+                    IManualPatch freeFlyPatch = new FreeFlyManualPatch(userSettings, modEntityManager, Logger);
+                    freeFlyPatch.SetUpManualPatch(harmony);
 
-                        IManualPatch achievementDisablePatch = new AchievementRegisterDisableManualPatch();
-                        achievementDisablePatch.SetUpManualPatch(harmony);
-                    }
+                    IManualPatch achievementDisablePatch = new AchievementRegisterDisableManualPatch();
+                    achievementDisablePatch.SetUpManualPatch(harmony);
                 }
 
                 // Run the rest after the game loop has started
@@ -75,61 +83,47 @@ namespace JumpKingMod
                     }
 
                     // Twitch Chat Relay
-                    string relayEnabledRaw = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false.ToString());
-                    if (bool.TryParse(relayEnabledRaw, out bool relayEnabled))
+                    bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
+                    if (relayEnabled)
                     {
-                        if (relayEnabled)
-                        {
-                            Logger.Information($"Initialising Twitch Chat UI Display");
-                            TwitchChatUIDisplay relay = new TwitchChatUIDisplay(modEntityManager, gameStateObserver, Logger);
-                        }
-                    }
-                    else
-                    {
-                        Logger.Warning($"Failed to parse '{JumpKingModSettingsContext.TwitchRelayEnabledKey}' from the settings file, read value of '{relayEnabledRaw}'");
+                        Logger.Information($"Initialising Twitch Chat UI Display");
+                        TwitchChatUIDisplay relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
                     }
 
                     // Ravens
-                    string ravensEnabledRaw = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false.ToString());
-                    if (bool.TryParse(ravensEnabledRaw, out bool ravensEnabled) && ravensEnabled)
+                    bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false);
+                    if (ravensEnabled)
                     {
                         // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
                         // using that trigger
-                        string ravenTriggerTypeRaw = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage.ToString());
-                        if (Enum.TryParse(ravenTriggerTypeRaw, out RavenTriggerTypes parsedTriggerType))
+                        RavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
+                        IMessengerRavenTrigger ravenTrigger = null;
+                        switch (ravenTriggerType)
                         {
-                            IMessengerRavenTrigger ravenTrigger = null;
-                            switch (parsedTriggerType)
-                            {
-                                case RavenTriggerTypes.ChatMessage:
-                                    Logger.Information($"Loading Chat Message Raven Trigger");
-                                    ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger); ;
-                                    break;
-                                case RavenTriggerTypes.ChannelPointReward:
-                                    Logger.Information($"Loading Channel Point Raven Trigger");
-                                    ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger);
-                                    break;
-                                case RavenTriggerTypes.Insult:
-                                    Logger.Information($"Loading Insult Raven Trigger");
-                                    PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(Logger);
-                                    fallTrigger.SetUpManualPatch(harmony);
-                                    ravenTrigger = fallTrigger;
-                                    break;
-                                default:
-                                    Logger.Error($"Unknown Raven Trigger Type {parsedTriggerType.ToString()}");
-                                    break;
-                            }
-
-                            if (ravenTrigger != null)
-                            {
-                                Logger.Information($"Initialising Messenger Ravens");
-                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(modEntityManager, ravenTrigger, Logger);
-                            }
+                            case RavenTriggerTypes.ChatMessage:
+                                Logger.Information($"Loading Chat Message Raven Trigger");
+                                ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger); ;
+                                break;
+                            case RavenTriggerTypes.ChannelPointReward:
+                                Logger.Information($"Loading Channel Point Raven Trigger");
+                                ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger);
+                                break;
+                            case RavenTriggerTypes.Insult:
+                                Logger.Information($"Loading Insult Raven Trigger");
+                                PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(Logger);
+                                fallTrigger.SetUpManualPatch(harmony);
+                                ravenTrigger = fallTrigger;
+                                break;
+                            default:
+                                Logger.Error($"Unknown Raven Trigger Type {ravenTriggerType.ToString()}");
+                                break;
                         }
-                    }
-                    else
-                    {
-                        Logger.Warning($"Failed to parse '{JumpKingModSettingsContext.RavensEnabledKey}' from the settings file");
+
+                        if (ravenTrigger != null)
+                        {
+                            Logger.Information($"Initialising Messenger Ravens");
+                            MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTrigger, Logger);
+                        }
                     }
                 });
             }

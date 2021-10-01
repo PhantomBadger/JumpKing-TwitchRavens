@@ -126,6 +126,46 @@ namespace JumpKingMod.Install.UI
         private bool ravenEnabled;
 
         /// <summary>
+        /// The key to use to toggle the raven spawning
+        /// </summary>
+        public Keys RavenToggleDebugKey
+        {
+            get
+            {
+                return ravenToggleDebugKey;
+            }
+            set
+            {
+                if (ravenToggleDebugKey != value)
+                {
+                    ravenToggleDebugKey = value;
+                    RaisePropertyChanged(nameof(RavenToggleDebugKey));
+                }
+            }
+        }
+        private Keys ravenToggleDebugKey;
+
+        /// <summary>
+        /// The key to use to clear the ravens
+        /// </summary>
+        public Keys RavenClearDebugKey
+        {
+            get
+            {
+                return ravenClearDebugKey;
+            }
+            set
+            {
+                if (ravenClearDebugKey != value)
+                {
+                    ravenClearDebugKey = value;
+                    RaisePropertyChanged(nameof(RavenClearDebugKey));
+                }
+            }
+        }
+        private Keys ravenClearDebugKey;
+
+        /// <summary>
         /// The trigger type we want to use for the ravens
         /// </summary>
         public RavenTriggerTypes RavenTriggerType
@@ -144,6 +184,57 @@ namespace JumpKingMod.Install.UI
             }
         }
         private RavenTriggerTypes ravenTriggerType;
+
+        /// <summary>
+        /// The maximum number of ravens visible on the screen at once
+        /// </summary>
+        public string MaxRavensCount
+        {
+            get
+            {
+                return maxRavensCount.ToString();
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    maxRavensCount = 0;
+                }
+                else
+                {
+                    if (int.TryParse(value, out int newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        maxRavensCount = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(MaxRavensCount));
+            }
+        }
+        private int maxRavensCount;
+
+        /// <summary>
+        /// The ID of the Channel Point Reward to use for the Raven Trigger
+        /// </summary>
+        public string RavensChannelPointID
+        {
+            get
+            {
+                return ravensChannelPointID;
+            }
+            set
+            {
+                if (ravensChannelPointID != value)
+                {
+                    ravensChannelPointID = value;
+                    RaisePropertyChanged(nameof(RavensChannelPointID));
+                }
+            }
+        }
+        private string ravensChannelPointID;
 
         /// <summary>
         /// Whether the chat display is enabled or not
@@ -461,19 +552,41 @@ namespace JumpKingMod.Install.UI
         /// </summary>
         private void UpdateModSettings()
         {
-            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchAccountName);
-            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchOAuth);
+            if (ModSettings == null)
+            {
+                return;
+            }
+
+            if (RavenEnabled && 
+                (RavenTriggerType == RavenTriggerTypes.ChannelPointReward || RavenTriggerType == RavenTriggerTypes.ChatMessage) && 
+                ChatDisplayEnabled)
+            {
+                MessageBoxResult result = MessageBox.Show($"If Chat Display is active, the Chat-based Raven Triggers will not function. Are you sure you want to proceed?", "Setting Conflict!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Cancel || result == MessageBoxResult.No || result == MessageBoxResult.None)
+                {
+                    return;
+                }
+            }
+
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchAccountName);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchOAuth);
 
             // Ravens
-            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, RavenEnabled.ToString());
-            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerType.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, RavenEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensToggleDebugKeyKey, RavenToggleDebugKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensClearDebugKeyKey, RavenClearDebugKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensMaxCountKey, MaxRavensCount);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerType.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, RavensChannelPointID);
 
             // Chat Display
-            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
 
             // Free Fly
-            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
-            ModSettings?.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
+
+            MessageBox.Show($"Settings updated successfully!");
         }
 
         /// <summary>
@@ -493,57 +606,19 @@ namespace JumpKingMod.Install.UI
                 TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
 
                 // Raven Info
-                string rawRavenType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage.ToString());
-                if (Enum.TryParse(rawRavenType, out RavenTriggerTypes ravenTriggerType))
-                {
-                    RavenTriggerType = ravenTriggerType;
-                }
-                else
-                {
-                    RavenTriggerType = RavenTriggerTypes.ChatMessage;
-                }
-
-                string rawRavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true.ToString());
-                if (bool.TryParse(rawRavenEnabled, out bool ravenEnabled))
-                {
-                    RavenEnabled = ravenEnabled;
-                }
-                else
-                {
-                    RavenEnabled = true;
-                }
+                RavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true);
+                RavenClearDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
+                RavenToggleDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+                MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5.ToString());
+                RavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
+                RavensChannelPointID = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
 
                 // Chat Display Info
-                string rawDisplayEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false.ToString());
-                if (bool.TryParse(rawDisplayEnabled, out bool displayEnabled))
-                {
-                    ChatDisplayEnabled = displayEnabled;
-                }
-                else
-                {
-                    ChatDisplayEnabled = false;
-                }
+                ChatDisplayEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
 
                 // Free Fly
-                string rawFreeFlyEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false.ToString());
-                if (bool.TryParse(rawFreeFlyEnabled, out bool freeFlyEnabled))
-                {
-                    FreeFlyingEnabled = freeFlyEnabled;
-                }
-                else
-                {
-                    FreeFlyingEnabled = false;
-                }
-
-                string rawFreeFlyToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1.ToString());
-                if (Enum.TryParse(rawFreeFlyToggleKey, out Keys toggleKey))
-                {
-                    FreeFlyToggleKey = toggleKey;
-                }
-                else
-                {
-                    FreeFlyToggleKey = Keys.F1;
-                }
+                FreeFlyingEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false);
+                FreeFlyToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
             }
         }
 

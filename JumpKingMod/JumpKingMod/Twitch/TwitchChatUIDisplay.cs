@@ -4,6 +4,7 @@ using JumpKingMod.Entities;
 using JumpKingMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
+using Settings;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -33,18 +34,12 @@ namespace JumpKingMod.Twitch
         private LinkedList<UITextEntity> textEntities;
 
         private const int NumberOfChatEntities = 5;
-        private const string SettingsFileName = "TwitchChatRelay.settings";
-        private readonly Dictionary<string, string> DefaultSettings = new Dictionary<string, string>()
-        {
-            { "TwitchAccountName", "" },
-            { "OAuth", "" },
-        };
         private readonly Vector2 ChatBoxBottomLeft = new Vector2(10, 100);
 
         /// <summary>
         /// Ctor for creating a <see cref="TwitchChatUIDisplay"/>
         /// </summary>
-        public TwitchChatUIDisplay(ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, ILogger logger)
+        public TwitchChatUIDisplay(TwitchClient twitchClient, ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, ILogger logger)
         {
             // Keep track of the logger
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
@@ -59,39 +54,9 @@ namespace JumpKingMod.Twitch
                 SetupObjectPool();
             });
 
-            // Initialise the settings and attempt to load the OAuth Token
-            var userSettings = new UserSettings(SettingsFileName, DefaultSettings, logger);
-            string oAuthToken = userSettings.GetSettingOrDefault("OAuth", string.Empty);
-            string twitchName = userSettings.GetSettingOrDefault("TwitchAccountName", string.Empty);
-
-            // If the Oauth Token is bad, exit now
-            if (string.IsNullOrWhiteSpace(oAuthToken))
-            {
-                logger.Error($"No valid OAuth token found in the {SettingsFileName} file!");
-                isValid = false;
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(twitchName))
-            {
-                logger.Error($"No valid TwitchAccountName found in the {SettingsFileName} file!");
-                isValid = false;
-                return;
-            }
-            logger.Information($"Setting up Twitch Relay for {twitchName}");
-
-            var credentials = new ConnectionCredentials(twitchName, oAuthToken);
-            var clientOptions = new ClientOptions
-            {
-                MessagesAllowedInPeriod = 750,
-                ThrottlingPeriod = TimeSpan.FromSeconds(30)
-            };
-            WebSocketClient webSocketClient = new WebSocketClient(clientOptions);
-            twitchClient = new TwitchClient(webSocketClient);
-            twitchClient.Initialize(credentials, twitchName);
-
+            this.twitchClient = twitchClient;
             twitchClient.OnMessageReceived += OnMessageReceived;
 
-            twitchClient.Connect();
             isValid = true;
 
             // Kick off the processing thread
@@ -105,6 +70,7 @@ namespace JumpKingMod.Twitch
         /// </summary>
         public void Dispose()
         {
+            twitchClient.OnMessageReceived -= OnMessageReceived;
             twitchClient?.Disconnect();
             processingThread?.Abort();
         }
