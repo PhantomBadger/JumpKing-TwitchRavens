@@ -361,7 +361,7 @@ namespace JumpKingMod.Install.UI
         /// </summary>
         private bool CanUpdateModSettings()
         {
-            string expectedSettingsFilePath = Path.Combine(ExpectedRemoteModDirectory, JumpKingModSettingsContext.SettingsFileName);
+            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingModSettingsContext.SettingsFileName);
             bool fileExists = File.Exists(expectedSettingsFilePath);
             return fileExists;
         }
@@ -411,8 +411,7 @@ namespace JumpKingMod.Install.UI
         private void LoadModSettings(bool createIfDoesntExist)
         {
             // Load in the settings
-            string expectedRemoteModFolder = ExpectedRemoteModDirectory;
-            string expectedSettingsFilePath = Path.Combine(expectedRemoteModFolder, JumpKingModSettingsContext.SettingsFileName);
+            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingModSettingsContext.SettingsFileName);
             if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
             {
                 ModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModSettingsContext.GetDefaultSettings(), logger);

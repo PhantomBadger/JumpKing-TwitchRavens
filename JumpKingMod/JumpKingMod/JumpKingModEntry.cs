@@ -58,6 +58,7 @@ namespace JumpKingMod
                 string relayEnabledRaw = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false.ToString());
                 if (bool.TryParse(relayEnabledRaw, out bool relayEnabled) && relayEnabled)
                 {
+                    Logger.Information($"Initialising Twitch Chat UI Display");
                     TwitchChatUIDisplay relay = new TwitchChatUIDisplay(modEntityManager, gameStateObserver, Logger);
                 }
                 else
@@ -85,12 +86,15 @@ namespace JumpKingMod
                             switch (parsedTriggerType)
                             {
                                 case RavenTriggerTypes.ChatMessage:
+                                    Logger.Information($"Loading Chat Message Raven Trigger");
                                     ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger); ;
                                     break;
                                 case RavenTriggerTypes.ChannelPointReward:
+                                    Logger.Information($"Loading Channel Point Raven Trigger");
                                     ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger);
                                     break;
                                 case RavenTriggerTypes.Insult:
+                                    Logger.Information($"Loading Insult Raven Trigger");
                                     PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(Logger);
                                     fallTrigger.SetUpManualPatch(harmony);
                                     ravenTrigger = fallTrigger;
@@ -102,6 +106,7 @@ namespace JumpKingMod
 
                             if (ravenTrigger != null)
                             {
+                                Logger.Information($"Initialising Messenger Ravens");
                                 MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(modEntityManager, ravenTrigger, Logger);
                             }
                         }
