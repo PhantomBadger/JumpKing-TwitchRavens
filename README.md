@@ -41,3 +41,12 @@ Most of the settings in the Installer have ToolTips or extra text explaining wha
 You can reach out to me on [Twitter](https://twitter.com/PhantomBadger_)
 
 ![heartchatmessage](https://user-images.githubusercontent.com/9095972/135729076-857302a4-7878-4654-b288-73283ae76090.png)
+
+# Future Features
+
+- [x] Support for Babe of Ascension & JK+
+- [ ] Custom Insults for the Insult Ravens
+- [ ] Text Wrapping for Longer Messages
+- [ ] Runtime Sub-Only Toggles
+- [ ] Twitch Emote Support
+- [ ] Support for Different Raven Sprites
