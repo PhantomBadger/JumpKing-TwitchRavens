@@ -9,6 +9,8 @@ There's even an 'Insult' mode, where the Ravens will instead bully you every tim
 
 ## Installation
 
+**If you're not using Steam, make a copy of the MonoGame.Framework.dll in your Game's install directory first! It will make uninstalling easier!**
+
 Check the Release page for the latest download
 - Run the Installer.UI.exe inside the Installer Folder
 
@@ -35,7 +37,7 @@ Most of the settings in the Installer have ToolTips or extra text explaining wha
 
 - To Uninstall the game, right click on the game in Steam, go to _Properties_, then _Local Files_, then click _Verify Integrity of game files..._
 - These instructions are mirrored in the 'About' window in the installer
-- For those not using Steam for the running of Jump King, you may need to redownload the game (The MonoGame.Framework.dll in particular!)
+- For those not using Steam for the running of Jump King, you may need to redownload the game (Or if you made a copy of the MonoGame.Framework.dll you can just replace the one in the game directory with your copy!) 
 
 # Contact
 You can reach out to me on [Twitter](https://twitter.com/PhantomBadger_)
