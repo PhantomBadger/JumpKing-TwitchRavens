@@ -65,17 +65,24 @@ namespace JumpKingMod.Entities.Raven.Triggers
         /// </summary>
         private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            // Print the message to the console
-            string displayString = $"{e?.ChatMessage?.Username}: {e?.ChatMessage?.Message}";
-            logger.Information(displayString);
-
-            if (e == null || e.ChatMessage == null || string.IsNullOrWhiteSpace(e.ChatMessage.Message))
+            try
             {
-                return;
-            }
+                // Print the message to the console
+                string displayString = $"{e?.ChatMessage?.Username}: {e?.ChatMessage?.Message}";
+                logger.Information(displayString);
 
-            // Queue up the request
-            relayRequestQueue.Add(e);
+                if (e == null || e.ChatMessage == null || string.IsNullOrWhiteSpace(e.ChatMessage.Message))
+                {
+                    return;
+                }
+
+                // Queue up the request
+                relayRequestQueue.Add(e);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Encountered Exception during OnMessageReceived: {ex.ToString()}");
+            }
         }
 
         /// <summary>
@@ -85,16 +92,23 @@ namespace JumpKingMod.Entities.Raven.Triggers
         {
             while (true)
             {
-                // Pop off a request
-                OnMessageReceivedArgs e = relayRequestQueue.Take();
-                string colourHex = e.ChatMessage.ColorHex;
-                Color nameColour = Color.White;
-                if (!string.IsNullOrWhiteSpace(colourHex) && colourHex.Length >= 7)
+                try
                 {
-                    nameColour = TwitchHexColourParser.ParseColourFromHex(colourHex);
+                    // Pop off a request
+                    OnMessageReceivedArgs e = relayRequestQueue.Take();
+                    string colourHex = e.ChatMessage.ColorHex;
+                    Color nameColour = Color.White;
+                    if (!string.IsNullOrWhiteSpace(colourHex) && colourHex.Length >= 7)
+                    {
+                        nameColour = TwitchHexColourParser.ParseColourFromHex(colourHex);
+                    }
+
+                    OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message);
                 }
-                
-                OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message);
+                catch (Exception ex)
+                {
+                    logger.Error($"Encountered Exception during ProcessRelayRequests: {ex.ToString()}");
+                }
             }
         }
     }

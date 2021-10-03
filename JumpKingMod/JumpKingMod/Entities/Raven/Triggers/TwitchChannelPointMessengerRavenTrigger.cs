@@ -68,16 +68,28 @@ namespace JumpKingMod.Entities.Raven.Triggers
         /// </summary>
         private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            if (e.ChatMessage.CustomRewardId.Equals(channelRewardID, StringComparison.OrdinalIgnoreCase))
+            if (e == null || e.ChatMessage == null || e.ChatMessage.CustomRewardId == null)
             {
-                string colourHex = e.ChatMessage.ColorHex;
-                Color nameColour = Color.White;
-                if (!string.IsNullOrWhiteSpace(colourHex) && colourHex.Length >= 7)
-                {
-                    nameColour = TwitchHexColourParser.ParseColourFromHex(colourHex);
-                }
+                return;
+            }
 
-                OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message);
+            try
+            {
+                if (e.ChatMessage.CustomRewardId.Equals(channelRewardID, StringComparison.OrdinalIgnoreCase))
+                {
+                    string colourHex = e.ChatMessage.ColorHex;
+                    Color nameColour = Color.White;
+                    if (!string.IsNullOrWhiteSpace(colourHex) && colourHex.Length >= 7)
+                    {
+                        nameColour = TwitchHexColourParser.ParseColourFromHex(colourHex);
+                    }
+
+                    OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Encountered Exception during OnMessageReceived: {ex.ToString()}");
             }
         }
     }

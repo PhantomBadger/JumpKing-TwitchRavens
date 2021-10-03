@@ -65,18 +65,21 @@ namespace JumpKingMod.Twitch
                 logger.Information($"Setting up Twitch Chat Client for {twitchName}");
 
                 var credentials = new ConnectionCredentials(twitchName, oAuthToken);
-                var clientOptions = new ClientOptions
-                {
-                    MessagesAllowedInPeriod = 750,
-                    ThrottlingPeriod = TimeSpan.FromSeconds(30)
-                };
+                var clientOptions = new ClientOptions();
                 WebSocketClient webSocketClient = new WebSocketClient(clientOptions);
                 twitchClient = new TwitchClient(webSocketClient);
                 twitchClient.Initialize(credentials, twitchName);
+
+                //twitchClient.OnLog += TwitchClient_OnLog;
 
                 twitchClient.Connect();
                 return twitchClient;
             }
         }
+
+        //private void TwitchClient_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
+        //{
+        //    logger.Information($"LOG {e.BotUsername} | {e.Data}");
+        //}
     }
 }

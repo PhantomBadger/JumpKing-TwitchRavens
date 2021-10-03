@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:JumpKingMod.Install.UI"
         xmlns:settings="clr-namespace:Settings;assembly=Settings"
         mc:Ignorable="d"
-        Title="Jump King Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        Title="Jump King Twitch Ravens Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="boolToVisibilityConverter" />
         <ObjectDataProvider x:Key="keysEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">

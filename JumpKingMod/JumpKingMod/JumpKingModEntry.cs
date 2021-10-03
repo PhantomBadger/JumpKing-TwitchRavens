@@ -37,7 +37,7 @@ namespace JumpKingMod
                 harmony.PatchAll();
 
                 Logger.Information($"====================================");
-                Logger.Information($"Thanks for using PhantomBadger's Jump King Mod!");
+                Logger.Information($"Thanks for using PhantomBadger's Jump King Twitch Raven Mod!");
                 Logger.Information($"You don't need to credit me for use of the mod, but a shoutout");
                 Logger.Information($"would be much appreciated!");
                 Logger.Information($"====================================");
