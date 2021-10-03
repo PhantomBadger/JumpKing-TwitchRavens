@@ -1,17 +1,34 @@
 # Jump King Twitch Raven Mod
 This Mod allows your Twitch Chat to lend words of encouragement whilst you climb to the babe! 
 
-Ravens can fly onto the stage and relay messages from your community, triggered either on every chat message or via a configurable Channel Point Reward.
+## Features
+### Twitch Ravens
+Twitch Chat can now communicate with you within the world of Jump King! Messages from chat will be parroted by small ravens that land on the stage as you traverse it. You have the option of gating this behind a Channel Point reward for busier chats!
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/9095972/135728881-c4a61ccb-663b-4218-8f22-9ece0366592a.gif" width="75%" height="75%" alt="Ravens land on the stage to relay messages from Twitch Chat!"/>
+</p>
 
-There's even an 'Insult' mode, where the Ravens will instead bully you every time you fall.
+The Ravens can be triggered through different ways to suit your chat
+- **Chat Message:** Spawns a Raven for every Chat Message that appears
+- **Channel Point:** Spawns a Raven when a chatter redeems a specified Channel Point (Uses the text from that channel point!)
+- **Insult:** Spawns Ravens when you fall, they choose from a pre-determined list of insults
 
-![birdchattest](https://user-images.githubusercontent.com/9095972/135728881-c4a61ccb-663b-4218-8f22-9ece0366592a.gif)
+### Chat Display
+Alternatively, you can opt to display the Twitch Chat directly in your game instead!
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/9095972/135768756-8af8db85-4c54-4ea3-9cbe-fafcebb6bf27.gif" width="75%" height="75%"/>
+</p>
+
+### Free Flying
+Toggle a 'free flying' mode for the Jump King, which will let you explore or practice jumps without consequence!
+
+_**Note:** Enabling this aspect of the mod will disable achievements in the game until the Free Flying mod is turned off in the settings!_
 
 ## Installation
 
 **If you're not using Steam, make a copy of the MonoGame.Framework.dll in your Game's install directory first! It will make uninstalling easier!**
 
-Check the Release page for the latest download
+Check the [Release](https://github.com/PhantomBadger/JumpKingMod/releases/) page for the latest download
 - Run the Installer.UI.exe inside the Installer Folder
 
 ![image](https://user-images.githubusercontent.com/9095972/135728412-5d00983e-8827-416d-8d55-3a87a5f9f6d7.png)
@@ -25,13 +42,6 @@ Check the Release page for the latest download
 
 - You can re-launch the Installer UI at any point, and click the 'Load Settings' button. The Application will attempt to load a valid settings file from the specified Game Directory
 - After which you can edit the settings you desire, click 'Save Settings', and your changes will take effect next time you launch the game 
-
-### Settings Info
-Most of the settings in the Installer have ToolTips or extra text explaining what they do
-- Raven Trigger Types:
-  - **Chat Message:** Spawns a Raven for every Chat Message that appears
-  - **Channel Point:** Spawns a Raven when a chatter redeems a specified Channel Point (Uses the text from that channel point!)
-  - **Insult:** Spawns Ravens when you fall, they choose from a pre-determined list of insults
 
 ## Uninstallation
 
