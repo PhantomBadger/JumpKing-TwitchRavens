@@ -56,7 +56,7 @@ You can reach out to me on [Twitter](https://twitter.com/PhantomBadger_)
 
 # Future Features
 
-- [x] Support for Babe of Ascension & JK+
+- [ ] Configurable exclusion word list
 - [ ] Custom Insults for the Insult Ravens
 - [ ] Text Wrapping for Longer Messages
 - [ ] Runtime Sub-Only Toggles
