@@ -29,6 +29,12 @@ _**Note:** Enabling this aspect of the mod will disable achievements in the game
 **If you're not using Steam, make a copy of the MonoGame.Framework.dll in your Game's install directory first! It will make uninstalling easier!**
 
 Check the [Release](https://github.com/PhantomBadger/JumpKingMod/releases/) page for the latest download
+
+**Before unzipping the downloaded .zip, Right Click, select 'Properties' and if there is an option at the bottom to 'Unblock' the file, tick it, and click 'Apply'**
+
+![image](https://user-images.githubusercontent.com/9095972/137400443-37a037bf-b1b2-407e-acea-06cea1232fdd.png)
+
+This will ensure that the mod loader isn't treated as a harmful application when running.
 - Run the Installer.UI.exe inside the Installer Folder
 
 ![image](https://user-images.githubusercontent.com/9095972/135728412-5d00983e-8827-416d-8d55-3a87a5f9f6d7.png)
@@ -38,6 +44,18 @@ Check the [Release](https://github.com/PhantomBadger/JumpKingMod/releases/) page
 - You should fill in and Save the Settings via the Installer first, to ensure everything runs smoothly :)
 - You can now launch the game normally from Steam/however you normally launch. You can be sure the mod has been installed correctly because a Console Window will open alongside
 
+### Common Issues
+<details>
+  <summary>Operation is not supported. HRESULT: 0x80131515</summary>
+  
+  <p align="center">
+    <img src="https://user-images.githubusercontent.com/9095972/137400957-8d5399be-3e28-46de-b589-d8fea48cbe2b.png" width="75%" height="75%"/>
+  </p>
+
+  Occurs when running the game after installing.
+  This is because your computer is blocking the .dlls from being dynamically loaded by Jump King. You can either right click each .dll in the mods folder, go to 'properties' and then click 'Unblock'. Or alternatively, you can run a powershell command in the mod's directory such as `dir -Recurse | Unblock-File` to unblock the files all at once. 
+</details>
+  
 ## Updating the Settings
 
 - You can re-launch the Installer UI at any point, and click the 'Load Settings' button. The Application will attempt to load a valid settings file from the specified Game Directory
