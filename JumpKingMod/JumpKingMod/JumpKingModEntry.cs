@@ -77,53 +77,60 @@ namespace JumpKingMod
                 // Run the rest after the game loop has started
                 Task.Run(() =>
                 {
-                    while (!gameStateObserver.IsGameLoopRunning())
+                    try
                     {
-                        Task.Delay(100).Wait();
-                    }
-
-                    // Twitch Chat Relay
-                    bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
-                    if (relayEnabled)
-                    {
-                        Logger.Information($"Initialising Twitch Chat UI Display");
-                        TwitchChatUIDisplay relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
-                    }
-
-                    // Ravens
-                    bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false);
-                    if (ravensEnabled)
-                    {
-                        // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
-                        // using that trigger
-                        RavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
-                        IMessengerRavenTrigger ravenTrigger = null;
-                        switch (ravenTriggerType)
+                        while (!gameStateObserver.IsGameLoopRunning())
                         {
-                            case RavenTriggerTypes.ChatMessage:
-                                Logger.Information($"Loading Chat Message Raven Trigger");
-                                ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger); ;
-                                break;
-                            case RavenTriggerTypes.ChannelPointReward:
-                                Logger.Information($"Loading Channel Point Raven Trigger");
-                                ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger);
-                                break;
-                            case RavenTriggerTypes.Insult:
-                                Logger.Information($"Loading Insult Raven Trigger");
-                                PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(Logger);
-                                fallTrigger.SetUpManualPatch(harmony);
-                                ravenTrigger = fallTrigger;
-                                break;
-                            default:
-                                Logger.Error($"Unknown Raven Trigger Type {ravenTriggerType.ToString()}");
-                                break;
+                            Task.Delay(100).Wait();
                         }
 
-                        if (ravenTrigger != null)
+                        // Twitch Chat Relay
+                        bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
+                        if (relayEnabled)
                         {
-                            Logger.Information($"Initialising Messenger Ravens");
-                            MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTrigger, Logger);
+                            Logger.Information($"Initialising Twitch Chat UI Display");
+                            TwitchChatUIDisplay relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
                         }
+
+                        // Ravens
+                        bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false);
+                        if (ravensEnabled)
+                        {
+                            // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
+                            // using that trigger
+                            RavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
+                            IMessengerRavenTrigger ravenTrigger = null;
+                            switch (ravenTriggerType)
+                            {
+                                case RavenTriggerTypes.ChatMessage:
+                                    Logger.Information($"Loading Chat Message Raven Trigger");
+                                    ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger); ;
+                                    break;
+                                case RavenTriggerTypes.ChannelPointReward:
+                                    Logger.Information($"Loading Channel Point Raven Trigger");
+                                    ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger);
+                                    break;
+                                case RavenTriggerTypes.Insult:
+                                    Logger.Information($"Loading Insult Raven Trigger");
+                                    PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(Logger);
+                                    fallTrigger.SetUpManualPatch(harmony);
+                                    ravenTrigger = fallTrigger;
+                                    break;
+                                default:
+                                    Logger.Error($"Unknown Raven Trigger Type {ravenTriggerType.ToString()}");
+                                    break;
+                            }
+
+                            if (ravenTrigger != null)
+                            {
+                                Logger.Information($"Initialising Messenger Ravens");
+                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTrigger, Logger);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error($"Error on Post-GameLoop Init: {e.ToString()}");
                     }
                 });
             }

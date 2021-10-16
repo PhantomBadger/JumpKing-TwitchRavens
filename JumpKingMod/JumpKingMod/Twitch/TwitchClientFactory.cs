@@ -51,6 +51,9 @@ namespace JumpKingMod.Twitch
                 string oAuthToken = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
                 string twitchName = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
 
+                oAuthToken = oAuthToken.Trim();
+                twitchName = twitchName.Trim();
+
                 // If the Oauth Token is bad, exit now
                 if (string.IsNullOrWhiteSpace(oAuthToken))
                 {
@@ -62,7 +65,7 @@ namespace JumpKingMod.Twitch
                     logger.Error($"No valid TwitchAccountName found in the {JumpKingModSettingsContext.SettingsFileName} file!");
                     return null;
                 }
-                logger.Information($"Setting up Twitch Chat Client for {twitchName}");
+                logger.Information($"Setting up Twitch Chat Client for '{twitchName}'");
 
                 var credentials = new ConnectionCredentials(twitchName, oAuthToken);
                 var clientOptions = new ClientOptions();
