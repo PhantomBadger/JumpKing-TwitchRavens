@@ -92,6 +92,9 @@ namespace JumpKingMod
                             TwitchChatUIDisplay relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
                         }
 
+                        // Make the exluded word filter
+                        ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
+
                         // Ravens
                         bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false);
                         if (ravensEnabled)
@@ -104,11 +107,11 @@ namespace JumpKingMod
                             {
                                 case RavenTriggerTypes.ChatMessage:
                                     Logger.Information($"Loading Chat Message Raven Trigger");
-                                    ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger); ;
+                                    ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
                                     break;
                                 case RavenTriggerTypes.ChannelPointReward:
                                     Logger.Information($"Loading Channel Point Raven Trigger");
-                                    ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, Logger);
+                                    ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
                                     break;
                                 case RavenTriggerTypes.Insult:
                                     Logger.Information($"Loading Insult Raven Trigger");

@@ -6,6 +6,8 @@ namespace Settings
     public abstract class JumpKingModSettingsContext
     {
         public const string SettingsFileName = "JumpKingMod.settings";
+        public const string ExcludedTermFilePath = "Content/Mods/ExcludedTermFileList.txt";
+        public const char CommentCharacter = '#';
 
         // Twitch
         public const string ChatListenerTwitchAccountNameKey = "ChatListenerTwitchAccountName";

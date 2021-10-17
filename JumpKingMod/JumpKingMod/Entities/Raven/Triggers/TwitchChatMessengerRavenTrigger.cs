@@ -28,6 +28,8 @@ namespace JumpKingMod.Entities.Raven.Triggers
         public event MessengerRavenTriggerArgs OnMessengerRavenTrigger;
 
         private readonly ILogger logger;
+        private readonly IExcludedTermFilter excludedTermFilter;
+        private readonly UserSettings userSettings;
         private readonly BlockingCollection<OnMessageReceivedArgs> relayRequestQueue;
         private readonly TwitchClient twitchClient;
         private readonly Thread processingThread;
@@ -36,10 +38,12 @@ namespace JumpKingMod.Entities.Raven.Triggers
         /// Constructor for creating a <see cref="TwitchChatMessengerRavenTrigger"/>
         /// </summary>
         /// <param name="logger">An <see cref="ILogger"/> implementation to use for logging</param>
-        public TwitchChatMessengerRavenTrigger(TwitchClient twitchClient, UserSettings userSettings, ILogger logger)
+        public TwitchChatMessengerRavenTrigger(TwitchClient twitchClient, UserSettings userSettings, IExcludedTermFilter excludedTermFilter, ILogger logger)
         {
             // Keep track of the logger
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.excludedTermFilter = excludedTermFilter ?? throw new ArgumentNullException(nameof(excludedTermFilter));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.relayRequestQueue = new BlockingCollection<OnMessageReceivedArgs>();
             this.twitchClient = twitchClient ?? throw new ArgumentNullException(nameof(twitchClient));
             twitchClient.OnMessageReceived += OnMessageReceived;
@@ -101,6 +105,13 @@ namespace JumpKingMod.Entities.Raven.Triggers
                     if (!string.IsNullOrWhiteSpace(colourHex) && colourHex.Length >= 7)
                     {
                         nameColour = TwitchHexColourParser.ParseColourFromHex(colourHex);
+                    }
+
+                    // Skip anything containing an excluded term
+                    if (excludedTermFilter.ContainsExcludedTerm(e.ChatMessage.Message))
+                    {
+                        logger.Warning($"Skipped Triggered Chat Message from '{e.ChatMessage.DisplayName}', as it contained an excluded term");
+                        continue;
                     }
 
                     OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message);

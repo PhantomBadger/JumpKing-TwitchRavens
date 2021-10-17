@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using Settings;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -297,6 +298,66 @@ namespace JumpKingMod.Install.UI
         private Keys freeFlyToggleKey;
 
         /// <summary>
+        /// A collection of excluded terms
+        /// </summary>
+        public ObservableCollection<string> ExcludedTerms
+        {
+            get
+            {
+                return excludedTerms;
+            }
+            set
+            {
+                if (excludedTerms != value)
+                {
+                    excludedTerms = value;
+                    RaisePropertyChanged(nameof(ExcludedTerms));
+                }
+            }
+        }
+        private ObservableCollection<string> excludedTerms;
+
+        /// <summary>
+        /// The index of the selected item in the excluded items list
+        /// </summary>
+        public int SelectedExcludedItemIndex
+        {
+            get
+            {
+                return selectedExcludedItemIndex;
+            }
+            set
+            {
+                if (selectedExcludedItemIndex != value)
+                {
+                    selectedExcludedItemIndex = value;
+                    RaisePropertyChanged(nameof(SelectedExcludedItemIndex));
+                }
+            }
+        }
+        private int selectedExcludedItemIndex;
+
+        /// <summary>
+        /// The candidate item to add to the excluded items list
+        /// </summary>
+        public string CandidateExcludedItem
+        {
+            get
+            {
+                return candidateExcludedItem;
+            }
+            set
+            {
+                if (candidateExcludedItem != value)
+                {
+                    candidateExcludedItem = value;
+                    RaisePropertyChanged(CandidateExcludedItem);
+                }
+            }
+        }
+        private string candidateExcludedItem;
+
+        /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
         /// </summary>
         public string ExpectedRemoteModDirectory
@@ -340,6 +401,8 @@ namespace JumpKingMod.Install.UI
         public DelegateCommand InstallCommand { get; private set; }
         public DelegateCommand UpdateSettingsCommand { get; private set; }
         public DelegateCommand LoadSettingsCommand { get; private set; }
+        public ICommand AddExcludedTermCommand { get; private set; }
+        public ICommand RemoveExcludedTermCommand { get; private set; }
 
         private readonly ILogger logger;
         private readonly UserSettings installerSettings;
@@ -360,6 +423,8 @@ namespace JumpKingMod.Install.UI
 
             GameDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.GameDirectoryKey, string.Empty);
             ModDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.ModDirectoryKey, string.Empty);
+
+            ExcludedTerms = new ObservableCollection<string>();
         }
 
         /// <summary>
@@ -381,6 +446,8 @@ namespace JumpKingMod.Install.UI
             InstallCommand = new DelegateCommand(_ => { InstallMod(); }, _ => { return CanInstallMod(); });
             UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return AreModSettingsLoaded && CanUpdateModSettings(); });
             LoadSettingsCommand = new DelegateCommand(_ => { LoadModSettings(createIfDoesntExist: true); }, _ => { return CanUpdateModSettings(); });
+            AddExcludedTermCommand = new DelegateCommand(_ => { AddExcludedTerm(); });
+            RemoveExcludedTermCommand = new DelegateCommand(_ => { RemoveExcludedTerm(); });
         }
 
         /// <summary>
@@ -539,6 +606,25 @@ namespace JumpKingMod.Install.UI
         }
 
         /// <summary>
+        /// Adds the <see cref="CandidateExcludedItem"/> to the <see cref="ExcludedTerms"/> list
+        /// </summary>
+        private void AddExcludedTerm()
+        {
+            ExcludedTerms?.Add(CandidateExcludedItem);
+        }
+
+        /// <summary>
+        /// Removes the <see cref="SelectedExcludedItemIndex"/> from the <see cref="ExcludedTerms"/> list
+        /// </summary>
+        private void RemoveExcludedTerm()
+        {
+            if (ExcludedTerms != null && ExcludedTerms.Count > SelectedExcludedItemIndex && SelectedExcludedItemIndex >= 0)
+            {
+                ExcludedTerms?.RemoveAt(SelectedExcludedItemIndex);
+            }
+        }
+
+        /// <summary>
         /// Updates the settings from the current values in the ViewModel
         /// </summary>
         private void UpdateInstallerSettings()
@@ -586,6 +672,11 @@ namespace JumpKingMod.Install.UI
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
 
+            // Exclusion List
+            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.ExcludedTermFilePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
+            File.WriteAllLines(expectedExclusionPath, ExcludedTerms);
+
             MessageBox.Show($"Settings updated successfully!");
         }
 
@@ -620,6 +711,30 @@ namespace JumpKingMod.Install.UI
                 FreeFlyingEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false);
                 FreeFlyToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
             }
+
+            // Load in Exclusion List
+            List<string> excludedTerms = new List<string>();
+            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.ExcludedTermFilePath);
+            if (File.Exists(expectedExclusionPath))
+            {
+                string[] fileContent = File.ReadAllLines(expectedExclusionPath);
+                for (int i = 0; i < fileContent.Length; i++)
+                {
+                    string line = fileContent[i].Trim();
+                    if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                    {
+                        continue;
+                    }
+
+                    excludedTerms.Add(line);
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
+                File.Create(expectedExclusionPath);
+            }
+            ExcludedTerms = new ObservableCollection<string>(excludedTerms);
         }
 
         /// <summary>
