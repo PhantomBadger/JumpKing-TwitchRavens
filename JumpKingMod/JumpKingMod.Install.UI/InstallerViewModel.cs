@@ -209,6 +209,10 @@ namespace JumpKingMod.Install.UI
                         {
                             newVal = Math.Abs(newVal);
                         }
+                        if (newVal > 100)
+                        {
+                            newVal = 100;
+                        }
                         maxRavensCount = newVal;
                     }
                 }
@@ -351,11 +355,106 @@ namespace JumpKingMod.Install.UI
                 if (candidateExcludedItem != value)
                 {
                     candidateExcludedItem = value;
-                    RaisePropertyChanged(CandidateExcludedItem);
+                    RaisePropertyChanged(nameof(CandidateExcludedItem));
                 }
             }
         }
         private string candidateExcludedItem;
+
+        /// <summary>
+        /// A collection of raven insults
+        /// </summary>
+        public ObservableCollection<string> RavenInsults
+        {
+            get
+            {
+                return ravenInsults;
+            }
+            set
+            {
+                if (ravenInsults != value)
+                {
+                    ravenInsults = value;
+                    RaisePropertyChanged(nameof(RavenInsults));
+                }
+            }
+        }
+        private ObservableCollection<string> ravenInsults;
+
+        /// <summary>
+        /// The index of the selected item in the Raven Insults list
+        /// </summary>
+        public int SelectedRavenInsultIndex
+        {
+            get
+            {
+                return selectedRavenInsultIndex;
+            }
+            set
+            {
+                if (selectedRavenInsultIndex != value)
+                {
+                    selectedRavenInsultIndex = value;
+                    RaisePropertyChanged(nameof(SelectedRavenInsultIndex));
+                }
+            }
+        }
+        private int selectedRavenInsultIndex;
+
+        /// <summary>
+        /// The candidate item to add to the Raven Insults list
+        /// </summary>
+        public string CandidateRavenInsult
+        {
+            get
+            {
+                return candidateRavenInsult;
+            }
+            set
+            {
+                if (candidateRavenInsult != value)
+                {
+                    candidateRavenInsult = value;
+                    RaisePropertyChanged(nameof(CandidateRavenInsult));
+                }
+            }
+        }
+        private string candidateRavenInsult;
+
+        /// <summary>
+        /// The number of ravens to spawn when the insult trigger is hit
+        /// </summary>
+        public string InsultRavenSpawnCount
+        {
+            get
+            {
+                return insultRavenSpawnCount.ToString();
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    insultRavenSpawnCount = 0;
+                }
+                else
+                {
+                    if (int.TryParse(value, out int newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        if (newVal > 100)
+                        {
+                            newVal = 100;
+                        }
+                        insultRavenSpawnCount = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(insultRavenSpawnCount));
+            }
+        }
+        private int insultRavenSpawnCount;
 
         /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
@@ -403,6 +502,8 @@ namespace JumpKingMod.Install.UI
         public DelegateCommand LoadSettingsCommand { get; private set; }
         public ICommand AddExcludedTermCommand { get; private set; }
         public ICommand RemoveExcludedTermCommand { get; private set; }
+        public ICommand AddRavenInsultCommand { get; private set; }
+        public ICommand RemoveRavenInsultCommand { get; private set; }
 
         private readonly ILogger logger;
         private readonly UserSettings installerSettings;
@@ -425,6 +526,7 @@ namespace JumpKingMod.Install.UI
             ModDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.ModDirectoryKey, string.Empty);
 
             ExcludedTerms = new ObservableCollection<string>();
+            RavenInsults = new ObservableCollection<string>();
         }
 
         /// <summary>
@@ -446,8 +548,18 @@ namespace JumpKingMod.Install.UI
             InstallCommand = new DelegateCommand(_ => { InstallMod(); }, _ => { return CanInstallMod(); });
             UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return AreModSettingsLoaded && CanUpdateModSettings(); });
             LoadSettingsCommand = new DelegateCommand(_ => { LoadModSettings(createIfDoesntExist: true); }, _ => { return CanUpdateModSettings(); });
-            AddExcludedTermCommand = new DelegateCommand(_ => { AddExcludedTerm(); });
-            RemoveExcludedTermCommand = new DelegateCommand(_ => { RemoveExcludedTerm(); });
+            AddExcludedTermCommand = new DelegateCommand(_ => { AddToCollection(ExcludedTerms, CandidateExcludedItem); });
+            RemoveExcludedTermCommand = new DelegateCommand(_ => 
+            { 
+                RemoveFromCollection(ExcludedTerms, SelectedExcludedItemIndex);
+                SelectedExcludedItemIndex = 0;
+            });
+            AddRavenInsultCommand = new DelegateCommand(_ => { AddToCollection(RavenInsults, CandidateRavenInsult); });
+            RemoveRavenInsultCommand = new DelegateCommand(_ => 
+            { 
+                RemoveFromCollection(RavenInsults, SelectedRavenInsultIndex);
+                SelectedRavenInsultIndex = 0;
+            });
         }
 
         /// <summary>
@@ -606,21 +718,21 @@ namespace JumpKingMod.Install.UI
         }
 
         /// <summary>
-        /// Adds the <see cref="CandidateExcludedItem"/> to the <see cref="ExcludedTerms"/> list
+        /// Adds the <paramref name="candidate"/> to the <paramref name="collection"/> list
         /// </summary>
-        private void AddExcludedTerm()
+        private void AddToCollection(ObservableCollection<string> collection, string candidate)
         {
-            ExcludedTerms?.Add(CandidateExcludedItem);
+            collection?.Add(candidate);
         }
 
         /// <summary>
-        /// Removes the <see cref="SelectedExcludedItemIndex"/> from the <see cref="ExcludedTerms"/> list
+        /// Removes the <paramref name="indexToRemove"/> from the <paramref name="collection"/>  list
         /// </summary>
-        private void RemoveExcludedTerm()
+        private void RemoveFromCollection(ObservableCollection<string> collection, int indexToRemove)
         {
-            if (ExcludedTerms != null && ExcludedTerms.Count > SelectedExcludedItemIndex && SelectedExcludedItemIndex >= 0)
+            if (collection != null && collection.Count > indexToRemove && indexToRemove >= 0)
             {
-                ExcludedTerms?.RemoveAt(SelectedExcludedItemIndex);
+                collection?.RemoveAt(indexToRemove);
             }
         }
 
@@ -677,6 +789,13 @@ namespace JumpKingMod.Install.UI
             Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
             File.WriteAllLines(expectedExclusionPath, ExcludedTerms);
 
+            // Raven Insults
+            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.RavenInsultsFilePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
+            File.WriteAllLines(expectedRavenInsultsPath, RavenInsults);
+
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenInsultSpawnCountKey, InsultRavenSpawnCount.ToString());
+
             MessageBox.Show($"Settings updated successfully!");
         }
 
@@ -703,6 +822,7 @@ namespace JumpKingMod.Install.UI
                 MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5.ToString());
                 RavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
                 RavensChannelPointID = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
+                InsultRavenSpawnCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
 
                 // Chat Display Info
                 ChatDisplayEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
@@ -715,26 +835,65 @@ namespace JumpKingMod.Install.UI
             // Load in Exclusion List
             List<string> excludedTerms = new List<string>();
             string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.ExcludedTermFilePath);
-            if (File.Exists(expectedExclusionPath))
+            try
             {
-                string[] fileContent = File.ReadAllLines(expectedExclusionPath);
-                for (int i = 0; i < fileContent.Length; i++)
+                if (File.Exists(expectedExclusionPath))
                 {
-                    string line = fileContent[i].Trim();
-                    if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                    string[] fileContent = File.ReadAllLines(expectedExclusionPath);
+                    for (int i = 0; i < fileContent.Length; i++)
                     {
-                        continue;
-                    }
+                        string line = fileContent[i].Trim();
+                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        {
+                            continue;
+                        }
 
-                    excludedTerms.Add(line);
+                        excludedTerms.Add(line);
+                    }
+                }
+                else
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
+                    File.Create(expectedExclusionPath);
                 }
             }
-            else
+            catch (Exception e)
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
-                File.Create(expectedExclusionPath);
+                logger.Error($"Encountered error when parsing Exclusion List {e.ToString()}");
             }
             ExcludedTerms = new ObservableCollection<string>(excludedTerms);
+
+            // Load in Raven Insults
+            List<string> ravenInsultsFileContent = new List<string>();
+            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.RavenInsultsFilePath);
+            try
+            {
+                if (File.Exists(expectedRavenInsultsPath))
+                {
+                    string[] fileContent = File.ReadAllLines(expectedRavenInsultsPath);
+                    for (int i = 0; i < fileContent.Length; i++)
+                    {
+                        string line = fileContent[i].Trim();
+                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        {
+                            continue;
+                        }
+
+                        ravenInsultsFileContent.Add(line);
+                    }
+                }
+                else
+                {
+                    ravenInsultsFileContent.AddRange(JumpKingModSettingsContext.GetDefaultInsults());
+                    Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
+                    File.WriteAllLines(expectedRavenInsultsPath, ravenInsultsFileContent);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Encountered error when parsing Raven Insults {e.ToString()}");
+            }
+            RavenInsults = new ObservableCollection<string>(ravenInsultsFileContent);
         }
 
         /// <summary>

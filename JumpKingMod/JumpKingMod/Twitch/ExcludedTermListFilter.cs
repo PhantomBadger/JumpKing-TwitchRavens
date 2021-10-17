@@ -25,24 +25,31 @@ namespace JumpKingMod.Twitch
             excludedPhrases = new List<string>();
 
             // Parsing Excluded Term List
-            if (File.Exists(JumpKingModSettingsContext.ExcludedTermFilePath))
+            try
             {
-                string[] fileContents = File.ReadAllLines(JumpKingModSettingsContext.ExcludedTermFilePath);
-                for (int i = 0; i < fileContents.Length; i++)
+                if (File.Exists(JumpKingModSettingsContext.ExcludedTermFilePath))
                 {
-                    string line = fileContents[i].Trim();
-                    if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                    string[] fileContents = File.ReadAllLines(JumpKingModSettingsContext.ExcludedTermFilePath);
+                    for (int i = 0; i < fileContents.Length; i++)
                     {
-                        continue;
-                    }
+                        string line = fileContents[i].Trim();
+                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        {
+                            continue;
+                        }
 
-                    excludedPhrases.Add(line);
+                        excludedPhrases.Add(line);
+                    }
+                    logger.Information($"Successfully loaded Excluded Term File with '{excludedPhrases.Count}' entries");
                 }
-                logger.Information($"Successfully loaded Excluded Term File with '{excludedPhrases.Count}' entries");
+                else
+                {
+                    logger.Error($"Unable to find Excluded Term File List at '{JumpKingModSettingsContext.ExcludedTermFilePath}'");
+                }
             }
-            else
+            catch (Exception e)
             {
-                logger.Error($"Unable to find Excluded Term File List at '{JumpKingModSettingsContext.ExcludedTermFilePath}'");
+                logger.Error($"Encountered exception when loading Excluded Words: {e.ToString()}");
             }
         }
 
@@ -51,6 +58,11 @@ namespace JumpKingMod.Twitch
         /// </summary>
         public bool ContainsExcludedTerm(string textToCheck)
         {
+            if (excludedPhrases == null || excludedPhrases.Count <= 0)
+            {
+                return false;
+            }
+
             return excludedPhrases.Any((string excludedPhrase) => textToCheck.ToLower().Contains(excludedPhrase.ToLower()));
         }
     }

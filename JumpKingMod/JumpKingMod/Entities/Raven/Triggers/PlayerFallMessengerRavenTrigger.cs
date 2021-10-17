@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
 using JumpKingMod.API;
 using JumpKingMod.Patching;
+using JumpKingMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
+using Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,44 +20,24 @@ namespace JumpKingMod.Entities.Raven.Triggers
     {
         public event MessengerRavenTriggerArgs OnMessengerRavenTrigger;
 
-        private static PlayerFallMessengerRavenTrigger instance;
-        private string[] insults;
+        private readonly IInsultGetter insultGetter;
+        private readonly UserSettings userSettings;
+        private readonly int spawnCount;
 
-        private readonly Random random;
+        private static PlayerFallMessengerRavenTrigger instance;
 
         /// <summary>
         /// Constructor for creating a <see cref="PlayerFallMessengerRavenTrigger"/>
         /// </summary>
         /// <param name="logger">an <see cref="ILogger"/> implementation for logging</param>
-        public PlayerFallMessengerRavenTrigger(ILogger logger)
+        public PlayerFallMessengerRavenTrigger(UserSettings userSettings, IInsultGetter insultGetter, ILogger logger)
         {
-            instance = this;
-            random = new Random();
+            this.insultGetter = insultGetter ?? throw new ArgumentNullException(nameof(insultGetter));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
-            insults = new string[]
-            {
-                "lmao",
-                "OMEGADOWN",
-                "LOL",
-                "Fall King",
-                "fucking idiot",
-                "lmfao",
-                "back to the old man",
-                "LETS GOOOO",
-                "stop playing",
-                "you suck",
-                "KEKW",
-                ":(",
-                "YEP FALL",
-                "Deez Nuts",
-                "Get got",
-                "kek wow",
-                "THIS DUDE",
-                "ravenJAM",
-                "Hi YouTube",
-                "L",
-                "It's like you don't even try",
-            };
+            spawnCount = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenInsultSpawnCountKey, 3);
+
+            instance = this;
         }
 
         /// <summary>
@@ -75,10 +57,15 @@ namespace JumpKingMod.Entities.Raven.Triggers
         {
             Task.Run(() =>
             {
-                for (int i = 0; i < 3; i++)
+                if (instance == null)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < instance.spawnCount; i++)
                 {
                     Task.Delay(500).Wait();
-                    instance.OnMessengerRavenTrigger?.Invoke(null, Color.White, instance.insults[instance.random.Next(0, instance.insults.Length)]);
+                    instance.OnMessengerRavenTrigger?.Invoke(null, Color.White, instance.insultGetter.GetInsult());
                 }
             });
         }

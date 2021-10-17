@@ -6,7 +6,8 @@ namespace Settings
     public abstract class JumpKingModSettingsContext
     {
         public const string SettingsFileName = "JumpKingMod.settings";
-        public const string ExcludedTermFilePath = "Content/Mods/ExcludedTermFileList.txt";
+        public const string ExcludedTermFilePath = "Content/Mods/ExcludedTermList.txt";
+        public const string RavenInsultsFilePath = "Content/Mods/RavenInsultsList.txt";
         public const char CommentCharacter = '#';
 
         // Twitch
@@ -23,6 +24,7 @@ namespace Settings
         public const string RavensMaxCountKey = "RavensMaxCount";
         public const string RavenTriggerTypeKey = "RavenTriggerType";
         public const string RavenChannelPointRewardIDKey = "RavenChannelPointRewardID";
+        public const string RavenInsultSpawnCountKey = "RavenInsultSpawnCount";
 
         // Free Fly
         public const string FreeFlyEnabledKey = "FreeFlyEnabled";
@@ -50,10 +52,38 @@ namespace Settings
                 // Channel Point
                 { RavenChannelPointRewardIDKey, "" },
                 // Insult
-
+                { RavenInsultSpawnCountKey, 3.ToString() },
                 // Free Fly
                 { FreeFlyEnabledKey, false.ToString() },
                 { FreeFlyToggleKeyKey, Keys.F1.ToString() }
+            };
+        }
+
+        public static string[] GetDefaultInsults()
+        {
+            return new string[]
+            {
+                "lmao",
+                "OMEGADOWN",
+                "LOL",
+                "Fall King",
+                "idiot",
+                "lmfao",
+                "back to the old man",
+                "LETS GOOOO",
+                "stop playing",
+                "you suck",
+                "KEKW",
+                ":(",
+                "YEP FALL",
+                "Deez Nuts",
+                "Get got",
+                "kek wow",
+                "THIS DUDE",
+                "ravenJAM",
+                "Hi YouTube",
+                "L",
+                "It's like you don't even try",
             };
         }
     }

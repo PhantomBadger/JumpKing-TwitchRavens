@@ -10,6 +10,7 @@ using System.Windows.Input;
 using HarmonyLib;
 using JumpKingMod.API;
 using JumpKingMod.Entities;
+using JumpKingMod.Entities.Raven;
 using JumpKingMod.Entities.Raven.Triggers;
 using JumpKingMod.Patching;
 using JumpKingMod.Settings;
@@ -92,9 +93,6 @@ namespace JumpKingMod
                             TwitchChatUIDisplay relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
                         }
 
-                        // Make the exluded word filter
-                        ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
-
                         // Ravens
                         bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false);
                         if (ravensEnabled)
@@ -106,19 +104,37 @@ namespace JumpKingMod
                             switch (ravenTriggerType)
                             {
                                 case RavenTriggerTypes.ChatMessage:
-                                    Logger.Information($"Loading Chat Message Raven Trigger");
-                                    ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
-                                    break;
+                                    {
+                                        Logger.Information($"Loading Chat Message Raven Trigger");
+
+                                        // Make the exluded word filter
+                                        ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
+
+                                        ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                        break;
+                                    }
                                 case RavenTriggerTypes.ChannelPointReward:
-                                    Logger.Information($"Loading Channel Point Raven Trigger");
-                                    ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
-                                    break;
+                                    {
+                                        Logger.Information($"Loading Channel Point Raven Trigger");
+
+                                        // Make the exluded word filter
+                                        ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
+
+                                        ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                        break;
+                                    }
                                 case RavenTriggerTypes.Insult:
-                                    Logger.Information($"Loading Insult Raven Trigger");
-                                    PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(Logger);
-                                    fallTrigger.SetUpManualPatch(harmony);
-                                    ravenTrigger = fallTrigger;
-                                    break;
+                                    {
+                                        Logger.Information($"Loading Insult Raven Trigger");
+
+                                        // Make the Insult Getter
+                                        RavenInsultFileInsultGetter insultGetter = new RavenInsultFileInsultGetter(Logger);
+
+                                        PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(userSettings, insultGetter, Logger);
+                                        fallTrigger.SetUpManualPatch(harmony);
+                                        ravenTrigger = fallTrigger;
+                                        break;
+                                    }
                                 default:
                                     Logger.Error($"Unknown Raven Trigger Type {ravenTriggerType.ToString()}");
                                     break;
