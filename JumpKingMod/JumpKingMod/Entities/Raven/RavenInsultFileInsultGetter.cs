@@ -25,7 +25,7 @@ namespace JumpKingMod.Entities.Raven
         public RavenInsultFileInsultGetter(ILogger logger)
         {
             insults = new List<string>();
-            random = new Random();
+            random = new Random(DateTime.Now.Millisecond);
 
             // Parsing Raven Insult List
             try
@@ -66,7 +66,9 @@ namespace JumpKingMod.Entities.Raven
                 return "NO INSULTS FOUND!";
             }
 
-            return insults[random.Next(0, insults.Count)];
+            int index = random.Next(0, insults.Count);
+
+            return insults[index];
         }
     }
 }
