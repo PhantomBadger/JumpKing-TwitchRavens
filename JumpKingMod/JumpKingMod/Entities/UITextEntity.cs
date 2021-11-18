@@ -23,19 +23,53 @@ namespace JumpKingMod.Entities
     public class UITextEntity : IDisposable, IForegroundModEntity
     {
         public Vector2 ScreenSpacePosition { get; set; }
-        public string TextValue { get; set; }
+        public string TextValue 
+        { 
+            get
+            {
+                return textValue;
+            }
+            set
+            {
+                if (textValue != value)
+                {
+                    textValue = value;
+                    formattedText = WrapText(textValue);
+                }
+            }
+        }
         public Color TextColor { get; set; }
-        public SpriteFont TextFont { get; set; }
+        public SpriteFont TextFont 
+        { 
+            get
+            {
+                return textFont;
+            }
+            set
+            {
+                if (textFont != value)
+                {
+                    textFont = value;
+                    formattedText = WrapText(textValue);
+                }
+            }
+        }
         public UITextEntityAnchor AnchorPoint { get; set; }
         public Vector2 Size
         {
             get
             {
-                return TextFont?.MeasureString(TextValue) ?? new Vector2(0, 0);
+                return TextFont?.MeasureString(formattedText) ?? new Vector2(0, 0);
             }
         }
 
         private readonly ModEntityManager modEntityManager;
+
+        private SpriteFont textFont;
+        private string textValue;
+        private string formattedText;
+
+        private const float MaxWidthOfLine = 300;
 
         /// <summary>
         /// Ctor for creating a <see cref="UITextEntity"/> with a position and text value, and the default font
@@ -107,7 +141,13 @@ namespace JumpKingMod.Entities
         /// </summary>
         public void ForegroundDraw()
         {
-            TextHelper.DrawString(TextFont, TextValue, ScreenSpacePosition, TextColor, GetAnchorVector());
+            Vector2 textSize = Size;
+            Vector2 modifiedPosition = ScreenSpacePosition - new Vector2(0, textSize.Y);
+            if (AnchorPoint == UITextEntityAnchor.Center)
+            {
+                modifiedPosition.Y -= textSize.Y / 2f;
+            }
+            TextHelper.DrawString(TextFont, formattedText, modifiedPosition, TextColor, GetAnchorVector());
         }
 
         /// <summary>
@@ -116,6 +156,96 @@ namespace JumpKingMod.Entities
         public void Update(float delta)
         {
             // Do Nothing
+        }
+
+        /// <summary>
+        /// Given an input string, creates a new string with newlines added based on the 
+        /// calculated size of the string with the <see cref="TextFont"/> currently set
+        /// </summary>
+        private string WrapText(string input)
+        {
+            if (TextFont == null || input == null)
+            {
+                return input;
+            }
+
+            string textToWrap = input ?? "";
+            StringBuilder formattedStringBuilder = new StringBuilder();
+            List<string> wordsInText = new List<string>(TextSplit(textValue, new char[] { ' ' }));
+
+            float runningWidthCounter = 0;
+            for (int i = 0; i < wordsInText.Count; i++)
+            {
+                string word = wordsInText[i];
+                Vector2 sizeOfWord = TextFont.MeasureString(wordsInText[i]);
+                runningWidthCounter += sizeOfWord.X;
+
+                // If when we add this word, we are above the max width
+                if (runningWidthCounter > MaxWidthOfLine)
+                {
+                    if (sizeOfWord.X > MaxWidthOfLine)
+                    {
+                        // The word on its own is too big!
+                        // We need to find the point at which it exceeds the limit, 
+                        // and add a new line there
+                        StringBuilder sb = new StringBuilder();
+                        List<int> indexOfSplits = new List<int>();
+                        float widthOfCandidate = 0;
+                        for (int j = 0; j < word.Length; j++)
+                        {
+                            sb.Append(word[j]);
+                            Vector2 sizeOfCandidate = TextFont.MeasureString(sb.ToString());
+                            widthOfCandidate = sizeOfCandidate.X;
+
+                            if (widthOfCandidate > MaxWidthOfLine)
+                            {
+                                // Here is where we need to split it!
+                                indexOfSplits.Add(j);
+                                sb.Clear();
+                            }
+                        }
+                        for (int j = 0; j < indexOfSplits.Count; j++)
+                        {
+                            word = word.Insert(indexOfSplits[j] + (j * 2), "-\n");
+                        }
+                        runningWidthCounter = sizeOfWord.X - widthOfCandidate;
+                    }
+                    else
+                    {
+                        // The word is a reasonable size, so we can newline it on its own
+                        word = $"\n{word}";
+                        runningWidthCounter = sizeOfWord.X;
+                    }
+                }
+                formattedStringBuilder.Append(word);
+            }
+
+            return formattedStringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Splits the given string based on the provided deliminators, but keeps
+        /// the deliminators in the resulting split string array
+        /// </summary>
+        private IEnumerable<string> TextSplit(string inputText, char[] deliminators)
+        {
+            int startIndex = 0;
+            int index = 0;
+
+            while ((index = inputText.IndexOfAny(deliminators, startIndex)) != -1)
+            {
+                if (index - startIndex > 0)
+                {
+                    yield return inputText.Substring(startIndex, index - startIndex);
+                }
+                yield return inputText.Substring(index, 1);
+                startIndex = index + 1;
+            }
+
+            if (startIndex < inputText.Length)
+            {
+                yield return inputText.Substring(startIndex);
+            }
         }
     }
 }

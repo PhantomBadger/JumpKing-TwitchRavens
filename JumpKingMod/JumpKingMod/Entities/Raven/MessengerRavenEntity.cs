@@ -30,11 +30,12 @@ namespace JumpKingMod.Entities.Raven
         protected UITextEntity messageEntity;
         protected float messageTimer;
         protected Vector2 entryVector;
-        protected float nameYOffset = 10;
+        protected float nameYOffset;
 
         protected const float LandingDistanceThreshold = 0.001f;
         protected const float MaxMessageTimeInSeconds = 3.0f;
         protected const float RavenSpeed = 3f;
+        protected const float HardcodedNameYOffset = 20;
 
         /// <summary>
         /// Ctor for creating a <see cref="MessengerRavenEntity"/>
@@ -77,7 +78,7 @@ namespace JumpKingMod.Entities.Raven
             {
                 ravenNameEntity = new UITextEntity(modEntityManager, Camera.TransformVector2(Transform), 
                     ravenName, ravenNameColour, UITextEntityAnchor.Center, JKContentManager.Font.MenuFontSmall);
-                nameYOffset = (ravenNameEntity.Size.Y / 2) + 2;
+                nameYOffset = (ravenNameEntity.Size.Y / 2) + HardcodedNameYOffset;
             }
         }
 
@@ -126,7 +127,7 @@ namespace JumpKingMod.Entities.Raven
                     if (messageEntity == null)
                     {
                         // TODO: Word wrap???
-                        Vector2 messagePosition = Transform + new Vector2(0, -40);
+                        Vector2 messagePosition = Transform + new Vector2(0, -20);
                         messageEntity = new UITextEntity(modEntityManager, Camera.TransformVector2(messagePosition), landingMessage, Color.White, UITextEntityAnchor.Center, JKContentManager.Font.MenuFontSmall);
                         Vector2 textSize = messageEntity.Size;
 
