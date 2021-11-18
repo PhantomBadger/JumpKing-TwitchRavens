@@ -114,7 +114,7 @@ namespace JumpKingMod.Entities.Raven.Triggers
                         continue;
                     }
 
-                    OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message);
+                    OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message, e.ChatMessage.IsSubscriber);
                 }
                 catch (Exception ex)
                 {

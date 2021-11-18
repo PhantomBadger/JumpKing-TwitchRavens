@@ -167,6 +167,26 @@ namespace JumpKingMod.Install.UI
         private Keys ravenClearDebugKey;
 
         /// <summary>
+        /// The key to use to toggle sub mode
+        /// </summary>
+        public Keys RavenSubModeToggleKey
+        {
+            get
+            {
+                return ravenSubModeToggleKey;
+            }
+            set
+            {
+                if (ravenSubModeToggleKey != value)
+                {
+                    ravenSubModeToggleKey = value;
+                    RaisePropertyChanged(nameof(RavenSubModeToggleKey));
+                }
+            }
+        }
+        private Keys ravenSubModeToggleKey;
+
+        /// <summary>
         /// The trigger type we want to use for the ravens
         /// </summary>
         public RavenTriggerTypes RavenTriggerType
@@ -773,6 +793,7 @@ namespace JumpKingMod.Install.UI
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, RavenEnabled.ToString());
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensToggleDebugKeyKey, RavenToggleDebugKey.ToString());
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensClearDebugKeyKey, RavenClearDebugKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, RavenSubModeToggleKey.ToString());
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensMaxCountKey, MaxRavensCount);
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerType.ToString());
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, RavensChannelPointID);
@@ -819,6 +840,7 @@ namespace JumpKingMod.Install.UI
                 RavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true);
                 RavenClearDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
                 RavenToggleDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+                RavenSubModeToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
                 MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5.ToString());
                 RavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
                 RavensChannelPointID = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);

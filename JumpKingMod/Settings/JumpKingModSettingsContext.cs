@@ -21,6 +21,7 @@ namespace Settings
         public const string RavensEnabledKey = "RavensEnabled";
         public const string RavensClearDebugKeyKey = "RavensClearDebugKey";
         public const string RavensToggleDebugKeyKey = "RavensToggleDebugKey";
+        public const string RavensSubModeToggleKeyKey = "RavensSubModeToggleKey";
         public const string RavensMaxCountKey = "RavensMaxCount";
         public const string RavenTriggerTypeKey = "RavenTriggerType";
         public const string RavenChannelPointRewardIDKey = "RavenChannelPointRewardID";
@@ -46,6 +47,7 @@ namespace Settings
                 { RavensEnabledKey, true.ToString() },
                 { RavensClearDebugKeyKey, Keys.F2.ToString() },
                 { RavensToggleDebugKeyKey, Keys.F3.ToString() },
+                { RavensSubModeToggleKeyKey, Keys.F4.ToString() },
                 { RavensMaxCountKey, 5.ToString() },
                 { RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage.ToString() },
                 // Message

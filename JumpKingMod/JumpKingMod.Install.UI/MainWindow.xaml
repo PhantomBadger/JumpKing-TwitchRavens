@@ -116,6 +116,9 @@
                                     <!-- Debug Clear -->
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <!-- Sub Mode Toggle -->
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                     <!-- Max Count -->
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
@@ -163,26 +166,36 @@
                                             Useful in case someone says something inappropriate.
                                         </TextBlock>
                                     </ToolTip>
+                                    <ToolTip x:Key="ravenSubToggleKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            Provides a key you can press to toggle Sub Mode for the Twitch Messages.
+                                            Useful if you want to gate interaction behind subs in the event of a 
+                                            raid or similar.
+                                        </TextBlock>
+                                    </ToolTip>
                                 </Grid.Resources>
                                 <!-- Raven Enabled -->
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" Text="Enabled: " />
                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding RavenEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
                                 <!-- Separator -->
                                 <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
-                                <!-- Toggle Key -->
-                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Debug Toggle Key:" />
+                                <!-- Toggle Active Key -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Active Key:" />
                                 <ComboBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavenToggleDebugKey, Mode=TwoWay}"/>
                                 <!-- Clear Key -->
-                                <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Debug Clear Key:" />
+                                <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Clear Key:" />
                                 <ComboBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavenClearDebugKey, Mode=TwoWay}"/>
+                                <!-- Toggle Sub Mode Key -->
+                                <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenSubToggleKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Sub Mode Key:" />
+                                <ComboBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenSubToggleKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavenSubModeToggleKey, Mode=TwoWay}"/>
                                 <!-- Max Number of Ravens-->
-                                <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Max Number of Ravens:" />
-                                <TextBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding MaxRavensCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Max Number of Ravens:" />
+                                <TextBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding MaxRavensCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <!-- Raven Trigger -->
-                                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenTriggerTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Trigger Type:" />
-                                <ComboBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenTriggerTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource ravenTriggerTypeEnumValues}}" SelectedItem="{Binding RavenTriggerType, Mode=TwoWay}"/>
+                                <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenTriggerTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Trigger Type:" />
+                                <ComboBox Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenTriggerTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource ravenTriggerTypeEnumValues}}" SelectedItem="{Binding RavenTriggerType, Mode=TwoWay}"/>
                                 <!-- Trigger Settings: Channel Point -->
-                                <Grid x:Name="grdChatPointSettings" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2">
+                                <Grid x:Name="grdChatPointSettings" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="FirstColumn"/>
                                         <ColumnDefinition SharedSizeGroup="SharedColumn"/>
@@ -218,7 +231,7 @@
                                     <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,5,2" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding RavensChannelPointID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </Grid>
                                 <!-- Trigger Settings: Excluded Term Filter -->
-                                <Grid x:Name="grdExcludedWords" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2">
+                                <Grid x:Name="grdExcludedWords" Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
@@ -256,7 +269,7 @@
                                              SelectedIndex="{Binding SelectedExcludedItemIndex, Mode=TwoWay}"/>
                                 </Grid>
                                 <!-- Trigger Settings: Insult List -->
-                                <Grid x:Name="grdRavenInsults" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2">
+                                <Grid x:Name="grdRavenInsults" Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>

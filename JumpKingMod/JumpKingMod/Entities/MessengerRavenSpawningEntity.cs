@@ -30,10 +30,13 @@ namespace JumpKingMod.Entities
         private readonly int maxRavenCount;
         private readonly Keys clearRavensKey;
         private readonly Keys toggleRavenSpawningKey;
+        private readonly Keys toggleSubModeKey;
 
         private bool clearRavensCooldown;
         private bool toggleRavensCooldown;
+        private bool toggleSubModeCooldown;
         private bool isRavenSpawningActive;
+        private bool isInSubMode;
 
         /// <summary>
         /// Ctor for creating a <see cref="MessengerRavenSpawningEntity"/>
@@ -56,6 +59,8 @@ namespace JumpKingMod.Entities
             maxRavenCount = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5);
             clearRavensKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
             toggleRavenSpawningKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+            toggleSubModeKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
+            isInSubMode = false;
 
             messengerRavenTrigger.OnMessengerRavenTrigger += OnMessengerRavenTrigger;
             modEntityManager.AddEntity(this);
@@ -73,9 +78,8 @@ namespace JumpKingMod.Entities
         /// <summary>
         /// Called by the Trigger implementation, spawns the raven
         /// </summary>
-        private void OnMessengerRavenTrigger(string ravenName, Color ravenNameColour, string ravenMessage)
+        private void OnMessengerRavenTrigger(string ravenName, Color ravenNameColour, string ravenMessage, bool isFromSubscriber)
         {
-            // TODO: Object Pool
             if (messengerRavens.Count >= maxRavenCount)
             {
                 return;
@@ -83,6 +87,12 @@ namespace JumpKingMod.Entities
 
             // Are we even meant to be spawning anything?
             if (!isRavenSpawningActive)
+            {
+                return;
+            }
+
+            // If we are gating behind subscribers and this isn't from a subscriber
+            if (isInSubMode && !isFromSubscriber)
             {
                 return;
             }
@@ -138,6 +148,22 @@ namespace JumpKingMod.Entities
             {
                 toggleRavensCooldown = false;
             }    
+
+            // Sub Mode
+            if (keyboardState.IsKeyDown(toggleSubModeKey))
+            {
+                if (!toggleSubModeCooldown)
+                {
+                    logger.Information($"{toggleSubModeKey.ToString()} Pressed - {(isInSubMode ? "Disabling" : "Enabling")} Sub-Only mode for Raven Spawning!");
+                    isInSubMode = !isInSubMode;
+
+                    toggleSubModeCooldown = true;
+                }
+            }
+            else
+            {
+                toggleSubModeCooldown = false;
+            }
 
             // Identify ravens we wanna destroy
             List<MessengerRavenEntity> ravensToDestroy = new List<MessengerRavenEntity>();
