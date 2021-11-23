@@ -26,6 +26,7 @@ namespace Settings
         public const string RavenTriggerTypeKey = "RavenTriggerType";
         public const string RavenChannelPointRewardIDKey = "RavenChannelPointRewardID";
         public const string RavenInsultSpawnCountKey = "RavenInsultSpawnCount";
+        public const string RavenEasterEggEnabledKey = "RavenEasterEggEnabled";
 
         // Free Fly
         public const string FreeFlyEnabledKey = "FreeFlyEnabled";
@@ -55,6 +56,8 @@ namespace Settings
                 { RavenChannelPointRewardIDKey, "" },
                 // Insult
                 { RavenInsultSpawnCountKey, 3.ToString() },
+                // Easter Egg
+                { RavenEasterEggEnabledKey, true.ToString() },
                 // Free Fly
                 { FreeFlyEnabledKey, false.ToString() },
                 { FreeFlyToggleKeyKey, Keys.F1.ToString() }

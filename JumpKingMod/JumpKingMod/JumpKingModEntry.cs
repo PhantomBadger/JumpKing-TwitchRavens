@@ -97,10 +97,12 @@ namespace JumpKingMod
                         bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false);
                         if (ravensEnabled)
                         {
+                            bool easterEggEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenEasterEggEnabledKey, true);
+
                             // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
                             // using that trigger
                             RavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
-                            IMessengerRavenTrigger ravenTrigger = null;
+                            List<IMessengerRavenTrigger> ravenTriggers = new List<IMessengerRavenTrigger>();
                             switch (ravenTriggerType)
                             {
                                 case RavenTriggerTypes.ChatMessage:
@@ -110,7 +112,14 @@ namespace JumpKingMod
                                         // Make the exluded word filter
                                         ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
 
-                                        ravenTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                        // Easter Egg
+                                        if (easterEggEnabled && 
+                                            TryGetAndStartEasterEggTrigger(userSettings, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
+                                        {
+                                            ravenTriggers.Add(easterEggTrigger);
+                                        }
+
+                                        ravenTriggers.Add(new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger));
                                         break;
                                     }
                                 case RavenTriggerTypes.ChannelPointReward:
@@ -120,7 +129,14 @@ namespace JumpKingMod
                                         // Make the exluded word filter
                                         ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
 
-                                        ravenTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                        // Easter Egg
+                                        if (easterEggEnabled && 
+                                            TryGetAndStartEasterEggTrigger(userSettings, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
+                                        {
+                                            ravenTriggers.Add(easterEggTrigger);
+                                        }
+
+                                        ravenTriggers.Add(new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger));
                                         break;
                                     }
                                 case RavenTriggerTypes.Insult:
@@ -132,7 +148,7 @@ namespace JumpKingMod
 
                                         PlayerFallMessengerRavenTrigger fallTrigger = new PlayerFallMessengerRavenTrigger(userSettings, insultGetter, Logger);
                                         fallTrigger.SetUpManualPatch(harmony);
-                                        ravenTrigger = fallTrigger;
+                                        ravenTriggers.Add(fallTrigger);
                                         break;
                                     }
                                 default:
@@ -140,10 +156,10 @@ namespace JumpKingMod
                                     break;
                             }
 
-                            if (ravenTrigger != null)
+                            if (ravenTriggers != null && ravenTriggers.Count > 0)
                             {
                                 Logger.Information($"Initialising Messenger Ravens");
-                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTrigger, Logger);
+                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTriggers, Logger);
                             }
                         }
                     }
@@ -159,6 +175,21 @@ namespace JumpKingMod
             }
 
             Logger.Information("Init Called!");
+        }
+
+        private static bool TryGetAndStartEasterEggTrigger(UserSettings userSettings, out FakeMessageEasterEggMessengerRavenTrigger trigger)
+        {
+            // Easter Egg
+            var easterEggTrigger = new FakeMessageEasterEggMessengerRavenTrigger(Logger);
+            string twitchName = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+            if (easterEggTrigger.ShouldActivateEasterEggs(twitchName))
+            {
+                easterEggTrigger.StartEasterEggTrigger(twitchName);
+                trigger = easterEggTrigger;
+                return true;
+            }
+            trigger = null;
+            return false;
         }
     }
 }

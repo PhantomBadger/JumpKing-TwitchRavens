@@ -22,7 +22,7 @@ namespace JumpKingMod.Entities
     {
         private readonly UserSettings userSettings;
         private readonly ModEntityManager modEntityManager;
-        private readonly IMessengerRavenTrigger messengerRavenTrigger;
+        private readonly List<IMessengerRavenTrigger> messengerRavenTriggers;
         private readonly ILogger logger;
         private readonly IRavenLandingPositionsCache ravenLandingPositionsCache;
         private readonly ConcurrentDictionary<MessengerRavenEntity, byte> messengerRavens;
@@ -42,11 +42,11 @@ namespace JumpKingMod.Entities
         /// Ctor for creating a <see cref="MessengerRavenSpawningEntity"/>
         /// </summary>
         public MessengerRavenSpawningEntity(UserSettings userSettings, ModEntityManager modEntityManager, 
-            IMessengerRavenTrigger messengerRavenTrigger, ILogger logger)
+            List<IMessengerRavenTrigger> messengerRavenTriggers, ILogger logger)
         {
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
-            this.messengerRavenTrigger = messengerRavenTrigger ?? throw new ArgumentNullException(nameof(messengerRavenTrigger));
+            this.messengerRavenTriggers = messengerRavenTriggers ?? throw new ArgumentNullException(nameof(messengerRavenTriggers));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             ravenLandingPositionsCache = new RavenLandingPositionsCache(logger);
             messengerRavens = new ConcurrentDictionary<MessengerRavenEntity, byte>();
@@ -62,7 +62,10 @@ namespace JumpKingMod.Entities
             toggleSubModeKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
             isInSubMode = false;
 
-            messengerRavenTrigger.OnMessengerRavenTrigger += OnMessengerRavenTrigger;
+            for (int i = 0; i < messengerRavenTriggers.Count; i++)
+            {
+                messengerRavenTriggers[i].OnMessengerRavenTrigger += OnMessengerRavenTrigger;
+            }
             modEntityManager.AddEntity(this);
         }
 
@@ -72,7 +75,10 @@ namespace JumpKingMod.Entities
         public void Dispose()
         {
             modEntityManager?.RemoveEntity(this);
-            messengerRavenTrigger.OnMessengerRavenTrigger -= OnMessengerRavenTrigger;
+            for (int i = 0; i < messengerRavenTriggers.Count; i++)
+            {
+                messengerRavenTriggers[i].OnMessengerRavenTrigger -= OnMessengerRavenTrigger;
+            }
         }
 
         /// <summary>

@@ -93,6 +93,8 @@
     <Compile Include="Entities\Raven\RavenInsultFileInsultGetter.cs" />
     <Compile Include="Entities\Raven\States\RavenFlyingState.cs" />
     <Compile Include="Entities\Raven\States\RavenIdleState.cs" />
+    <Compile Include="Entities\Raven\Triggers\EasterEgg\EasterEggMessageInfo.cs" />
+    <Compile Include="Entities\Raven\Triggers\FakeMessageEasterEggMessengerRavenTrigger.cs" />
     <Compile Include="Entities\Raven\Triggers\TwitchChannelPointMessengerRavenTrigger.cs" />
     <Compile Include="Entities\UITextEntity.cs" />
     <Compile Include="Entities\UITextEntityAnchor.cs" />
