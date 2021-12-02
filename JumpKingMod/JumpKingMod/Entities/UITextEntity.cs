@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.Xna.Framework.Graphics.SpriteFont;
 
 namespace JumpKingMod.Entities
 {
@@ -35,6 +36,7 @@ namespace JumpKingMod.Entities
                 {
                     textValue = value;
                     formattedText = WrapText(textValue);
+                    shouldUseFallbackFont = ShouldUseFallbackFont(formattedText);
                 }
             }
         }
@@ -43,14 +45,16 @@ namespace JumpKingMod.Entities
         { 
             get
             {
-                return textFont;
+                return shouldUseFallbackFont ? ModContentManager.ArialUnicodeMS : textFont;
             }
             set
             {
                 if (textFont != value)
                 {
                     textFont = value;
+                    targetFontCharacterLookup = textFont.GetGlyphs();
                     formattedText = WrapText(textValue);
+                    shouldUseFallbackFont = ShouldUseFallbackFont(formattedText);
                 }
             }
         }
@@ -68,6 +72,8 @@ namespace JumpKingMod.Entities
         private SpriteFont textFont;
         private string textValue;
         private string formattedText;
+        private Dictionary<char, Glyph> targetFontCharacterLookup;
+        private bool shouldUseFallbackFont;
 
         private const float MaxWidthOfLine = 300;
 
@@ -246,6 +252,26 @@ namespace JumpKingMod.Entities
             {
                 yield return inputText.Substring(startIndex);
             }
+        }
+
+        /// <summary>
+        /// Determines whether we should use the fallback font for this string or not
+        /// </summary>
+        private bool ShouldUseFallbackFont(string input)
+        {
+            if (targetFontCharacterLookup == null)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (!targetFontCharacterLookup.ContainsKey(input[i]))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

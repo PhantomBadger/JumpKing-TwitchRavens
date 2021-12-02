@@ -50,6 +50,7 @@ namespace JumpKingMod
 
                 // Load Settings
                 UserSettings userSettings = new UserSettings(JumpKingModSettingsContext.SettingsFileName, JumpKingModSettingsContext.GetDefaultSettings(), Logger);
+                ModContentManager.LoadContent(Logger);
 
                 // Set up observer
                 GameStateObserverManualPatch gameStateObserver = new GameStateObserverManualPatch(Logger);

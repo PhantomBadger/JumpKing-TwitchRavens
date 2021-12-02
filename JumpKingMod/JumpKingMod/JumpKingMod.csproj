@@ -99,6 +99,7 @@
     <Compile Include="Entities\UITextEntity.cs" />
     <Compile Include="Entities\UITextEntityAnchor.cs" />
     <Compile Include="Entities\Raven\RavenLandingPositionsCache.cs" />
+    <Compile Include="ModContentManager.cs" />
     <Compile Include="Patching\AchievementRegisterDisableManualPatch.cs" />
     <Compile Include="Patching\GameStateObserverManualPatch.cs" />
     <Compile Include="JumpKingModEntry.cs" />
@@ -126,7 +127,11 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\arial-unicode-ms.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y /E /C /S "$(SolutionDir)JumpKingMod\bin\$(ConfigurationName)\*" "D:\SteamLibrary\steamapps\common\Jump King\Content\Mods"</PostBuildEvent>
