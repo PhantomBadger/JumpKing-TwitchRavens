@@ -126,7 +126,6 @@ namespace JumpKingMod.Entities.Raven
                     // Say a message
                     if (messageEntity == null)
                     {
-                        // TODO: Word wrap???
                         Vector2 messagePosition = Transform + new Vector2(0, -20);
                         messageEntity = new UITextEntity(modEntityManager, Camera.TransformVector2(messagePosition), landingMessage, Color.White, UITextEntityAnchor.Center, JKContentManager.Font.MenuFontSmall);
                         Vector2 textSize = messageEntity.Size;

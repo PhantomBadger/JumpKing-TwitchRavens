@@ -266,6 +266,11 @@ namespace JumpKingMod.Entities
 
             for (int i = 0; i < input.Length; i++)
             {
+                if (input[i] == '\n')
+                {
+                    continue;
+                }
+
                 if (!targetFontCharacterLookup.ContainsKey(input[i]))
                 {
                     return true;
