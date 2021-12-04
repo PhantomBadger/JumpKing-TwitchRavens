@@ -74,9 +74,10 @@ You can reach out to me on [Twitter](https://twitter.com/PhantomBadger_)
 
 # Future Features
 
-- [ ] Configurable exclusion word list
-- [ ] Custom Insults for the Insult Ravens
-- [ ] Text Wrapping for Longer Messages
-- [ ] Runtime Sub-Only Toggles
+- [x] Configurable exclusion word list
+- [x] Custom Insults for the Insult Ravens
+- [x] Text Wrapping for Longer Messages
+- [x] Runtime Sub-Only Toggles
 - [ ] Twitch Emote Support
 - [ ] Support for Different Raven Sprites
+- [ ] YouTube Chat Support
