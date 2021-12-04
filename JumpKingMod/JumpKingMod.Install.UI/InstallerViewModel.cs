@@ -635,6 +635,8 @@ namespace JumpKingMod.Install.UI
 
                         if (localFiles.Count > 0)
                         {
+                            FileUnblocker fileUnblocker = new FileUnblocker();
+
                             // Go through each file, and move it over into the destination
                             for (int i = 0; i < localFiles.Count; i++)
                             {
@@ -642,6 +644,16 @@ namespace JumpKingMod.Install.UI
                                 string dstFilePath = Path.Combine(expectedRemoteModFolder, relativePath);
                                 Directory.CreateDirectory(Path.GetDirectoryName(dstFilePath));
                                 File.Copy(localFiles[i], dstFilePath, true);
+
+                                // Attempt to unblock the file
+                                if (!fileUnblocker.TryUnblockFile(dstFilePath, out string error, out int errorCode) && errorCode != FileUnblocker.ERROR_FILE_NOT_FOUND)
+                                {
+                                    logger.Warning($"Failed to unblock '{dstFilePath}' with error '{error}', file will need to be manually unblocked. Refer to README on Repo");
+                                }
+                                else
+                                {
+                                    logger.Information($"Successfully Copied & Unblocked File '{dstFilePath}'");
+                                }
                             }
                         }
                         else

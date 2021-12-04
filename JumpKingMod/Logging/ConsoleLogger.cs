@@ -17,12 +17,18 @@ namespace Logging
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool AllocConsole();
 
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
         /// <summary>
         /// Default ctor for creating a <see cref="ConsoleLogger"/>
         /// </summary>
         public ConsoleLogger()
         {
-            AllocConsole();
+            if (GetConsoleWindow() == IntPtr.Zero)
+            {
+                AllocConsole();
+            }
         }
 
         /// <summary>
@@ -30,7 +36,8 @@ namespace Logging
         /// </summary>
         public void Information(string message)
         {
-            Console.WriteLine($"INF - {message}");
+            string finalMessage = $"INF - {message}";
+            Console.WriteLine(finalMessage);
         }
 
         /// <summary>
@@ -38,7 +45,8 @@ namespace Logging
         /// </summary>
         public void Warning(string message)
         {
-            Console.WriteLine($"WAR - {message}");
+            string finalMessage = $"WAR - {message}";
+            Console.WriteLine(finalMessage);
         }
 
         /// <summary>
@@ -46,7 +54,8 @@ namespace Logging
         /// </summary>
         public void Error(string message)
         {
-            Console.WriteLine($"ERR - {message}");
+            string finalMessage = $"ERR - {message}";
+            Console.WriteLine(finalMessage);
         }
     }
 }
