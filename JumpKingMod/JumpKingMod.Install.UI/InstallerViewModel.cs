@@ -623,13 +623,25 @@ namespace JumpKingMod.Install.UI
                     if (!expectedRemoteModFolder.Equals(ModDirectory, StringComparison.OrdinalIgnoreCase))
                     {
                         Directory.CreateDirectory(expectedRemoteModFolder);
-                        string[] dllFiles = Directory.GetFiles(ModDirectory);
-                        if (dllFiles.Length > 0)
+
+                        // Get all files and all files in the subfolders
+                        List<string> localFiles = new List<string>();
+                        localFiles.AddRange(Directory.GetFiles(ModDirectory));
+                        string[] folders = Directory.GetDirectories(ModDirectory);
+                        for (int i = 0; i < folders.Length; i++)
                         {
-                            for (int i = 0; i < dllFiles.Length; i++)
+                            localFiles.AddRange(Directory.GetFiles(folders[i]));
+                        }
+
+                        if (localFiles.Count > 0)
+                        {
+                            // Go through each file, and move it over into the destination
+                            for (int i = 0; i < localFiles.Count; i++)
                             {
-                                string dstFilePath = Path.Combine(expectedRemoteModFolder, Path.GetFileName(dllFiles[i]));
-                                File.Copy(dllFiles[i], dstFilePath, true);
+                                string relativePath = localFiles[i].Replace(ModDirectory, "").Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                                string dstFilePath = Path.Combine(expectedRemoteModFolder, relativePath);
+                                Directory.CreateDirectory(Path.GetDirectoryName(dstFilePath));
+                                File.Copy(localFiles[i], dstFilePath, true);
                             }
                         }
                         else
