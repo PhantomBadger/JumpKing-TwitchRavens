@@ -30,7 +30,7 @@ _**Note:** Enabling this aspect of the mod will disable achievements in the game
 
 Check the [Release](https://github.com/PhantomBadger/JumpKingMod/releases/) page for the latest download
 
-**Before unzipping the downloaded .zip, Right Click, select 'Properties' and if there is an option at the bottom to 'Unblock' the file, tick it, and click 'Apply'**
+**(If v1.1) Before unzipping the downloaded .zip, Right Click, select 'Properties' and if there is an option at the bottom to 'Unblock' the file, tick it, and click 'Apply'**
 
 ![image](https://user-images.githubusercontent.com/9095972/137400443-37a037bf-b1b2-407e-acea-06cea1232fdd.png)
 
@@ -74,10 +74,10 @@ You can reach out to me on [Twitter](https://twitter.com/PhantomBadger_)
 
 # Future Features
 
-- [x] Configurable exclusion word list
-- [x] Custom Insults for the Insult Ravens
-- [x] Text Wrapping for Longer Messages
-- [x] Runtime Sub-Only Toggles
+- [x] Configurable exclusion word list [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
+- [x] Custom Insults for the Insult Ravens [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
+- [x] Text Wrapping for Longer Messages [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
+- [x] Runtime Sub-Only Toggles [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
 - [ ] Twitch Emote Support
 - [ ] Support for Different Raven Sprites
 - [ ] YouTube Chat Support
