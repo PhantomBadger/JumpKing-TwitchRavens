@@ -10,6 +10,10 @@ namespace Settings
         public const string RavenInsultsFilePath = "Content/Mods/RavenInsultsList.txt";
         public const char CommentCharacter = '#';
 
+        // YouTube
+        public const string YouTubeApiKeyKey = "YouTubeAPIKey";
+        public const string YouTubeChannelNameKey = "YouTubeChannelName";
+
         // Twitch
         public const string ChatListenerTwitchAccountNameKey = "ChatListenerTwitchAccountName";
         public const string OAuthKey = "OAuth";
@@ -36,6 +40,10 @@ namespace Settings
         {
             return new Dictionary<string, string>()
             {
+                // YouTube
+                { YouTubeApiKeyKey, "" },
+                { YouTubeChannelNameKey, "" },
+
                 // Twitch Chat
                 { ChatListenerTwitchAccountNameKey, "" },
                 { OAuthKey, "" },

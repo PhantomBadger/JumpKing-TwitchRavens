@@ -86,6 +86,12 @@ namespace JumpKingMod
                             Task.Delay(100).Wait();
                         }
 
+                        var youtubeChatClient = new YouTube.YouTubeChatClient("UCSJ4gkVC6NrvII8umztf0Ow", userSettings, Logger);
+                        var result = youtubeChatClient.GetActiveStreamsAsync(false).Result;
+                        var result2 = youtubeChatClient.GetLiveChatIdAsync(result[0].VideoId).Result;
+                        youtubeChatClient.Connect(result2);
+
+                        /*
                         // Twitch Chat Relay
                         bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
                         if (relayEnabled)
@@ -162,7 +168,9 @@ namespace JumpKingMod
                                 Logger.Information($"Initialising Messenger Ravens");
                                 MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTriggers, Logger);
                             }
+                        
                         }
+                        */
                     }
                     catch (Exception e)
                     {

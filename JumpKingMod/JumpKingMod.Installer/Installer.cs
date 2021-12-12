@@ -93,8 +93,9 @@ namespace JumpKingMod.Install
                         if (firstOperand.Equals(callOperand, StringComparison.OrdinalIgnoreCase))
                         {
                             // The mod is already installed!
-                            error = "Unable to Install Mod - The mod has already been installed!";
-                            return false;
+                            //error = "Unable to Install Mod - The mod has already been installed!";
+                            //return false;
+                            return true;
                         }
                     }
                     ilProcessor.InsertBefore(firstInstruction, loadFromArgInstruction);
