@@ -13,7 +13,7 @@ namespace JumpKingMod.Entities.Raven.Triggers
 {
     /// <summary>
     /// An implementation of <see cref="IMessengerRavenTrigger"/> which spawns fake messages on a timer based on the
-    /// a specific twitch user as an easter egg
+    /// a specific twitch/youtube user as an easter egg
     /// </summary>
     public class FakeMessageEasterEggMessengerRavenTrigger : IMessengerRavenTrigger
     {
@@ -22,6 +22,18 @@ namespace JumpKingMod.Entities.Raven.Triggers
         private readonly Dictionary<string, List<EasterEggMessageInfo>> easterEggMessages =
             new Dictionary<string, List<EasterEggMessageInfo>>(StringComparer.OrdinalIgnoreCase)
         {
+            {   // Lo-Fi Girl YouTube Channel - Used for Testing
+                "UCSJ4gkVC6NrvII8umztf0Ow", new List<EasterEggMessageInfo>()
+                {
+                    new EasterEggMessageInfo()
+                    {
+                        RavenMessage = "Test!",
+                        RavenName = "PhantomBadger",
+                        RavenNameColor = Color.Blue,
+                        MessageOdds = 1,
+                    },
+                }
+            },
             {
                 "PhantomBadger", new List<EasterEggMessageInfo>()
                 {
@@ -186,28 +198,28 @@ namespace JumpKingMod.Entities.Raven.Triggers
         /// <summary>
         /// Checks whether we should activate easter eggs for this user or not
         /// </summary>
-        public bool ShouldActivateEasterEggs(string twitchName)
+        public bool ShouldActivateEasterEggs(string channelId)
         {
-            return easterEggMessages.ContainsKey(twitchName.Trim());
+            return easterEggMessages.ContainsKey(channelId.Trim());
         }
 
         /// <summary>
         /// Starts the easter egg processing thread for the specified user
         /// </summary>
-        public void StartEasterEggTrigger(string twitchName)
+        public void StartEasterEggTrigger(string channelId)
         {
             // Create the cancellation token
             cancellationTokenSource = new CancellationTokenSource();
 
             // Get the easter egg messages to use and calculate the percentage limits
-            List<EasterEggMessageInfo> easterEggMessageInfos = easterEggMessages[twitchName.Trim()];
+            List<EasterEggMessageInfo> easterEggMessageInfos = easterEggMessages[channelId.Trim()];
             int maxOddsValue = 0;
             for (int i = 0; i < easterEggMessageInfos.Count; i++)
             {
                 maxOddsValue += (int)easterEggMessageInfos[i].MessageOdds;
             }
 
-            triggerThread = new Thread(() => { PerformTriggerLoop(twitchName, easterEggMessageInfos, maxOddsValue, cancellationTokenSource.Token); });
+            triggerThread = new Thread(() => { PerformTriggerLoop(channelId, easterEggMessageInfos, maxOddsValue, cancellationTokenSource.Token); });
             triggerThread.Start();
         }
 
@@ -222,9 +234,9 @@ namespace JumpKingMod.Entities.Raven.Triggers
         /// <summary>
         /// Performs the trigger spawning loop
         /// </summary>
-        private void PerformTriggerLoop(string twitchName, List<EasterEggMessageInfo> easterEggMessageInfos, int maxOddsValue, CancellationToken token)
+        private void PerformTriggerLoop(string channelId, List<EasterEggMessageInfo> easterEggMessageInfos, int maxOddsValue, CancellationToken token)
         {
-            logger.Information($"Starting Easter Egg Trigger for '{twitchName}'");
+            logger.Information($"Starting Easter Egg Trigger for '{channelId}'");
 
             while (!token.IsCancellationRequested)
             {

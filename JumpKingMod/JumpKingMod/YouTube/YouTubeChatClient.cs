@@ -179,7 +179,7 @@ namespace JumpKingMod.YouTube
                 chatRequestPageToken = chatMessageResponse.NextPageToken;
 
                 // Process all messages
-                logger.Information($"= Received YouTube Chat Message Batch of {chatMessageResponse.Items.Count} Messages =");
+                logger.Information($"Received YouTube Chat Message Batch of {chatMessageResponse.Items.Count} Messages");
                 YouTubeChatMessageBatchArgs eventArgs = new YouTubeChatMessageBatchArgs()
                 {
                     LiveChatMessages = chatMessageResponse.Items,

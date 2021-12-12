@@ -102,6 +102,7 @@
     <Compile Include="API\IGameStateObserver.cs" />
     <Compile Include="API\IModEntity.cs" />
     <Compile Include="API\IModEntityState.cs" />
+    <Compile Include="API\IYouTubeClientConnector.cs" />
     <Compile Include="Components\LoopingAnimationComponent.cs" />
     <Compile Include="Entities\MessengerRavenSpawningEntity.cs" />
     <Compile Include="Entities\ModEntityManager.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Twitch\TwitchClientFactory.cs" />
     <Compile Include="Twitch\TwitchChatUIDisplay.cs" />
     <Compile Include="Twitch\TwitchHexColourParser.cs" />
+    <Compile Include="YouTube\ManualYouTubeClientConnector.cs" />
     <Compile Include="YouTube\YouTubeChatClient.cs" />
     <Compile Include="YouTube\YouTubeChatClientFactory.cs" />
     <Compile Include="YouTube\YouTubeChatMessageBatchArgs.cs" />
