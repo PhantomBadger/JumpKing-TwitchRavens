@@ -15,6 +15,7 @@ using JumpKingMod.Entities.Raven.Triggers;
 using JumpKingMod.Patching;
 using JumpKingMod.Settings;
 using JumpKingMod.Twitch;
+using JumpKingMod.YouTube;
 using Logging;
 using Logging.API;
 using Settings;
@@ -64,6 +65,9 @@ namespace JumpKingMod
                 // Twitch Chat Client
                 TwitchClientFactory twitchClientFactory = new TwitchClientFactory(userSettings, Logger);
 
+                // YouTube Chat Client
+                YouTubeChatClientFactory youtubeChatClientFactory = new YouTubeChatClientFactory(userSettings, Logger);
+
                 // Free Fly Patch
                 bool freeFlyEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false);
                 if (freeFlyEnabled)
@@ -86,12 +90,6 @@ namespace JumpKingMod
                             Task.Delay(100).Wait();
                         }
 
-                        var youtubeChatClient = new YouTube.YouTubeChatClient("UCSJ4gkVC6NrvII8umztf0Ow", userSettings, Logger);
-                        var result = youtubeChatClient.GetActiveStreamsAsync(false).Result;
-                        var result2 = youtubeChatClient.GetLiveChatIdAsync(result[0].VideoId).Result;
-                        youtubeChatClient.Connect(result2);
-
-                        /*
                         // Twitch Chat Relay
                         bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
                         if (relayEnabled)
@@ -110,6 +108,10 @@ namespace JumpKingMod
                             // using that trigger
                             RavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
                             List<IMessengerRavenTrigger> ravenTriggers = new List<IMessengerRavenTrigger>();
+
+                            // HARDCODE TO USE YOUTUBE
+                            ravenTriggerType = RavenTriggerTypes.YouTubeChatMessage;
+
                             switch (ravenTriggerType)
                             {
                                 case RavenTriggerTypes.ChatMessage:
@@ -120,7 +122,7 @@ namespace JumpKingMod
                                         ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
 
                                         // Easter Egg
-                                        if (easterEggEnabled && 
+                                        if (easterEggEnabled &&
                                             TryGetAndStartEasterEggTrigger(userSettings, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                         {
                                             ravenTriggers.Add(easterEggTrigger);
@@ -137,7 +139,7 @@ namespace JumpKingMod
                                         ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
 
                                         // Easter Egg
-                                        if (easterEggEnabled && 
+                                        if (easterEggEnabled &&
                                             TryGetAndStartEasterEggTrigger(userSettings, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                         {
                                             ravenTriggers.Add(easterEggTrigger);
@@ -158,6 +160,17 @@ namespace JumpKingMod
                                         ravenTriggers.Add(fallTrigger);
                                         break;
                                     }
+                                case RavenTriggerTypes.YouTubeChatMessage:
+                                    {
+                                        Logger.Information("Loading YouTube Chat Message Raven Trigger");
+
+                                        // Make the exluded word filter
+                                        ExcludedTermListFilter filter = new ExcludedTermListFilter(Logger);
+
+                                        YouTubeChatMessengerRavenTrigger chatTrigger = new YouTubeChatMessengerRavenTrigger(youtubeChatClientFactory.GetYouTubeClient(), filter, Logger);
+                                        ravenTriggers.Add(chatTrigger);
+                                        break;
+                                    }
                                 default:
                                     Logger.Error($"Unknown Raven Trigger Type {ravenTriggerType.ToString()}");
                                     break;
@@ -168,9 +181,7 @@ namespace JumpKingMod
                                 Logger.Information($"Initialising Messenger Ravens");
                                 MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTriggers, Logger);
                             }
-                        
-                        }
-                        */
+                        }            
                     }
                     catch (Exception e)
                     {

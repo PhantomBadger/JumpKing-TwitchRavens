@@ -10,6 +10,7 @@ namespace Settings
     {
         ChatMessage,
         ChannelPointReward,
-        Insult
+        Insult,
+        YouTubeChatMessage,
     }
 }

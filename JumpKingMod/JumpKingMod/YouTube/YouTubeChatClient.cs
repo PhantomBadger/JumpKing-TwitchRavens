@@ -18,29 +18,27 @@ namespace JumpKingMod.YouTube
     /// </summary>
     public class YouTubeChatClient
     {
+        public event EventHandler<YouTubeChatMessageBatchArgs> OnMessageBatchReceived;
+
         private readonly string channelId;
         private readonly YouTubeService youtubeService;
         private readonly CancellationTokenSource cancellationTokenSource;
         private readonly ILogger logger;
 
         private Task connectedLoopTask;
+        private DateTime? lastConnectedStartTime;
+
+        private const int DefaultPollingIntervalInMilliseconds = 1000;
 
         /// <summary>
         /// The Constructor for creating a <see cref="YouTubeChatClient"/>
         /// </summary>
         /// <param name="channelId">The ID of the channel we intend to listen to</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> for logging</param>
-        public YouTubeChatClient(string channelId, UserSettings settings, ILogger logger)
+        public YouTubeChatClient(string channelId, string apiKey, ILogger logger)
         {
             this.channelId = channelId ?? throw new ArgumentNullException(nameof(channelId));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            string apiKey = settings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeApiKeyKey, string.Empty);
-            if (string.IsNullOrWhiteSpace(apiKey))
-            {
-                logger.Error($"Invalid API Key Provided!");
-                return;
-            }
 
             youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
@@ -50,6 +48,7 @@ namespace JumpKingMod.YouTube
             cancellationTokenSource = new CancellationTokenSource();
 
             connectedLoopTask = null;
+            lastConnectedStartTime = null;
         }
 
         /// <summary>
@@ -129,6 +128,7 @@ namespace JumpKingMod.YouTube
                 return false;
             }
 
+            lastConnectedStartTime = DateTime.Now;
             connectedLoopTask = ListenToChatLoop(liveChatId);
             return true;
         }
@@ -154,6 +154,14 @@ namespace JumpKingMod.YouTube
         }
 
         /// <summary>
+        /// Returns the <see cref="DateTime"/> a last successful connection was made
+        /// </summary>
+        public DateTime? GetLastStartConnectionTime()
+        {
+            return lastConnectedStartTime;
+        }
+
+        /// <summary>
         /// Internal loop to process the chat messages
         /// </summary>
         private async Task ListenToChatLoop(string liveChatId)
@@ -171,15 +179,16 @@ namespace JumpKingMod.YouTube
                 chatRequestPageToken = chatMessageResponse.NextPageToken;
 
                 // Process all messages
-                for (int i = 0; i < chatMessageResponse.Items.Count; i++)
+                logger.Information($"= Received YouTube Chat Message Batch of {chatMessageResponse.Items.Count} Messages =");
+                YouTubeChatMessageBatchArgs eventArgs = new YouTubeChatMessageBatchArgs()
                 {
-                    LiveChatMessage chatMessage = chatMessageResponse.Items[i];
-
-                    logger.Information($"{chatMessage.AuthorDetails.DisplayName}: {chatMessage.Snippet.DisplayMessage}");
-                }
+                    LiveChatMessages = chatMessageResponse.Items,
+                    MinDelayBeforeNextBatch = chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds,
+                };
+                OnMessageBatchReceived?.Invoke(this, eventArgs);
 
                 // Wait the increment given to us
-                await Task.Delay((int)(chatMessageResponse.PollingIntervalMillis ?? 1000));
+                await Task.Delay((int)(chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds));
             }
         }
     }
