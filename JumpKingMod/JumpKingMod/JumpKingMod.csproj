@@ -133,10 +133,13 @@
     <Compile Include="Twitch\TwitchClientFactory.cs" />
     <Compile Include="Twitch\TwitchChatUIDisplay.cs" />
     <Compile Include="Twitch\TwitchHexColourParser.cs" />
-    <Compile Include="YouTube\ManualYouTubeClientConnector.cs" />
+    <Compile Include="YouTube\Connectors\ManualConnectionRequest.cs" />
+    <Compile Include="YouTube\Connectors\ManualConnectorStates.cs" />
+    <Compile Include="YouTube\Connectors\ManualYouTubeClientConnector.cs" />
     <Compile Include="YouTube\YouTubeChatClient.cs" />
     <Compile Include="YouTube\YouTubeChatClientFactory.cs" />
     <Compile Include="YouTube\YouTubeChatMessageBatchArgs.cs" />
+    <Compile Include="YouTube\YouTubeChatSessionInfo.cs" />
     <Compile Include="YouTube\YouTubeHexColourGenerator.cs" />
     <Compile Include="YouTube\YouTubeLiveStreamData.cs" />
   </ItemGroup>

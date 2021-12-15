@@ -60,9 +60,6 @@ namespace JumpKingMod.YouTube
                 logger.Information($"Setting up YouTube Chat Client for '{channelId}'");
 
                 youtubeClient = new YouTubeChatClient(channelId, apiKey, logger);
-                var result = youtubeClient.GetActiveStreamsAsync(false).Result;
-                var result2 = youtubeClient.GetLiveChatIdAsync(result[0].VideoId).Result;
-                youtubeClient.Connect(result2);
 
                 return youtubeClient;
             }

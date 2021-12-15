@@ -181,7 +181,7 @@ namespace JumpKingMod
 
                                         // Create the YouTube Client and kick off the connection process
                                         YouTubeChatClient youtubeClient = youtubeChatClientFactory.GetYouTubeClient();
-                                        IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient);
+                                        IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, modEntityManager, Logger);
                                         clientController.StartAttemptingConnection();
 
                                         // Create the Trigger

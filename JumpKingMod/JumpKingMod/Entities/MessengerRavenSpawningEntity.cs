@@ -113,7 +113,7 @@ namespace JumpKingMod.Entities
         /// <summary>
         /// Called each frame by the Mod Entity Manager, allows debug controls and cleans up the ravens
         /// </summary>
-        public void Update(float p_delta)
+        public void Update(float delta)
         {
             // Debug controls
             KeyboardState keyboardState = Keyboard.GetState();

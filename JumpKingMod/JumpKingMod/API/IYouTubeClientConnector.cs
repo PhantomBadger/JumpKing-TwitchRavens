@@ -14,6 +14,6 @@ namespace JumpKingMod.API
     {
         YouTubeChatClient YoutubeClient { get; }
 
-        Task<bool> StartAttemptingConnection();
+        void StartAttemptingConnection();
     }
 }

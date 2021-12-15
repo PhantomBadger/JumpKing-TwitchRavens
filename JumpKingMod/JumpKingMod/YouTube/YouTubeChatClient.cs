@@ -5,6 +5,7 @@ using JumpKingMod.Settings;
 using Logging.API;
 using Settings;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,11 +23,13 @@ namespace JumpKingMod.YouTube
 
         private readonly string channelId;
         private readonly YouTubeService youtubeService;
-        private readonly CancellationTokenSource cancellationTokenSource;
         private readonly ILogger logger;
 
-        private Task connectedLoopTask;
+        private BlockingCollection<YouTubeChatSessionInfo> connectionQueue;
+        private CancellationTokenSource cancellationTokenSource;
+        private Thread messagePollingThread;
         private DateTime? lastConnectedStartTime;
+        private bool isConnected;
 
         private const int DefaultPollingIntervalInMilliseconds = 1000;
 
@@ -45,9 +48,11 @@ namespace JumpKingMod.YouTube
                 ApiKey = apiKey,
                 ApplicationName = "Jump King Chat Ravens"
             });
+            connectionQueue = new BlockingCollection<YouTubeChatSessionInfo>();
             cancellationTokenSource = new CancellationTokenSource();
 
-            connectedLoopTask = null;
+            messagePollingThread = new Thread(ListenToChatLoop);
+            messagePollingThread.Start();
             lastConnectedStartTime = null;
         }
 
@@ -116,20 +121,32 @@ namespace JumpKingMod.YouTube
         /// <summary>
         /// Kick off the chat listening for the provided Live Chat ID
         /// </summary>
-        public bool Connect(string liveChatId)
+        public bool Connect(string liveChatId, out string error)
         {
-            if (connectedLoopTask != null)
+            error = string.Empty;
+            if (isConnected)
             {
+                error = "There is already a connection established!";
                 return false;
             }
 
             if (youtubeService == null)
             {
+                error = "The YouTube Service failed to be created!";
                 return false;
             }
 
             lastConnectedStartTime = DateTime.Now;
-            connectedLoopTask = ListenToChatLoop(liveChatId);
+            cancellationTokenSource = new CancellationTokenSource();
+
+            // Kick off the connection
+            isConnected = true;
+            connectionQueue.Add(new YouTubeChatSessionInfo()
+            {
+                LiveChatId = liveChatId,
+                Token = cancellationTokenSource.Token
+            });
+
             return true;
         }
 
@@ -138,7 +155,7 @@ namespace JumpKingMod.YouTube
         /// </summary>
         public bool Disconnect()
         {
-            if (connectedLoopTask == null)
+            if (!isConnected)
             {
                 return false;
             }
@@ -149,7 +166,7 @@ namespace JumpKingMod.YouTube
             }
 
             cancellationTokenSource.Cancel();
-            connectedLoopTask = null;
+            isConnected = false;
             return true;
         }
 
@@ -164,31 +181,35 @@ namespace JumpKingMod.YouTube
         /// <summary>
         /// Internal loop to process the chat messages
         /// </summary>
-        private async Task ListenToChatLoop(string liveChatId)
+        private void ListenToChatLoop()
         {
             string chatRequestPageToken = null;
-
-            while (!cancellationTokenSource.Token.IsCancellationRequested)
+            while (true)
             {
-                // Build and execute the Chat Message Request
-                LiveChatMessagesResource.ListRequest chatMessageRequest = youtubeService.LiveChatMessages.List(liveChatId, "snippet,authorDetails");
-                chatMessageRequest.PageToken = chatRequestPageToken ?? "";
-                LiveChatMessageListResponse chatMessageResponse = await chatMessageRequest.ExecuteAsync();
+                YouTubeChatSessionInfo sessionInfo = connectionQueue.Take();
 
-                // Record the next page token so we don't get emssages we've already gotten
-                chatRequestPageToken = chatMessageResponse.NextPageToken;
-
-                // Process all messages
-                logger.Information($"Received YouTube Chat Message Batch of {chatMessageResponse.Items.Count} Messages");
-                YouTubeChatMessageBatchArgs eventArgs = new YouTubeChatMessageBatchArgs()
+                while (!sessionInfo.Token.IsCancellationRequested)
                 {
-                    LiveChatMessages = chatMessageResponse.Items,
-                    MinDelayBeforeNextBatch = chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds,
-                };
-                OnMessageBatchReceived?.Invoke(this, eventArgs);
+                    // Build and execute the Chat Message Request
+                    LiveChatMessagesResource.ListRequest chatMessageRequest = youtubeService.LiveChatMessages.List(sessionInfo.LiveChatId, "snippet,authorDetails");
+                    chatMessageRequest.PageToken = chatRequestPageToken ?? "";
+                    LiveChatMessageListResponse chatMessageResponse = chatMessageRequest.ExecuteAsync().Result;
 
-                // Wait the increment given to us
-                await Task.Delay((int)(chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds));
+                    // Record the next page token so we don't get emssages we've already gotten
+                    chatRequestPageToken = chatMessageResponse.NextPageToken;
+
+                    // Process all messages
+                    logger.Information($"Received YouTube Chat Message Batch of {chatMessageResponse.Items.Count} Messages");
+                    YouTubeChatMessageBatchArgs eventArgs = new YouTubeChatMessageBatchArgs()
+                    {
+                        LiveChatMessages = chatMessageResponse.Items,
+                        MinDelayBeforeNextBatch = chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds,
+                    };
+                    OnMessageBatchReceived?.Invoke(this, eventArgs);
+
+                    // Wait the increment given to us
+                    Task.Delay((int)(chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds)).Wait();
+                }
             }
         }
     }
