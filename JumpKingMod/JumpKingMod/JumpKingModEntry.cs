@@ -172,7 +172,7 @@ namespace JumpKingMod
                                         var filter = new ExcludedTermListFilter(Logger);
 
                                         // Easter Egg
-                                        string youTubeChannelId = "UCSJ4gkVC6NrvII8umztf0Ow"; // userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
+                                        string youTubeChannelId = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
                                         if (easterEggEnabled &&
                                             TryGetAndStartEasterEggTrigger(youTubeChannelId, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                         {
