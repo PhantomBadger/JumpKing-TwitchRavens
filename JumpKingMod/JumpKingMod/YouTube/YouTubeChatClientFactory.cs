@@ -40,7 +40,7 @@ namespace JumpKingMod.YouTube
             else
             {
                 // Initialise the settings and attempt to load the api key
-                string channelId = "UCSJ4gkVC6NrvII8umztf0Ow"; // Hardcode to Lo-Fi girl for testing
+                string channelId = "UCFumXqqxJkHCMMKjuDs_2hQ"; // Hardcode to PhantomBadger for testing
                 //string channelId = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
                 string apiKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeApiKeyKey, string.Empty);
 

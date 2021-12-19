@@ -20,6 +20,8 @@ namespace JumpKingMod.YouTube
     public class YouTubeChatClient
     {
         public event EventHandler<YouTubeChatMessageBatchArgs> OnMessageBatchReceived;
+        public event EventHandler OnConnected;
+        public event EventHandler OnDisconnected;
 
         private readonly string channelId;
         private readonly YouTubeService youtubeService;
@@ -187,28 +189,59 @@ namespace JumpKingMod.YouTube
             while (true)
             {
                 YouTubeChatSessionInfo sessionInfo = connectionQueue.Take();
+                
+                // We have connected and are actively listening to chat
+                logger.Information($"Invoking OnConnected Event");
+                OnConnected?.Invoke(this, new EventArgs());
 
-                while (!sessionInfo.Token.IsCancellationRequested)
+                try
                 {
-                    // Build and execute the Chat Message Request
-                    LiveChatMessagesResource.ListRequest chatMessageRequest = youtubeService.LiveChatMessages.List(sessionInfo.LiveChatId, "snippet,authorDetails");
-                    chatMessageRequest.PageToken = chatRequestPageToken ?? "";
-                    LiveChatMessageListResponse chatMessageResponse = chatMessageRequest.ExecuteAsync().Result;
-
-                    // Record the next page token so we don't get emssages we've already gotten
-                    chatRequestPageToken = chatMessageResponse.NextPageToken;
-
-                    // Process all messages
-                    logger.Information($"Received YouTube Chat Message Batch of {chatMessageResponse.Items.Count} Messages");
-                    YouTubeChatMessageBatchArgs eventArgs = new YouTubeChatMessageBatchArgs()
+                    while (!sessionInfo.Token.IsCancellationRequested)
                     {
-                        LiveChatMessages = chatMessageResponse.Items,
-                        MinDelayBeforeNextBatch = chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds,
-                    };
-                    OnMessageBatchReceived?.Invoke(this, eventArgs);
+                        // Build and execute the Chat Message Request
+                        LiveChatMessagesResource.ListRequest chatMessageRequest = youtubeService.LiveChatMessages.List(sessionInfo.LiveChatId, "snippet,authorDetails");
+                        chatMessageRequest.PageToken = chatRequestPageToken ?? "";
+                        LiveChatMessageListResponse chatMessageResponse = chatMessageRequest.ExecuteAsync().Result;
+                        if (chatMessageResponse == null || chatMessageResponse.Items == null)
+                        {
+                            logger.Warning($"An Invalid Response was received from the Live Chat Message Request!");
+                            break;
+                        }
 
-                    // Wait the increment given to us
-                    Task.Delay((int)(chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds)).Wait();
+                        if (chatMessageResponse.OfflineAt != null)
+                        {
+                            logger.Warning($"Identified the connected stream as now being offline, stopping listening for messages!");
+                            break;
+                        }
+
+                        // Record the next page token so we don't get emssages we've already gotten
+                        chatRequestPageToken = chatMessageResponse.NextPageToken;
+
+                        // Process all messages
+                        logger.Information($"Received YouTube Chat Message Batch of {chatMessageResponse.Items.Count} Messages");
+                        float pollingDelay = chatMessageResponse.PollingIntervalMillis ?? DefaultPollingIntervalInMilliseconds;
+                        YouTubeChatMessageBatchArgs eventArgs = new YouTubeChatMessageBatchArgs()
+                        {
+                            LiveChatMessages = chatMessageResponse.Items,
+                            MinDelayBeforeNextBatch = pollingDelay,
+                        };
+                        OnMessageBatchReceived?.Invoke(this, eventArgs);
+
+                        // Wait the increment given to us
+                        Task.Delay((int)pollingDelay).Wait();
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Encountered exception from Chat Loop Listener - Forcibly Disconnecting!: {e.ToString()}");
+                }
+                finally
+                {
+                    isConnected = false;
+
+                    // If we got here a connection has been cancelled or otherwise terminated
+                    logger?.Information($"Invoking OnDisconnected Event");
+                    OnDisconnected?.Invoke(this, new EventArgs());
                 }
             }
         }

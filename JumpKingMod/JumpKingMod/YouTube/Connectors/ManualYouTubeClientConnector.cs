@@ -49,17 +49,35 @@ namespace JumpKingMod.YouTube
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             connectionRequests = new BlockingCollection<ManualConnectionRequest>();
 
+            // Bind to the YouTube Client Disconnect Event
+            youtubeClient.OnDisconnected += OnYouTubeClientDisconnected;
+
+            // Prime the UI Text
             connectKey = Keys.F9;
             connectionStatusText = new UITextEntity(modEntityManager, new Vector2(480, 0), string.Empty, Color.Red,
                             UITextEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall);
 
+            // Set our initial state
             ChangeState(ManualConnectorStates.Inactive);
 
+            // Set up our processing thread
             connectionThread = new Thread(YouTubeConnectionProcessingThread);
             connectionThread.Start();
             buttonPressedCooldown = false;
 
+            // Add ourselves to the Mod Entity Manager
             modEntityManager.AddEntity(this);
+        }
+
+        /// <summary>
+        /// Called if the YouTube Client Disconnects on it's side of things, handles everything on our end
+        /// </summary>
+        private void OnYouTubeClientDisconnected(object sender, EventArgs e)
+        {
+            if (manualConnectorState != ManualConnectorStates.Inactive)
+            {
+                ChangeState(ManualConnectorStates.NotConnected);
+            }
         }
 
         /// <summary>
@@ -165,30 +183,39 @@ namespace JumpKingMod.YouTube
         /// <returns></returns>
         private async Task<Tuple<bool, string>> AttemptYouTubeConnection()
         {
-            // Get the available live streams for the user associated with the client
-            List<YouTubeLiveStreamData> liveStreamData = await youtubeClient.GetActiveStreamsAsync(isUpcomingEvent: false);
-            if (liveStreamData.Count <= 0)
+            try
             {
-                var errorText = "No Live Stream Data found for the specified user!";
+                // Get the available live streams for the user associated with the client
+                List<YouTubeLiveStreamData> liveStreamData = await youtubeClient.GetActiveStreamsAsync(isUpcomingEvent: false);
+                if (liveStreamData.Count <= 0)
+                {
+                    var errorText = "No Live Stream Data found for the specified user!";
+                    logger.Error(errorText);
+                    return new Tuple<bool, string>(false, errorText);
+                }
+
+                // Get the first valid video ID within
+                string videoId = liveStreamData.FirstOrDefault()?.VideoId;
+                if (string.IsNullOrWhiteSpace(videoId))
+                {
+                    var errorText = "Invalid Video ID found for the found Live Stream Data";
+                    logger.Error(errorText);
+                    return new Tuple<bool, string>(false, errorText);
+                }
+
+                // Get the Live Chat Id of that video
+                string liveChatId = await youtubeClient.GetLiveChatIdAsync(videoId);
+
+                // Connect using that live chat Id
+                bool connectionResult = youtubeClient.Connect(liveChatId, out string error);
+                return new Tuple<bool, string>(connectionResult, error);
+            }
+            catch (Exception e)
+            {
+                var errorText = $"Encountered Exception when attempting to connect to YouTube: {e.ToString()}";
                 logger.Error(errorText);
                 return new Tuple<bool, string>(false, errorText);
             }
-
-            // Get the first valid video ID within
-            string videoId = liveStreamData.FirstOrDefault()?.VideoId;
-            if (string.IsNullOrWhiteSpace(videoId))
-            {
-                var errorText = "Invalid Video ID found for the found Live Stream Data";
-                logger.Error(errorText);
-                return new Tuple<bool, string>(false, errorText);
-            }
-
-            // Get the Live Chat Id of that video
-            string liveChatId = await youtubeClient.GetLiveChatIdAsync(videoId);
-
-            // Connect using that live chat Id
-            bool connectionResult = youtubeClient.Connect(liveChatId, out string error);
-            return new Tuple<bool, string>(connectionResult, error);
         }
 
         /// <summary>
@@ -225,7 +252,7 @@ namespace JumpKingMod.YouTube
                         break;
                     case ManualConnectorStates.NotConnected:
                         connectionStatusText.TextValue = $"Not Connected - Press {connectKey.ToString()} to Connect";
-                        connectionStatusText.TextColor = Color.DarkRed;
+                        connectionStatusText.TextColor = Color.Red;
                         break;
                     case ManualConnectorStates.AttemptingConnection:
                         connectionStatusText.TextValue = $"Attempting Connection...";
