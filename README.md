@@ -1,19 +1,19 @@
-# Jump King Twitch Raven Mod
-This Mod allows your Twitch Chat to lend words of encouragement whilst you climb to the babe! 
+# Jump King Chat Raven Mod
+This Mod allows your Twitch or YouTube Chat to lend words of encouragement whilst you climb to the babe! 
 
 ## Features
-### Twitch Ravens
-Twitch Chat can now communicate with you within the world of Jump King! Messages from chat will be parroted by small ravens that land on the stage as you traverse it. You have the option of gating this behind a Channel Point reward for busier chats!
+### Twitch & YouTube Ravens
+Both Twitch and YouTube Chat can now communicate with you within the world of Jump King! Messages from chat will be parroted by small ravens that land on the stage as you traverse it. You have the option of gating this behind a Channel Point reward for busier chats!
 <p align="center">
   <img src="https://user-images.githubusercontent.com/9095972/135728881-c4a61ccb-663b-4218-8f22-9ece0366592a.gif" width="75%" height="75%" alt="Ravens land on the stage to relay messages from Twitch Chat!"/>
 </p>
 
 The Ravens can be triggered through different ways to suit your chat
 - **Chat Message:** Spawns a Raven for every Chat Message that appears
-- **Channel Point:** Spawns a Raven when a chatter redeems a specified Channel Point (Uses the text from that channel point!)
-- **Insult:** Spawns Ravens when you fall, they choose from a pre-determined list of insults
+- **Channel Point:** Spawns a Raven when a chatter redeems a specified Channel Point (Uses the text from that channel point!) *(Twitch Only)*
+- **Insult:** Spawns Ravens when you fall, they choose from a pre-determined list of insults *(Twitch Only)*
 
-### Chat Display
+### Chat Display *(Twitch Only)*
 Alternatively, you can opt to display the Twitch Chat directly in your game instead!
 <p align="center">
   <img src="https://user-images.githubusercontent.com/9095972/135768756-8af8db85-4c54-4ea3-9cbe-fafcebb6bf27.gif" width="75%" height="75%"/>
@@ -26,23 +26,7 @@ _**Note:** Enabling this aspect of the mod will disable achievements in the game
 
 ## Installation
 
-**If you're not using Steam, make a copy of the MonoGame.Framework.dll in your Game's install directory first! It will make uninstalling easier!**
-
-Check the [Release](https://github.com/PhantomBadger/JumpKingMod/releases/) page for the latest download
-
-**(If v1.1) Before unzipping the downloaded .zip, Right Click, select 'Properties' and if there is an option at the bottom to 'Unblock' the file, tick it, and click 'Apply'**
-
-![image](https://user-images.githubusercontent.com/9095972/137400443-37a037bf-b1b2-407e-acea-06cea1232fdd.png)
-
-This will ensure that the mod loader isn't treated as a harmful application when running.
-- Run the Installer.UI.exe inside the Installer Folder
-
-![image](https://user-images.githubusercontent.com/9095972/135728412-5d00983e-8827-416d-8d55-3a87a5f9f6d7.png)
-- Click the '...' next to the Game Directory text box and point this at your Jump King Install Directory (the place where JumpKing.exe is)
-- Click the '...' next to the Mod Directory text box and point this at the Mod folder in the Install package
-- Click 'Install', a pop-up should appear confirming it has succeeded
-- You should fill in and Save the Settings via the Installer first, to ensure everything runs smoothly :)
-- You can now launch the game normally from Steam/however you normally launch. You can be sure the mod has been installed correctly because a Console Window will open alongside
+[Check out the Instructions here!](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/Installation.md)
 
 ### Common Issues
 <details>
@@ -80,4 +64,4 @@ You can reach out to me on [Twitter](https://twitter.com/PhantomBadger_)
 - [x] Runtime Sub-Only Toggles [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
 - [ ] Twitch Emote Support
 - [ ] Support for Different Raven Sprites
-- [ ] YouTube Chat Support
+- [x] YouTube Chat Support
