@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Xna.Framework.Input;
+using System.ComponentModel;
 
 namespace JumpKingMod.Install.UI
 {
@@ -48,6 +49,26 @@ namespace JumpKingMod.Install.UI
             }
         }
         private string youTubeAPIKey;
+
+        /// <summary>
+        /// The key to press to connect/disconnect from youtube
+        /// </summary>
+        public Keys ConnectKey
+        {
+            get
+            {
+                return connectKey;
+            }
+            set
+            {
+                if (connectKey != value)
+                {
+                    connectKey = value;
+                    RaisePropertyChanged(nameof(ConnectKey));
+                }
+            }
+        }
+        private Keys connectKey;
 
         /// <summary>
         /// Invokes the <see cref="PropertyChanged"/> event

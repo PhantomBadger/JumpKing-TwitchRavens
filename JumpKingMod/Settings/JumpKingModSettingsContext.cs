@@ -16,6 +16,7 @@ namespace Settings
         // YouTube
         public const string YouTubeApiKeyKey = "YouTubeAPIKey";
         public const string YouTubeChannelNameKey = "YouTubeChannelName";
+        public const string YouTubeConnectKeyKey = "YouTubeConnectKey";
         public const string YouTubeRavenTriggerTypeKey = "YouTubeRavenTriggerType";
 
         // Twitch
@@ -50,6 +51,7 @@ namespace Settings
                 // YouTube
                 { YouTubeApiKeyKey, "" },
                 { YouTubeChannelNameKey, "" },
+                { YouTubeConnectKeyKey, Keys.F9.ToString() },
                 { YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage.ToString() },
 
                 // Twitch Chat

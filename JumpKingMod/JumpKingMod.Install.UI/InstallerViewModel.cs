@@ -534,6 +534,7 @@ namespace JumpKingMod.Install.UI
             // YouTube
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeChannelNameKey, YouTubeSettings.YouTubeAccountName);
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeApiKeyKey, YouTubeSettings.YouTubeAPIKey);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeConnectKeyKey, YouTubeSettings.ConnectKey.ToString());
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, Ravens.YouTubeRavenTriggerType.ToString());
 
             // Twitch
@@ -588,6 +589,7 @@ namespace JumpKingMod.Install.UI
                 // YouTube Info
                 YouTubeSettings.YouTubeAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
                 YouTubeSettings.YouTubeAPIKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeApiKeyKey, string.Empty);
+                YouTubeSettings.ConnectKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
                 Ravens.YouTubeRavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
 
                 // Twitch Info

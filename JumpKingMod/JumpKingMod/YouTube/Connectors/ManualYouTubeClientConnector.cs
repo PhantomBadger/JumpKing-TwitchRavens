@@ -1,9 +1,11 @@
 ﻿using JumpKing;
 using JumpKingMod.API;
 using JumpKingMod.Entities;
+using JumpKingMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Settings;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -42,7 +44,7 @@ namespace JumpKingMod.YouTube
         /// <summary>
         /// Ctor for creating a <see cref="ManualYouTubeClientConnector"/>
         /// </summary>
-        public ManualYouTubeClientConnector(YouTubeChatClient youtubeClient, ModEntityManager modEntityManager, ILogger logger)
+        public ManualYouTubeClientConnector(YouTubeChatClient youtubeClient, ModEntityManager modEntityManager, UserSettings userSettings, ILogger logger)
         {
             this.youtubeClient = youtubeClient ?? throw new ArgumentNullException(nameof(youtubeClient));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
@@ -53,7 +55,7 @@ namespace JumpKingMod.YouTube
             youtubeClient.OnDisconnected += OnYouTubeClientDisconnected;
 
             // Prime the UI Text
-            connectKey = Keys.F9;
+            connectKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
             connectionStatusText = new UITextEntity(modEntityManager, new Vector2(480, 0), string.Empty, Color.Red,
                             UITextEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall);
 

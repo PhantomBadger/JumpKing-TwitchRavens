@@ -154,6 +154,8 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
                                     <ToolTip x:Key="youTubeAccountTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
@@ -182,6 +184,9 @@
                                     </Italic>
                                 </TextBlock>
                                 <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding YouTubeSettings.YouTubeAPIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource youTubeAPITooltip}"/>
+                                <!-- Connect Key -->
+                                <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" IsEnabled="{Binding AreModSettingsLoaded}" Text="Connect Key:" ToolTip="When pressed this will cause the mod to connect/disconnect from the YouTube Stream" />
+                                <ComboBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="{Binding AreModSettingsLoaded}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding YouTubeSettings.ConnectKey, Mode=TwoWay}" ToolTip="When pressed this will cause the mod to connect/disconnect from the YouTube Stream"/>
                             </Grid>
                         </TabItem>
                         <TabItem x:Name="tabItemRavens" Header="Ravens">
