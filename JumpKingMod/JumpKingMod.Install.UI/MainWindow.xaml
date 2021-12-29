@@ -137,7 +137,7 @@
                                     <Italic>
                                         You shouldn't show this to anyone!
                                         To generate an OAuth Token,
-                                        <Hyperlink NavigateUri="https://twitchapps.com/tmi/" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
+                                        <Hyperlink NavigateUri="https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#twitch" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
                                     </Italic>
                                 </TextBlock>
                                 <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchSettings.TwitchOAuth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource oAuthTooltip}"/>
@@ -178,7 +178,7 @@
                                     <Italic>
                                         You shouldn't show this to anyone!
                                         To generate this API key
-                                        <Hyperlink NavigateUri="https://console.cloud.google.com/apis/credentials" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
+                                        <Hyperlink NavigateUri="https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#youtube" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
                                     </Italic>
                                 </TextBlock>
                                 <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding YouTubeSettings.YouTubeAPIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource youTubeAPITooltip}"/>
