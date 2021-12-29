@@ -20,3 +20,5 @@ This will ensure that the mod loader isn't treated as a harmful application when
 ![image](https://user-images.githubusercontent.com/9095972/147677631-f3463081-9cb3-4d60-8571-3f357286a8e0.png)
 
 - You can now launch the game normally from Steam/however you normally launch. You can be sure the mod has been installed correctly because a Console Window will open alongside
+
+For YouTube Support, you should also check out [this guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/ConnectingToYouTube.md)
