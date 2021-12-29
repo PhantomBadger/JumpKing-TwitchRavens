@@ -28,6 +28,8 @@ _**Note:** Enabling this aspect of the mod will disable achievements in the game
 
 [Check out the Instructions here!](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/Installation.md)
 
+For YouTube Support, check out [this guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/ConnectingToYouTube.md)
+
 ### Common Issues
 <details>
   <summary>Operation is not supported. HRESULT: 0x80131515</summary>
