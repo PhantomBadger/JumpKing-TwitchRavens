@@ -10,6 +10,8 @@ Depending on your streaming platform of choice, the Chat Ravens Mod will require
  - Once connected, a token will be provided, it will look something like `oauth:6xx327ztkga11s32eza5w0ttwzg5yn`
  - Copy and paste this token into the "Twitch OAuth" section of the Installer
 
+![image](https://user-images.githubusercontent.com/9095972/147676707-bf3a3af9-1f09-40c4-b864-bcf02b33bb50.png)
+
 ## YouTube
 
  - To generate your YouTube API Key, go to this link: https://console.cloud.google.com/apis/credentials 
@@ -20,3 +22,5 @@ Depending on your streaming platform of choice, the Chat Ravens Mod will require
  - Once a project has been created, make sure it is selected then click 'Create Credentials' at the top of the screen, and select 'API Key' from the drop down
  - An API Key will be generated for you, it will look something like `AIzaSyDchfFGogUxIprKhZYDo0ku59zTC58s5uc`
  - Copy and paste this token into the "YouTube API Key" section of the Installer
+
+![image](https://user-images.githubusercontent.com/9095972/147676745-205259ae-e6f7-4985-bee1-0c0d819c89e4.png)
