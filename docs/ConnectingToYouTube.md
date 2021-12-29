@@ -1,7 +1,7 @@
 # Connecting to YouTube
 YouTube's livestreaming services differ from how Twitch handles things a fair bit, as such there are some slight deviations to how things work for you.
 
-- Once your settings have been correctly updated to support [YouTube connection](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#youtube), you can launch Jump King before going live. **However, you will be unable to connect to the chat until you have gone live** Due to restrictions put in place at YouTube's API the mod is not easily able to query for streams that are not *currently live*.
+- Once your settings have been correctly updated to support [YouTube connection](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#youtube), you can launch Jump King before going live. **However, you will be unable to connect to the chat until you have gone live.**
 - Once you have launched the game and have started, you will see a "Disconnected" message in the top right - this is the status of your connection. Since your YouTube Stream's chat does not exist until you are live we are unable to connect to it until you are live.
 
 ![image](https://user-images.githubusercontent.com/9095972/147679343-48120272-bbef-4f14-8718-c03f077e405c.png)
