@@ -46,7 +46,7 @@ namespace JumpKingMod.YouTube
                 // Check if any of the data is bad, exit now
                 if (string.IsNullOrWhiteSpace(channelId))
                 {
-                    logger.Error($"No valid ChannelName found in the {JumpKingModSettingsContext.SettingsFileName} file!");
+                    logger.Error($"No valid YouTube ChannelName found in the {JumpKingModSettingsContext.SettingsFileName} file!");
                     return null;
                 }
                 if (string.IsNullOrWhiteSpace(apiKey))
@@ -55,6 +55,7 @@ namespace JumpKingMod.YouTube
                     return null;
                 }
 
+                channelId = channelId.Trim();
                 apiKey = apiKey.Trim();
                 logger.Information($"Setting up YouTube Chat Client for '{channelId}'");
 

@@ -52,5 +52,32 @@ namespace JumpKingMod.Install.UI
             AboutWindow aboutWindow = new AboutWindow();
             aboutWindow.ShowDialog();
         }
+
+        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (tabControl != null)
+            {
+                if (tabControl.SelectedItem == tabItemYouTube)
+                {
+                    tabControl.SelectedItem = tabItemTwitch;
+                }
+            }
+        }
+
+        private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (tabControl != null)
+            {
+                if (tabControl.SelectedItem == tabItemTwitch)
+                {
+                    tabControl.SelectedItem = tabItemYouTube;
+                }
+
+                if (tabControl.SelectedItem == tabItemChatDisplay)
+                {
+                    tabControl.SelectedItem = tabItemYouTube;
+                }
+            }
+        }
     }
 }

@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Settings
 {
-    public enum RavenTriggerTypes
+    public enum TwitchRavenTriggerTypes
     {
         ChatMessage,
         ChannelPointReward,
-        Insult,
-        YouTubeChatMessage,
+        Insult
     }
 }

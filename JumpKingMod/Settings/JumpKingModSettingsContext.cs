@@ -10,13 +10,18 @@ namespace Settings
         public const string RavenInsultsFilePath = "Content/Mods/RavenInsultsList.txt";
         public const char CommentCharacter = '#';
 
+        // Streaming
+        public const string SelectedStreamingPlatformKey = "SelectedStreamingPlatform";
+
         // YouTube
         public const string YouTubeApiKeyKey = "YouTubeAPIKey";
         public const string YouTubeChannelNameKey = "YouTubeChannelName";
+        public const string YouTubeRavenTriggerTypeKey = "YouTubeRavenTriggerType";
 
         // Twitch
         public const string ChatListenerTwitchAccountNameKey = "ChatListenerTwitchAccountName";
         public const string OAuthKey = "OAuth";
+        public const string RavenTriggerTypeKey = "RavenTriggerType";
 
         // Twitch Relay
         public const string TwitchRelayEnabledKey = "TwitchRelayEnabled";
@@ -27,7 +32,6 @@ namespace Settings
         public const string RavensToggleDebugKeyKey = "RavensToggleDebugKey";
         public const string RavensSubModeToggleKeyKey = "RavensSubModeToggleKey";
         public const string RavensMaxCountKey = "RavensMaxCount";
-        public const string RavenTriggerTypeKey = "RavenTriggerType";
         public const string RavenChannelPointRewardIDKey = "RavenChannelPointRewardID";
         public const string RavenInsultSpawnCountKey = "RavenInsultSpawnCount";
         public const string RavenEasterEggEnabledKey = "RavenEasterEggEnabled";
@@ -40,13 +44,18 @@ namespace Settings
         {
             return new Dictionary<string, string>()
             {
+                // Selected Streaming Platform
+                { SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch.ToString() },
+
                 // YouTube
                 { YouTubeApiKeyKey, "" },
                 { YouTubeChannelNameKey, "" },
+                { YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage.ToString() },
 
                 // Twitch Chat
                 { ChatListenerTwitchAccountNameKey, "" },
                 { OAuthKey, "" },
+                { RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage.ToString() },
 
                 // Chat Display
                 { TwitchRelayEnabledKey, false.ToString() },
@@ -58,7 +67,6 @@ namespace Settings
                 { RavensToggleDebugKeyKey, Keys.F3.ToString() },
                 { RavensSubModeToggleKeyKey, Keys.F4.ToString() },
                 { RavensMaxCountKey, 5.ToString() },
-                { RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage.ToString() },
                 // Message
                 // Channel Point
                 { RavenChannelPointRewardIDKey, "" },

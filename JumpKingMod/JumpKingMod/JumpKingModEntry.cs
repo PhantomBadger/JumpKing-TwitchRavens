@@ -90,12 +90,18 @@ namespace JumpKingMod
                             Task.Delay(100).Wait();
                         }
 
+                        // Get the Streaming Platform being used
+                        AvailableStreamingPlatforms selectedStreamingPlatform = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
+                        
                         // Twitch Chat Relay
-                        bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
-                        if (relayEnabled)
+                        if (selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch)
                         {
-                            Logger.Information($"Initialising Twitch Chat UI Display");
-                            var relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
+                            bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
+                            if (relayEnabled)
+                            {
+                                Logger.Information($"Initialising Twitch Chat UI Display");
+                                var relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
+                            }
                         }
 
                         // Ravens
@@ -104,94 +110,109 @@ namespace JumpKingMod
                         {
                             bool easterEggEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenEasterEggEnabledKey, true);
 
-                            // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
-                            // using that trigger
-                            RavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
                             var ravenTriggers = new List<IMessengerRavenTrigger>();
 
-                            // HARDCODE TO USE YOUTUBE
-                            ravenTriggerType = RavenTriggerTypes.YouTubeChatMessage;
-
-                            switch (ravenTriggerType)
+                            // Platform-Specific Raven Setups
+                            if (selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch)
                             {
-                                case RavenTriggerTypes.ChatMessage:
-                                    {
-                                        Logger.Information($"Loading Chat Message Raven Trigger");
+                                // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
+                                // using that trigger
+                                TwitchRavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
 
-                                        // Make the exluded word filter
-                                        var filter = new ExcludedTermListFilter(Logger);
-
-                                        // Easter Egg
-                                        string twitchName = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
-                                        if (easterEggEnabled &&
-                                            TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
+                                switch (ravenTriggerType)
+                                {
+                                    case TwitchRavenTriggerTypes.ChatMessage:
                                         {
-                                            ravenTriggers.Add(easterEggTrigger);
+                                            Logger.Information($"Loading Twitch Chat Message Raven Trigger");
+
+                                            // Make the exluded word filter
+                                            var filter = new ExcludedTermListFilter(Logger);
+
+                                            // Easter Egg
+                                            string twitchName = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                                            if (easterEggEnabled &&
+                                                TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
+                                            {
+                                                ravenTriggers.Add(easterEggTrigger);
+                                            }
+
+                                            var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                            ravenTriggers.Add(chatTrigger);
+                                            break;
                                         }
-
-                                        var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
-                                        ravenTriggers.Add(chatTrigger);
-                                        break;
-                                    }
-                                case RavenTriggerTypes.ChannelPointReward:
-                                    {
-                                        Logger.Information($"Loading Channel Point Raven Trigger");
-
-                                        // Make the exluded word filter
-                                        var filter = new ExcludedTermListFilter(Logger);
-
-                                        // Easter Egg
-                                        string twitchName = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
-                                        if (easterEggEnabled &&
-                                            TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
+                                    case TwitchRavenTriggerTypes.ChannelPointReward:
                                         {
-                                            ravenTriggers.Add(easterEggTrigger);
+                                            Logger.Information($"Loading Twitch Channel Point Raven Trigger");
+
+                                            // Make the exluded word filter
+                                            var filter = new ExcludedTermListFilter(Logger);
+
+                                            // Easter Egg
+                                            string twitchName = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                                            if (easterEggEnabled &&
+                                                TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
+                                            {
+                                                ravenTriggers.Add(easterEggTrigger);
+                                            }
+
+                                            var channelPointTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                            ravenTriggers.Add(channelPointTrigger);
+                                            break;
                                         }
-
-                                        var channelPointTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
-                                        ravenTriggers.Add(channelPointTrigger);
-                                        break;
-                                    }
-                                case RavenTriggerTypes.Insult:
-                                    {
-                                        Logger.Information($"Loading Insult Raven Trigger");
-
-                                        // Make the Insult Getter
-                                        var insultGetter = new RavenInsultFileInsultGetter(Logger);
-
-                                        var fallTrigger = new PlayerFallMessengerRavenTrigger(userSettings, insultGetter, Logger);
-                                        fallTrigger.SetUpManualPatch(harmony);
-                                        ravenTriggers.Add(fallTrigger);
-                                        break;
-                                    }
-                                case RavenTriggerTypes.YouTubeChatMessage:
-                                    {
-                                        Logger.Information("Loading YouTube Chat Message Raven Trigger");
-
-                                        // Make the exluded word filter
-                                        var filter = new ExcludedTermListFilter(Logger);
-
-                                        // Easter Egg
-                                        string youTubeChannelId = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
-                                        if (easterEggEnabled &&
-                                            TryGetAndStartEasterEggTrigger(youTubeChannelId, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
+                                    case TwitchRavenTriggerTypes.Insult:
                                         {
-                                            ravenTriggers.Add(easterEggTrigger);
+                                            Logger.Information($"Loading Twitch Insult Raven Trigger");
+
+                                            // Make the Insult Getter
+                                            var insultGetter = new RavenInsultFileInsultGetter(Logger);
+
+                                            var fallTrigger = new PlayerFallMessengerRavenTrigger(userSettings, insultGetter, Logger);
+                                            fallTrigger.SetUpManualPatch(harmony);
+                                            ravenTriggers.Add(fallTrigger);
+                                            break;
                                         }
-
-                                        // Create the YouTube Client and kick off the connection process
-                                        YouTubeChatClient youtubeClient = youtubeChatClientFactory.GetYouTubeClient();
-                                        IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, modEntityManager, Logger);
-                                        clientController.StartAttemptingConnection();
-
-                                        // Create the Trigger
-                                        var chatTrigger = new YouTubeChatMessengerRavenTrigger(youtubeClient, filter, Logger);
-                                        ravenTriggers.Add(chatTrigger);
+                                    default:
+                                        Logger.Error($"Unknown Twitch Raven Trigger Type {ravenTriggerType.ToString()}");
                                         break;
-                                    }
-                                default:
-                                    Logger.Error($"Unknown Raven Trigger Type {ravenTriggerType.ToString()}");
-                                    break;
+                                }
+                            }
+                            else if (selectedStreamingPlatform == AvailableStreamingPlatforms.YouTube)
+                            {
+                                // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
+                                // using that trigger
+                                YouTubeRavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
+
+                                switch (ravenTriggerType)
+                                {
+                                    case YouTubeRavenTriggerTypes.ChatMessage:
+                                        {
+                                            Logger.Information("Loading YouTube Chat Message Raven Trigger");
+
+                                            // Make the exluded word filter
+                                            var filter = new ExcludedTermListFilter(Logger);
+
+                                            // Easter Egg
+                                            string youTubeChannelId = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
+                                            if (easterEggEnabled &&
+                                                TryGetAndStartEasterEggTrigger(youTubeChannelId, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
+                                            {
+                                                ravenTriggers.Add(easterEggTrigger);
+                                            }
+
+                                            // Create the YouTube Client and kick off the connection process
+                                            YouTubeChatClient youtubeClient = youtubeChatClientFactory.GetYouTubeClient();
+                                            IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, modEntityManager, Logger);
+                                            clientController.StartAttemptingConnection();
+
+                                            // Create the Trigger
+                                            var chatTrigger = new YouTubeChatMessengerRavenTrigger(youtubeClient, filter, Logger);
+                                            ravenTriggers.Add(chatTrigger);
+                                            break;
+                                        }
+                                    default:
+                                        Logger.Error($"Unknown YouTube Raven Trigger Type {ravenTriggerType.ToString()}");
+                                        break;
+                                }
                             }
 
                             if (ravenTriggers != null && ravenTriggers.Count > 0)

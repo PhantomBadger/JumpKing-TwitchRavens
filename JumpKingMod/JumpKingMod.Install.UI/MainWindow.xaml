@@ -8,15 +8,58 @@
         xmlns:local="clr-namespace:JumpKingMod.Install.UI"
         xmlns:settings="clr-namespace:Settings;assembly=Settings"
         mc:Ignorable="d"
-        Title="Jump King Twitch Ravens Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        Title="Jump King Chat Ravens Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+   
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="boolToVisibilityConverter" />
+
         <ObjectDataProvider x:Key="keysEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="Input:Keys"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+
+        <Style x:Key="ToggleFlipSwitchStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <StackPanel Orientation="Horizontal">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <Border x:Name="on" Width="60" Height="25" Background="LightGray" CornerRadius="2,0,0,4" Margin="10,0,0,0">
+                                <TextBlock x:Name="onText" Text="Twitch" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="off" Width="60" Height="25" Background="LightGray" CornerRadius="0,2,4,0">
+                                <TextBlock x:Name="offText" Text="YouTube" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter TargetName="on" Property="Background" Value="#6441a5"/>
+                                <Setter TargetName="onText" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="off" Property="Background" Value="#FF0000"/>
+                                <Setter TargetName="offText" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#ADADAD"/>
+                                <Setter TargetName="on" Property="Background" Value="LightGray"/>
+                                <Setter TargetName="onText" Property="Foreground" Value="DarkGray"/>
+                                <Setter TargetName="off" Property="Background" Value="LightGray"/>
+                                <Setter TargetName="offText" Property="Foreground" Value="DarkGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
+    
     <DockPanel>
         <Menu DockPanel.Dock="Top" Padding="2,0,0,2">
             <MenuItem Header="_File">
@@ -55,8 +98,9 @@
             <!-- Settings -->
             <GroupBox Header="Settings">
                 <StackPanel>
-                    <TabControl Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Padding="5" SelectedIndex="0">
-                        <TabItem Header="Twitch">
+                    <ToggleButton Content="Streaming Platform:" Margin="2,2,10,2" IsEnabled="{Binding AreModSettingsLoaded}" Style="{StaticResource ToggleFlipSwitchStyle}" IsChecked="{Binding IsStreamingOnTwitch, Mode=TwoWay}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Unchecked"/>
+                    <TabControl x:Name="tabControl" IsEnabled="{Binding AreModSettingsLoaded}" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Padding="5" SelectedIndex="0">
+                        <TabItem x:Name="tabItemTwitch" Header="Twitch" Visibility="{Binding IsStreamingOnTwitch, Converter={StaticResource boolToVisibilityConverter}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -86,7 +130,7 @@
                                 </Grid.Resources>
                                 <!-- Twitch Account -->
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource twitchAccountTooltip}" Text="Twitch Account Name:" />
-                                <TextBox Grid.Row="1" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchAccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource twitchAccountTooltip}"/>
+                                <TextBox Grid.Row="1" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchSettings.TwitchAccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource twitchAccountTooltip}"/>
                                 <!-- OAuth -->
                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource oAuthTooltip}" Text="Twitch OAuth:" />
                                 <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,0,10,0" FontSize="9" ToolTip="{StaticResource oAuthTooltip}">
@@ -96,10 +140,51 @@
                                         <Hyperlink NavigateUri="https://twitchapps.com/tmi/" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
                                     </Italic>
                                 </TextBlock>
-                                <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchOAuth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource oAuthTooltip}"/>
+                                <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchSettings.TwitchOAuth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource oAuthTooltip}"/>
                             </Grid>
                     </TabItem>
-                        <TabItem Header="Ravens">
+                        <TabItem x:Name="tabItemYouTube" Header="YouTube" Visibility="{Binding IsStreamingOnYouTube, Converter={StaticResource boolToVisibilityConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <ToolTip x:Key="youTubeAccountTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            The name of the YouTube Channel to Listen to
+                                            <LineBreak/>
+                                            We will look for active streams on this account and listen for chat messages
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="youTubeAPITooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            This YouTube API token gives this application permission to use YouTube's API
+                                        </TextBlock>
+                                    </ToolTip>
+                                </Grid.Resources>
+                                <!-- YouTube Account -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource youTubeAccountTooltip}" Text="YouTube Account Name:" />
+                                <TextBox Grid.Row="1" Grid.Column="0" Margin="0,2,0,2" Text="{Binding YouTubeSettings.YouTubeAccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource youTubeAccountTooltip}"/>
+                                <!-- API Key -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource youTubeAPITooltip}" Text="YouTube API Key:" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,0,10,0" FontSize="9" ToolTip="{StaticResource youTubeAPITooltip}">
+                                    <Italic>
+                                        You shouldn't show this to anyone!
+                                        To generate this API key
+                                        <Hyperlink NavigateUri="https://console.cloud.google.com/apis/credentials" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
+                                    </Italic>
+                                </TextBlock>
+                                <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding YouTubeSettings.YouTubeAPIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding AreModSettingsLoaded}" ToolTip="{StaticResource youTubeAPITooltip}"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem x:Name="tabItemRavens" Header="Ravens">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" SharedSizeGroup="FirstColumn"/>
@@ -133,9 +218,14 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <ObjectDataProvider x:Key="ravenTriggerTypeEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+                                    <ObjectDataProvider x:Key="twitchRavenTriggerTypeEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
                                         <ObjectDataProvider.MethodParameters>
-                                            <x:Type TypeName="settings:RavenTriggerTypes"/>
+                                            <x:Type TypeName="settings:TwitchRavenTriggerTypes"/>
+                                        </ObjectDataProvider.MethodParameters>
+                                    </ObjectDataProvider>
+                                    <ObjectDataProvider x:Key="youTubeRavenTriggerTypeEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+                                        <ObjectDataProvider.MethodParameters>
+                                            <x:Type TypeName="settings:YouTubeRavenTriggerTypes"/>
                                         </ObjectDataProvider.MethodParameters>
                                     </ObjectDataProvider>
                                     <ToolTip x:Key="enabledRavenTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
@@ -143,15 +233,22 @@
                                             If enabled, the mod will spawn ravens based on specific triggers
                                         </TextBlock>
                                     </ToolTip>
-                                    <ToolTip x:Key="ravenTriggerTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <ToolTip x:Key="twitchRavenTriggerTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
                                         <TextBlock>
-                                            The trigger for spawning the ravens
+                                            The trigger for spawning the ravens via Twitch
                                             <LineBreak/>
                                             <Bold>ChatMessage:</Bold> Whenever a Message is typed in the Twitch Chat
                                             <LineBreak/>
                                             <Bold>ChannelPointReward:</Bold> Whenever a specified Channel Point Reward is redeemed
                                             <LineBreak/>
                                             <Bold>Insult:</Bold> Whenever you fall off screen
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="youTubeRavenTriggerTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            The trigger for spawning the ravens via YouTube
+                                            <LineBreak/>
+                                            <Bold>ChatMessage:</Bold> Whenever a Message is typed in the YouTube Chat
                                         </TextBlock>
                                     </ToolTip>
                                     <ToolTip x:Key="ravenDebugToggleKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
@@ -176,24 +273,96 @@
                                 </Grid.Resources>
                                 <!-- Raven Enabled -->
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" Text="Enabled: " />
-                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding RavenEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding Ravens.RavenEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
                                 <!-- Separator -->
-                                <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
+                                <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
                                 <!-- Toggle Active Key -->
-                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Active Key:" />
-                                <ComboBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavenToggleDebugKey, Mode=TwoWay}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Active Key:" />
+                                <ComboBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding Ravens.RavenToggleDebugKey, Mode=TwoWay}"/>
                                 <!-- Clear Key -->
-                                <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Clear Key:" />
-                                <ComboBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavenClearDebugKey, Mode=TwoWay}"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Clear Key:" />
+                                <ComboBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding Ravens.RavenClearDebugKey, Mode=TwoWay}"/>
                                 <!-- Toggle Sub Mode Key -->
-                                <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenSubToggleKeyTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Sub Mode Key:" />
-                                <ComboBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenSubToggleKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavenSubModeToggleKey, Mode=TwoWay}"/>
+                                <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenSubToggleKeyTooltip}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Sub Mode Key:" />
+                                <ComboBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenSubToggleKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding Ravens.RavenSubModeToggleKey, Mode=TwoWay}"/>
                                 <!-- Max Number of Ravens-->
-                                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Max Number of Ravens:" />
-                                <TextBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding MaxRavensCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Max Number of Ravens:" />
+                                <TextBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding Ravens.MaxRavensCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <!-- Raven Trigger -->
-                                <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenTriggerTooltip}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Trigger Type:" />
-                                <ComboBox Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenTriggerTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource ravenTriggerTypeEnumValues}}" SelectedItem="{Binding RavenTriggerType, Mode=TwoWay}"/>
+                                <!-- Twitch -->
+                                <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource twitchRavenTriggerTooltip}" Text="Trigger Type:">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Ravens.RavenEnabled}" Value="True"/>
+                                                        <Condition Binding="{Binding IsStreamingOnTwitch}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <ComboBox Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource twitchRavenTriggerTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" ItemsSource="{Binding Source={StaticResource twitchRavenTriggerTypeEnumValues}}" SelectedItem="{Binding Ravens.RavenTriggerType, Mode=TwoWay}">
+                                    <ComboBox.Style>
+                                        <Style TargetType="{x:Type ComboBox}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Ravens.RavenEnabled}" Value="True"/>
+                                                        <Condition Binding="{Binding IsStreamingOnTwitch}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ComboBox.Style>
+                                </ComboBox>
+                                <!-- YouTube -->
+                                <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource youTubeRavenTriggerTooltip}" Text="Trigger Type:">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Ravens.RavenEnabled}" Value="True"/>
+                                                        <Condition Binding="{Binding IsStreamingOnYouTube}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <ComboBox Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource youTubeRavenTriggerTooltip}" IsEnabled="{Binding AreModSettingsLoaded}"  ItemsSource="{Binding Source={StaticResource youTubeRavenTriggerTypeEnumValues}}" SelectedItem="{Binding Ravens.YouTubeRavenTriggerType, Mode=TwoWay}">
+                                    <ComboBox.Style>
+                                        <Style TargetType="{x:Type ComboBox}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Ravens.RavenEnabled}" Value="True"/>
+                                                        <Condition Binding="{Binding IsStreamingOnYouTube}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ComboBox.Style>
+                                </ComboBox>
                                 <!-- Trigger Settings: Channel Point -->
                                 <Grid x:Name="grdChatPointSettings" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2">
                                     <Grid.ColumnDefinitions>
@@ -210,15 +379,21 @@
                                         <Style TargetType="{x:Type Grid}">
                                             <Setter Property="Visibility" Value="Collapsed"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RavenTriggerType}" Value="ChannelPointReward">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Ravens.RavenTriggerType}" Value="ChannelPointReward"/>
+                                                        <Condition Binding="{Binding IsStreamingOnTwitch}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Grid.Style>
-                                    <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,10,10,5" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" />
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Channel Point Reward ID:" />
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" Grid.ColumnSpan="2" FontSize="9" TextWrapping="Wrap" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}">
+                                    <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,10,10,5" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,2,10,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Channel Point Reward ID:" />
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" Grid.ColumnSpan="2" FontSize="9" TextWrapping="Wrap" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}">
                                         <Italic>
                                             If you're not sure how to get this, 
                                             <Hyperlink NavigateUri="https://www.instafluff.tv/TwitchCustomRewardID/?channel=YOURNAME" RequestNavigate="Hyperlink_RequestNavigate">
@@ -228,7 +403,7 @@
                                             and then redeem the reward in your chat.
                                         </Italic>
                                     </TextBlock>
-                                    <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,5,2" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding RavensChannelPointID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,5,2" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding Ravens.RavensChannelPointID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </Grid>
                                 <!-- Trigger Settings: Excluded Term Filter -->
                                 <Grid x:Name="grdExcludedWords" Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2">
@@ -247,26 +422,47 @@
                                         <Style TargetType="{x:Type Grid}">
                                             <Setter Property="Visibility" Value="Collapsed"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RavenTriggerType}" Value="ChannelPointReward">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding RavenTriggerType}" Value="ChatMessage">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsStreamingOnTwitch}" Value="True"/>
+                                                        <Condition Binding="{Binding Ravens.RavenTriggerType}" Value="ChatMessage"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsStreamingOnTwitch}" Value="True"/>
+                                                        <Condition Binding="{Binding Ravens.RavenTriggerType}" Value="ChannelPointReward"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsStreamingOnYouTube}" Value="True"/>
+                                                        <Condition Binding="{Binding Ravens.YouTubeRavenTriggerType}" Value="ChatMessage"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Grid.Style>
-                                    <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,10,10,5" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" />
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Excluded Terms:" />
-                                    <TextBox Grid.Row="2" Grid.Column="0" Margin="5,2,5,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" 
-                                             Text="{Binding CandidateExcludedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <Button Grid.Row="2" Grid.Column="1" Content="+" Padding="5,0,5,0" Margin="0,2,5,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"
+                                    <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,10,10,5" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,2,10,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Excluded Terms:" />
+                                    <TextBox Grid.Row="2" Grid.Column="0" Margin="5,2,5,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" 
+                                             Text="{Binding Ravens.CandidateExcludedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Button Grid.Row="2" Grid.Column="1" Content="+" Padding="5,0,5,0" Margin="0,2,5,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"
                                             Command="{Binding AddExcludedTermCommand}"/>
-                                    <Button Grid.Row="2" Grid.Column="2" Content="-" Padding="6,0,6,0" Margin="0,2,5,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"
+                                    <Button Grid.Row="2" Grid.Column="2" Content="-" Padding="6,0,6,0" Margin="0,2,5,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"
                                             Command="{Binding RemoveExcludedTermCommand}"/>
-                                    <ListBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,2,5,2" MinHeight="50" MaxHeight="300" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" 
-                                             ItemsSource="{Binding ExcludedTerms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                             SelectedIndex="{Binding SelectedExcludedItemIndex, Mode=TwoWay}"/>
+                                    <ListBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,2,5,2" MinHeight="50" MaxHeight="300" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" 
+                                             ItemsSource="{Binding Ravens.ExcludedTerms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             SelectedIndex="{Binding Ravens.SelectedExcludedItemIndex, Mode=TwoWay}"/>
                                 </Grid>
                                 <!-- Trigger Settings: Insult List -->
                                 <Grid x:Name="grdRavenInsults" Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2">
@@ -287,33 +483,49 @@
                                         <Style TargetType="{x:Type Grid}">
                                             <Setter Property="Visibility" Value="Collapsed"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RavenTriggerType}" Value="Insult">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Ravens.RavenTriggerType}" Value="Insult"/>
+                                                        <Condition Binding="{Binding IsStreamingOnTwitch}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Grid.Style>
-                                    <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,10,10,5" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" />
+                                    <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,10,10,5" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" />
 
                                     <!-- Number of Insult Ravens -->
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Insult Raven Spawn Count:"/>
-                                    <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,2,5,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding InsultRavenSpawnCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,2,10,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Insult Raven Spawn Count:"/>
+                                    <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,2,5,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding Ravens.InsultRavenSpawnCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                                     <!-- Insult List Box -->
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,2,10,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Raven Insults:" />
-                                    <TextBox Grid.Row="4" Grid.Column="0" Margin="5,2,5,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" 
-                                             Text="{Binding CandidateRavenInsult, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <Button Grid.Row="4" Grid.Column="1" Content="+" Padding="5,0,5,0" Margin="0,2,5,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,2,10,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Raven Insults:" />
+                                    <TextBox Grid.Row="4" Grid.Column="0" Margin="5,2,5,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" 
+                                             Text="{Binding Ravens.CandidateRavenInsult, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Button Grid.Row="4" Grid.Column="1" Content="+" Padding="5,0,5,0" Margin="0,2,5,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"
                                             Command="{Binding AddRavenInsultCommand}"/>
-                                    <Button Grid.Row="4" Grid.Column="2" Content="-" Padding="6,0,6,0" Margin="0,2,5,2" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"
+                                    <Button Grid.Row="4" Grid.Column="2" Content="-" Padding="6,0,6,0" Margin="0,2,5,2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"
                                             Command="{Binding RemoveRavenInsultCommand}"/>
-                                    <ListBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,2,5,2" MinHeight="50" MaxHeight="300" Visibility="{Binding RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" 
-                                             ItemsSource="{Binding RavenInsults, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                             SelectedIndex="{Binding SelectedRavenInsultIndex, Mode=TwoWay}"/>
+                                    <ListBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5,2,5,2" MinHeight="50" MaxHeight="300" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" 
+                                             ItemsSource="{Binding Ravens.RavenInsults, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             SelectedIndex="{Binding Ravens.SelectedRavenInsultIndex, Mode=TwoWay}"/>
                                 </Grid>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="Chat Display">
+                        <TabItem x:Name="tabItemChatDisplay" Header="Chat Display">
+                            <TabItem.Style>
+                                <Style TargetType="{x:Type TabItem}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsStreamingOnTwitch}" Value="True">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TabItem.Style>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -327,7 +539,7 @@
                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding ChatDisplayEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="Fly">
+                        <TabItem x:Name="tabItemFly" Header="Fly">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>

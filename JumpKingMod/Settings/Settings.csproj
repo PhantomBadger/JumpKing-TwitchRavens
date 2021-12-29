@@ -47,11 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AvailableStreamingPlatforms.cs" />
     <Compile Include="JumpKingModInstallerSettingsContext.cs" />
     <Compile Include="JumpKingModSettingsContext.cs" />
-    <Compile Include="RavenTriggerTypes.cs" />
+    <Compile Include="TwitchRavenTriggerTypes.cs" />
     <Compile Include="UserSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="YouTubeRavenTriggerTypes.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Logging\Logging.csproj">

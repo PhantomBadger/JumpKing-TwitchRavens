@@ -67,199 +67,71 @@ namespace JumpKingMod.Install.UI
         private string modDirectory;
 
         /// <summary>
-        /// The name of the twitch account to use
+        /// Converts the <see cref="SelectedStreamingPlatform"/> property into a bool which can be bound to the UI or filtered against
         /// </summary>
-        public string TwitchAccountName
+        public bool IsStreamingOnTwitch
         {
             get
             {
-                return twitchAccountName;
+                return selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch;
             }
             set
             {
-                if (twitchAccountName != value)
-                {
-                    twitchAccountName = value;
-                    RaisePropertyChanged(nameof(TwitchAccountName));
-                }
+                SelectedStreamingPlatform = value ? AvailableStreamingPlatforms.Twitch : AvailableStreamingPlatforms.YouTube;
             }
         }
-        private string twitchAccountName;
 
         /// <summary>
-        /// The OAuth token to use for Twitch Chat
+        /// Converts the <see cref="SelectedStreamingPlatform"/> property into a bool which can be bound to the UI or filtered against
         /// </summary>
-        public string TwitchOAuth
+        public bool IsStreamingOnYouTube
         {
             get
             {
-                return twitchOAuth;
+                return selectedStreamingPlatform == AvailableStreamingPlatforms.YouTube;
             }
             set
             {
-                if (twitchOAuth != value)
-                {
-                    twitchOAuth = value;
-                    RaisePropertyChanged(nameof(TwitchOAuth));
-                }
+                SelectedStreamingPlatform = value ? AvailableStreamingPlatforms.YouTube : AvailableStreamingPlatforms.Twitch;
             }
         }
-        private string twitchOAuth;
 
         /// <summary>
-        /// Whether the Raven system is enabled or not
+        /// What streaming platform is selected for use with the Mod
         /// </summary>
-        public bool RavenEnabled
+        public AvailableStreamingPlatforms SelectedStreamingPlatform
         {
             get
             {
-                return ravenEnabled;
+                return selectedStreamingPlatform;
             }
             set
             {
-                if (ravenEnabled != value)
+                if (selectedStreamingPlatform != value)
                 {
-                    ravenEnabled = value;
-                    RaisePropertyChanged(nameof(RavenEnabled));
+                    selectedStreamingPlatform = value;
+                    RaisePropertyChanged(nameof(SelectedStreamingPlatform));
+                    RaisePropertyChanged(nameof(IsStreamingOnTwitch));
+                    RaisePropertyChanged(nameof(IsStreamingOnYouTube));
                 }
             }
         }
-        private bool ravenEnabled;
+        private AvailableStreamingPlatforms selectedStreamingPlatform;
 
         /// <summary>
-        /// The key to use to toggle the raven spawning
+        /// An aggregate class of Twitch Settings
         /// </summary>
-        public Keys RavenToggleDebugKey
-        {
-            get
-            {
-                return ravenToggleDebugKey;
-            }
-            set
-            {
-                if (ravenToggleDebugKey != value)
-                {
-                    ravenToggleDebugKey = value;
-                    RaisePropertyChanged(nameof(RavenToggleDebugKey));
-                }
-            }
-        }
-        private Keys ravenToggleDebugKey;
+        public TwitchSettings TwitchSettings { get; set; }
 
         /// <summary>
-        /// The key to use to clear the ravens
+        /// An aggregate class of YouTube Settings
         /// </summary>
-        public Keys RavenClearDebugKey
-        {
-            get
-            {
-                return ravenClearDebugKey;
-            }
-            set
-            {
-                if (ravenClearDebugKey != value)
-                {
-                    ravenClearDebugKey = value;
-                    RaisePropertyChanged(nameof(RavenClearDebugKey));
-                }
-            }
-        }
-        private Keys ravenClearDebugKey;
+        public YouTubeSettings YouTubeSettings { get; set; }
 
         /// <summary>
-        /// The key to use to toggle sub mode
+        /// An aggregate class of Raven Settings
         /// </summary>
-        public Keys RavenSubModeToggleKey
-        {
-            get
-            {
-                return ravenSubModeToggleKey;
-            }
-            set
-            {
-                if (ravenSubModeToggleKey != value)
-                {
-                    ravenSubModeToggleKey = value;
-                    RaisePropertyChanged(nameof(RavenSubModeToggleKey));
-                }
-            }
-        }
-        private Keys ravenSubModeToggleKey;
-
-        /// <summary>
-        /// The trigger type we want to use for the ravens
-        /// </summary>
-        public RavenTriggerTypes RavenTriggerType
-        {
-            get
-            {
-                return ravenTriggerType;
-            }
-            set
-            {
-                if (ravenTriggerType != value)
-                {
-                    ravenTriggerType = value;
-                    RaisePropertyChanged(nameof(RavenTriggerType));
-                }
-            }
-        }
-        private RavenTriggerTypes ravenTriggerType;
-
-        /// <summary>
-        /// The maximum number of ravens visible on the screen at once
-        /// </summary>
-        public string MaxRavensCount
-        {
-            get
-            {
-                return maxRavensCount.ToString();
-            }
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    maxRavensCount = 0;
-                }
-                else
-                {
-                    if (int.TryParse(value, out int newVal))
-                    {
-                        if (newVal < 0)
-                        {
-                            newVal = Math.Abs(newVal);
-                        }
-                        if (newVal > 100)
-                        {
-                            newVal = 100;
-                        }
-                        maxRavensCount = newVal;
-                    }
-                }
-                RaisePropertyChanged(nameof(MaxRavensCount));
-            }
-        }
-        private int maxRavensCount;
-
-        /// <summary>
-        /// The ID of the Channel Point Reward to use for the Raven Trigger
-        /// </summary>
-        public string RavensChannelPointID
-        {
-            get
-            {
-                return ravensChannelPointID;
-            }
-            set
-            {
-                if (ravensChannelPointID != value)
-                {
-                    ravensChannelPointID = value;
-                    RaisePropertyChanged(nameof(RavensChannelPointID));
-                }
-            }
-        }
-        private string ravensChannelPointID;
+        public RavensSettings Ravens { get; set; }
 
         /// <summary>
         /// Whether the chat display is enabled or not
@@ -320,161 +192,6 @@ namespace JumpKingMod.Install.UI
             }
         }
         private Keys freeFlyToggleKey;
-
-        /// <summary>
-        /// A collection of excluded terms
-        /// </summary>
-        public ObservableCollection<string> ExcludedTerms
-        {
-            get
-            {
-                return excludedTerms;
-            }
-            set
-            {
-                if (excludedTerms != value)
-                {
-                    excludedTerms = value;
-                    RaisePropertyChanged(nameof(ExcludedTerms));
-                }
-            }
-        }
-        private ObservableCollection<string> excludedTerms;
-
-        /// <summary>
-        /// The index of the selected item in the excluded items list
-        /// </summary>
-        public int SelectedExcludedItemIndex
-        {
-            get
-            {
-                return selectedExcludedItemIndex;
-            }
-            set
-            {
-                if (selectedExcludedItemIndex != value)
-                {
-                    selectedExcludedItemIndex = value;
-                    RaisePropertyChanged(nameof(SelectedExcludedItemIndex));
-                }
-            }
-        }
-        private int selectedExcludedItemIndex;
-
-        /// <summary>
-        /// The candidate item to add to the excluded items list
-        /// </summary>
-        public string CandidateExcludedItem
-        {
-            get
-            {
-                return candidateExcludedItem;
-            }
-            set
-            {
-                if (candidateExcludedItem != value)
-                {
-                    candidateExcludedItem = value;
-                    RaisePropertyChanged(nameof(CandidateExcludedItem));
-                }
-            }
-        }
-        private string candidateExcludedItem;
-
-        /// <summary>
-        /// A collection of raven insults
-        /// </summary>
-        public ObservableCollection<string> RavenInsults
-        {
-            get
-            {
-                return ravenInsults;
-            }
-            set
-            {
-                if (ravenInsults != value)
-                {
-                    ravenInsults = value;
-                    RaisePropertyChanged(nameof(RavenInsults));
-                }
-            }
-        }
-        private ObservableCollection<string> ravenInsults;
-
-        /// <summary>
-        /// The index of the selected item in the Raven Insults list
-        /// </summary>
-        public int SelectedRavenInsultIndex
-        {
-            get
-            {
-                return selectedRavenInsultIndex;
-            }
-            set
-            {
-                if (selectedRavenInsultIndex != value)
-                {
-                    selectedRavenInsultIndex = value;
-                    RaisePropertyChanged(nameof(SelectedRavenInsultIndex));
-                }
-            }
-        }
-        private int selectedRavenInsultIndex;
-
-        /// <summary>
-        /// The candidate item to add to the Raven Insults list
-        /// </summary>
-        public string CandidateRavenInsult
-        {
-            get
-            {
-                return candidateRavenInsult;
-            }
-            set
-            {
-                if (candidateRavenInsult != value)
-                {
-                    candidateRavenInsult = value;
-                    RaisePropertyChanged(nameof(CandidateRavenInsult));
-                }
-            }
-        }
-        private string candidateRavenInsult;
-
-        /// <summary>
-        /// The number of ravens to spawn when the insult trigger is hit
-        /// </summary>
-        public string InsultRavenSpawnCount
-        {
-            get
-            {
-                return insultRavenSpawnCount.ToString();
-            }
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    insultRavenSpawnCount = 0;
-                }
-                else
-                {
-                    if (int.TryParse(value, out int newVal))
-                    {
-                        if (newVal < 0)
-                        {
-                            newVal = Math.Abs(newVal);
-                        }
-                        if (newVal > 100)
-                        {
-                            newVal = 100;
-                        }
-                        insultRavenSpawnCount = newVal;
-                    }
-                }
-                RaisePropertyChanged(nameof(insultRavenSpawnCount));
-            }
-        }
-        private int insultRavenSpawnCount;
 
         /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
@@ -540,13 +257,14 @@ namespace JumpKingMod.Install.UI
             logger = new ConsoleLogger();
             installerSettings = new UserSettings(JumpKingModInstallerSettingsContext.SettingsFileName, JumpKingModInstallerSettingsContext.GetDefaultSettings(), logger);
 
+            Ravens = new RavensSettings();
+            TwitchSettings = new TwitchSettings();
+            YouTubeSettings = new YouTubeSettings();
+
             InitialiseCommands();
 
             GameDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.GameDirectoryKey, string.Empty);
             ModDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.ModDirectoryKey, string.Empty);
-
-            ExcludedTerms = new ObservableCollection<string>();
-            RavenInsults = new ObservableCollection<string>();
         }
 
         /// <summary>
@@ -568,17 +286,17 @@ namespace JumpKingMod.Install.UI
             InstallCommand = new DelegateCommand(_ => { InstallMod(); }, _ => { return CanInstallMod(); });
             UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return AreModSettingsLoaded && CanUpdateModSettings(); });
             LoadSettingsCommand = new DelegateCommand(_ => { LoadModSettings(createIfDoesntExist: true); }, _ => { return CanUpdateModSettings(); });
-            AddExcludedTermCommand = new DelegateCommand(_ => { AddToCollection(ExcludedTerms, CandidateExcludedItem); });
+            AddExcludedTermCommand = new DelegateCommand(_ => { AddToCollection(Ravens.ExcludedTerms, Ravens.CandidateExcludedItem); });
             RemoveExcludedTermCommand = new DelegateCommand(_ => 
             { 
-                RemoveFromCollection(ExcludedTerms, SelectedExcludedItemIndex);
-                SelectedExcludedItemIndex = 0;
+                RemoveFromCollection(Ravens.ExcludedTerms, Ravens.SelectedExcludedItemIndex);
+                Ravens.SelectedExcludedItemIndex = 0;
             });
-            AddRavenInsultCommand = new DelegateCommand(_ => { AddToCollection(RavenInsults, CandidateRavenInsult); });
+            AddRavenInsultCommand = new DelegateCommand(_ => { AddToCollection(Ravens.RavenInsults, Ravens.CandidateRavenInsult); });
             RemoveRavenInsultCommand = new DelegateCommand(_ => 
             { 
-                RemoveFromCollection(RavenInsults, SelectedRavenInsultIndex);
-                SelectedRavenInsultIndex = 0;
+                RemoveFromCollection(Ravens.RavenInsults, Ravens.SelectedRavenInsultIndex);
+                Ravens.SelectedRavenInsultIndex = 0;
             });
         }
 
@@ -799,8 +517,9 @@ namespace JumpKingMod.Install.UI
                 return;
             }
 
-            if (RavenEnabled && 
-                (RavenTriggerType == RavenTriggerTypes.ChannelPointReward || RavenTriggerType == RavenTriggerTypes.ChatMessage) && 
+            if (SelectedStreamingPlatform == AvailableStreamingPlatforms.Twitch &&
+                Ravens.RavenEnabled && 
+                (Ravens.RavenTriggerType == TwitchRavenTriggerTypes.ChannelPointReward || Ravens.RavenTriggerType == TwitchRavenTriggerTypes.ChatMessage) && 
                 ChatDisplayEnabled)
             {
                 MessageBoxResult result = MessageBox.Show($"If Chat Display is active, the Chat-based Raven Triggers will not function. Are you sure you want to proceed?", "Setting Conflict!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
@@ -810,17 +529,25 @@ namespace JumpKingMod.Install.UI
                 }
             }
 
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchAccountName);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchOAuth);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.SelectedStreamingPlatformKey, SelectedStreamingPlatform.ToString());
+
+            // YouTube
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeChannelNameKey, YouTubeSettings.YouTubeAccountName);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeApiKeyKey, YouTubeSettings.YouTubeAPIKey);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, Ravens.YouTubeRavenTriggerType.ToString());
+
+            // Twitch
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchSettings.TwitchAccountName);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchSettings.TwitchOAuth);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, Ravens.RavenTriggerType.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, Ravens.RavensChannelPointID);
 
             // Ravens
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, RavenEnabled.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensToggleDebugKeyKey, RavenToggleDebugKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensClearDebugKeyKey, RavenClearDebugKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, RavenSubModeToggleKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensMaxCountKey, MaxRavensCount);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerType.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, RavensChannelPointID);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, Ravens.RavenEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Ravens.RavenToggleDebugKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensClearDebugKeyKey, Ravens.RavenClearDebugKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Ravens.RavenSubModeToggleKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensMaxCountKey, Ravens.MaxRavensCount);
 
             // Chat Display
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
@@ -832,14 +559,14 @@ namespace JumpKingMod.Install.UI
             // Exclusion List
             string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.ExcludedTermFilePath);
             Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
-            File.WriteAllLines(expectedExclusionPath, ExcludedTerms);
+            File.WriteAllLines(expectedExclusionPath, Ravens.ExcludedTerms);
 
             // Raven Insults
             string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.RavenInsultsFilePath);
             Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
-            File.WriteAllLines(expectedRavenInsultsPath, RavenInsults);
+            File.WriteAllLines(expectedRavenInsultsPath, Ravens.RavenInsults);
 
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenInsultSpawnCountKey, InsultRavenSpawnCount.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenInsultSpawnCountKey, Ravens.InsultRavenSpawnCount.ToString());
 
             MessageBox.Show($"Settings updated successfully!");
         }
@@ -856,19 +583,26 @@ namespace JumpKingMod.Install.UI
                 ModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModSettingsContext.GetDefaultSettings(), logger);
 
                 // Load the initial data
+                SelectedStreamingPlatform = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
+
+                // YouTube Info
+                YouTubeSettings.YouTubeAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
+                YouTubeSettings.YouTubeAPIKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeApiKeyKey, string.Empty);
+                Ravens.YouTubeRavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
+
                 // Twitch Info
-                TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
-                TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
+                TwitchSettings.TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                TwitchSettings.TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
+                Ravens.RavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
+                Ravens.RavensChannelPointID = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
 
                 // Raven Info
-                RavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true);
-                RavenClearDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
-                RavenToggleDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
-                RavenSubModeToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
-                MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5.ToString());
-                RavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, RavenTriggerTypes.ChatMessage);
-                RavensChannelPointID = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
-                InsultRavenSpawnCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
+                Ravens.RavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true);
+                Ravens.RavenClearDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
+                Ravens.RavenToggleDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+                Ravens.RavenSubModeToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
+                Ravens.MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5.ToString());
+                Ravens.InsultRavenSpawnCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
 
                 // Chat Display Info
                 ChatDisplayEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
@@ -907,7 +641,7 @@ namespace JumpKingMod.Install.UI
             {
                 logger.Error($"Encountered error when parsing Exclusion List {e.ToString()}");
             }
-            ExcludedTerms = new ObservableCollection<string>(excludedTerms);
+            Ravens.ExcludedTerms = new ObservableCollection<string>(excludedTerms);
 
             // Load in Raven Insults
             List<string> ravenInsultsFileContent = new List<string>();
@@ -939,7 +673,7 @@ namespace JumpKingMod.Install.UI
             {
                 logger.Error($"Encountered error when parsing Raven Insults {e.ToString()}");
             }
-            RavenInsults = new ObservableCollection<string>(ravenInsultsFileContent);
+            Ravens.RavenInsults = new ObservableCollection<string>(ravenInsultsFileContent);
         }
 
         /// <summary>
