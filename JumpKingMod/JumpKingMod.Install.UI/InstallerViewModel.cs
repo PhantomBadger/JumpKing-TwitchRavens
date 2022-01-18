@@ -232,6 +232,40 @@ namespace JumpKingMod.Install.UI
         }
         private UserSettings modSettings;
 
+        public string InstallErrorMessage
+        {
+            get
+            {
+                return installErrorMessage;
+            }
+            set
+            {
+                if (installErrorMessage != value)
+                {
+                    installErrorMessage = value;
+                    RaisePropertyChanged(nameof(InstallErrorMessage));
+                }
+            }
+        }
+        private string installErrorMessage;
+
+        public bool ShowInstallErrorMessage
+        {
+            get
+            {
+                return showInstallErrorMessage;
+            }
+            set
+            {
+                if (showInstallErrorMessage != value)
+                {
+                    showInstallErrorMessage = value;
+                    RaisePropertyChanged(nameof(ShowInstallErrorMessage));
+                }
+            }
+        }
+        private bool showInstallErrorMessage;
+
         public ICommand BrowseGameDirectoryCommand { get; private set; }
         public ICommand BrowseModDirectoryCommand { get; private set; }
         public DelegateCommand InstallCommand { get; private set; }
@@ -265,6 +299,16 @@ namespace JumpKingMod.Install.UI
 
             GameDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.GameDirectoryKey, string.Empty);
             ModDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.ModDirectoryKey, string.Empty);
+
+            if (string.IsNullOrWhiteSpace(ModDirectory))
+            {
+                string attemptedDir = Path.Combine(@"..\Mod\");
+                var directoryInfo = new DirectoryInfo(attemptedDir);
+                if (directoryInfo.Exists)
+                {
+                    ModDirectory = directoryInfo.FullName;
+                }
+            }
         }
 
         /// <summary>
@@ -433,6 +477,8 @@ namespace JumpKingMod.Install.UI
         /// </summary>
         private bool CanInstallMod()
         {
+            StringBuilder installMessageBuilder = new StringBuilder();
+
             bool validGameDir = false;
             if (Directory.Exists(GameDirectory))
             {
@@ -446,6 +492,20 @@ namespace JumpKingMod.Install.UI
                 string dllPath = Path.Combine(ModDirectory, ExpectedModDllName);
                 validModDir = File.Exists(dllPath);
             }
+
+            // Update the messaging
+            ShowInstallErrorMessage = false;
+            if (!validGameDir)
+            {
+                installMessageBuilder.Append("The Install Directory specified does not contain MonoGame.Framework.dll or JumpKing.exe\n");
+                ShowInstallErrorMessage = true;
+            }
+            if (!validModDir)
+            {
+                installMessageBuilder.Append("The Mod Directory specified does not contain JumpKingModLoader.dll");
+                ShowInstallErrorMessage = true;
+            }
+            InstallErrorMessage = installMessageBuilder.ToString();
 
             return validGameDir && validModDir;
         }
