@@ -88,14 +88,14 @@ namespace JumpKingMod.Entities
         /// <summary>
         /// Called by the Trigger implementation, spawns the raven
         /// </summary>
-        private void OnMessengerRavenTrigger(string ravenName, Color ravenNameColour, string ravenMessage, bool isFromSubscriber)
+        private void OnMessengerRavenTrigger(string ravenName, Color ravenNameColour, string ravenMessage, bool isFromSubscriber, bool isPriority)
         {
             if (!isGameLoopRunning)
             {
                 return;
             }
 
-            if (messengerRavens.Count >= maxRavenCount)
+            if (messengerRavens.Count >= maxRavenCount && !isPriority)
             {
                 return;
             }
@@ -107,7 +107,7 @@ namespace JumpKingMod.Entities
             }
 
             // If we are gating behind subscribers and this isn't from a subscriber
-            if (isInSubMode && !isFromSubscriber)
+            if (isInSubMode && !isFromSubscriber && !isPriority)
             {
                 return;
             }

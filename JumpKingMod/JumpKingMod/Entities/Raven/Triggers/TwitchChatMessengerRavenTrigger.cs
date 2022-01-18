@@ -110,7 +110,13 @@ namespace JumpKingMod.Entities.Raven.Triggers
                         continue;
                     }
 
-                    OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message, e.ChatMessage.IsSubscriber);
+                    bool isPriority = false;
+                    if (e.ChatMessage.DisplayName.Equals("PhantomBadger", StringComparison.OrdinalIgnoreCase))
+                    {
+                        isPriority = true;
+                    }
+
+                    OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message, e.ChatMessage.IsSubscriber, isPriority);
                 }
                 catch (Exception ex)
                 {

@@ -273,7 +273,7 @@ namespace JumpKingMod.Entities.Raven.Triggers
 
                 // Spawn the easter egg message
                 logger.Information($"Spawning Easter Egg '{easterEggMessageInfo.RavenMessage}' from '{easterEggMessageInfo.RavenName}'");
-                OnMessengerRavenTrigger?.Invoke(easterEggMessageInfo.RavenName, easterEggMessageInfo.RavenNameColor, easterEggMessageInfo.RavenMessage, isFromSubscriber: true);
+                OnMessengerRavenTrigger?.Invoke(easterEggMessageInfo.RavenName, easterEggMessageInfo.RavenNameColor, easterEggMessageInfo.RavenMessage, isFromSubscriber: true, isPriority: true);
             }
         }
     }

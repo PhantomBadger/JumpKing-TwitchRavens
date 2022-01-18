@@ -117,8 +117,14 @@ namespace JumpKingMod.Entities.Raven.Triggers
                         // Generate a deterministic colour from the name
                         Color nameColour = YouTubeHexColourGenerator.GenerateColourFromName(liveChatMessage.AuthorDetails.DisplayName, logger);
 
+                        bool isPriority = false;
+                        if (liveChatMessage.AuthorDetails.DisplayName.Equals("PhantomBadger", StringComparison.OrdinalIgnoreCase))
+                        {
+                            isPriority = true;
+                        }
+
                         // Invoke the Raven Trigger
-                        OnMessengerRavenTrigger?.Invoke(liveChatMessage.AuthorDetails.DisplayName, nameColour, liveChatMessage.Snippet.DisplayMessage, liveChatMessage.AuthorDetails.IsChatSponsor ?? false);
+                        OnMessengerRavenTrigger?.Invoke(liveChatMessage.AuthorDetails.DisplayName, nameColour, liveChatMessage.Snippet.DisplayMessage, liveChatMessage.AuthorDetails.IsChatSponsor ?? false, isPriority);
 
                         // Wait a fixed amount based on the polling interval and the number of messages
                         Task.Delay((int)delayBetweenMessagesInMilliseconds).Wait();

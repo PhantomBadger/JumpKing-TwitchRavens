@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JumpKingMod.API
 {
-    public delegate void MessengerRavenTriggerArgs(string ravenName, Color ravenNameColour, string ravenMessage, bool isFromSubscriber);
+    public delegate void MessengerRavenTriggerArgs(string ravenName, Color ravenNameColour, string ravenMessage, bool isFromSubscriber, bool isPriority);
 
     public interface IMessengerRavenTrigger
     {

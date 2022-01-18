@@ -65,7 +65,7 @@ namespace JumpKingMod.Entities.Raven.Triggers
                 for (int i = 0; i < instance.spawnCount; i++)
                 {
                     Task.Delay(500).Wait();
-                    instance.OnMessengerRavenTrigger?.Invoke(null, Color.White, instance.insultGetter.GetInsult(), isFromSubscriber: true);
+                    instance.OnMessengerRavenTrigger?.Invoke(null, Color.White, instance.insultGetter.GetInsult(), isFromSubscriber: true, isPriority: true);
                 }
             });
         }
