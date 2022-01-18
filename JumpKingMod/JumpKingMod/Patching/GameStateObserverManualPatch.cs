@@ -19,11 +19,20 @@ namespace JumpKingMod.Patching
     /// </summary>
     public class GameStateObserverManualPatch : IManualPatch, IGameStateObserver
     {
+        public delegate void GameLoopRunningDelegate();
+        public delegate void GameLoopNotRunningDelegate();
+        public event GameLoopRunningDelegate OnGameLoopRunning;
+        public event GameLoopNotRunningDelegate OnGameLoopNotRunning;
+
         private static ILogger logger;
         private static bool isGameInitialized;
         private static bool areGameAssetsLoaded;
         private static object gameLoopObject;
         private static MethodInfo gameLoopIsRunningMethodInfo;
+
+        private bool prevGameLoopState;
+        private Task gameStatePollingTask;
+        private CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
         /// A latch which lets you wait until the game has been initialised
@@ -59,6 +68,10 @@ namespace JumpKingMod.Patching
             isGameInitialized = false;
             areGameAssetsLoaded = false;
             logger = newLogger ?? throw new ArgumentNullException(nameof(newLogger));
+
+            cancellationTokenSource = new CancellationTokenSource();
+            prevGameLoopState = false;
+            gameStatePollingTask = Task.Run(() => PollGameStateLoop(cancellationTokenSource.Token));
         }
 
         /// <summary>
@@ -134,6 +147,35 @@ namespace JumpKingMod.Patching
             assetsLoadedLatch?.Set();
 
             logger.Information($"Base Game has finished calling JKContentManager.LoadAssets!");
+        }
+
+        /// <summary>
+        /// Poll the game loop state to trigger the appropriate events
+        /// </summary>
+        private void PollGameStateLoop(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                bool gameLoopState = gameLoopObject != null && gameLoopIsRunningMethodInfo != null && (bool)gameLoopIsRunningMethodInfo.Invoke(gameLoopObject, null);
+                if (gameLoopState != prevGameLoopState)
+                {
+                    prevGameLoopState = gameLoopState;
+
+                    // Trigger the appropriate events
+                    if (gameLoopState)
+                    {
+                        logger.Information($"Game Loop is now running!");
+                        OnGameLoopRunning?.Invoke();
+                    }
+                    else
+                    {
+                        logger.Information($"Game Loop is no longer running!");
+                        OnGameLoopNotRunning?.Invoke();
+                    }
+                }
+
+                Task.Delay(100).Wait();
+            }
         }
     }
 }

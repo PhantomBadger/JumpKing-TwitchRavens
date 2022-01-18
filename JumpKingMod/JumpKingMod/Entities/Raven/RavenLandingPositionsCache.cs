@@ -105,6 +105,14 @@ namespace JumpKingMod.Entities.Raven
         }
 
         /// <summary>
+        /// Invalidates the entire cache, clearing all floor positions
+        /// </summary>
+        public void InvalidateCache()
+        {
+            floorPositionCache.Clear();
+        }
+
+        /// <summary>
         /// Gets a <see cref="Rectangle"/> representing a hitbox at the specified position
         /// </summary>
         private Rectangle GetHitbox(Vector2 transform, int hitboxWidth, int hitboxHeight)

@@ -22,5 +22,10 @@ namespace JumpKingMod.API
         /// Invalidates the cache for the specified screen
         /// </summary>
         void InvalidateCache(int screenIndex);
+
+        /// <summary>
+        /// Invalidates the entire cache
+        /// </summary>
+        void InvalidateCache();
     }
 }

@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using JumpKingMod.Settings;
 using Settings;
+using JumpKingMod.Patching;
 
 namespace JumpKingMod.Entities
 {
@@ -38,11 +39,13 @@ namespace JumpKingMod.Entities
         private bool isRavenSpawningActive;
         private bool isInSubMode;
 
+        private bool isGameLoopRunning;
+
         /// <summary>
         /// Ctor for creating a <see cref="MessengerRavenSpawningEntity"/>
         /// </summary>
         public MessengerRavenSpawningEntity(UserSettings userSettings, ModEntityManager modEntityManager, 
-            List<IMessengerRavenTrigger> messengerRavenTriggers, ILogger logger)
+            List<IMessengerRavenTrigger> messengerRavenTriggers, bool isGameLoopRunning, ILogger logger)
         {
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
@@ -55,6 +58,7 @@ namespace JumpKingMod.Entities
             clearRavensCooldown = false;
             toggleRavensCooldown = false;
             isRavenSpawningActive = true;
+            this.isGameLoopRunning = isGameLoopRunning;
 
             maxRavenCount = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5);
             clearRavensKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
@@ -86,6 +90,11 @@ namespace JumpKingMod.Entities
         /// </summary>
         private void OnMessengerRavenTrigger(string ravenName, Color ravenNameColour, string ravenMessage, bool isFromSubscriber)
         {
+            if (!isGameLoopRunning)
+            {
+                return;
+            }
+
             if (messengerRavens.Count >= maxRavenCount)
             {
                 return;
@@ -198,6 +207,23 @@ namespace JumpKingMod.Entities
         public void Draw()
         {
             // Nothing
+        }
+
+        /// <summary>
+        /// Called by the <see cref="GameStateObserverManualPatch.OnGameLoopRunning"/> and allows ravens to spawn
+        /// </summary>
+        public void OnGameLoopStarted()
+        {
+            isGameLoopRunning = true;
+        }
+
+        /// <summary>
+        /// Called by the <see cref="GameStateObserverManualPatch.OnGameLoopNotRunning"/> and prevents ravens from spawning
+        /// </summary>
+        public void OnGameLoopStopped()
+        {
+            isGameLoopRunning = false;
+            ravenLandingPositionsCache.InvalidateCache();
         }
     }
 }

@@ -218,7 +218,11 @@ namespace JumpKingMod
                             if (ravenTriggers != null && ravenTriggers.Count > 0)
                             {
                                 Logger.Information($"Initialising Messenger Ravens");
-                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTriggers, Logger);
+                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTriggers, isGameLoopRunning: true, Logger);
+
+                                // Bind to the events so we can start/stop ravens and invalidate caches
+                                gameStateObserver.OnGameLoopRunning += spawningEntity.OnGameLoopStarted;
+                                gameStateObserver.OnGameLoopNotRunning += spawningEntity.OnGameLoopStopped;
                             }
                         }            
                     }
