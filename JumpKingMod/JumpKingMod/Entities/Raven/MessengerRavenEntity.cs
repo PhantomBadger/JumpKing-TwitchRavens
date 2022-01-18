@@ -190,21 +190,21 @@ namespace JumpKingMod.Entities.Raven
         public override void Draw()
         {
             // Debug render possible floor positions
-            if (Keyboard.GetState().IsKeyDown(Keys.P))
-            {
-                List<Vector2> hitPositions = landingPositionsCache.GetPossibleFloorPositions(Camera.CurrentScreen);
-                if (hitPositions.Count > 0)
-                {
-                    for (int i = 0; i < hitPositions.Count; i++)
-                    {
-                        ravenContent.BlinkTreasure.Draw(Camera.TransformVector2(hitPositions[i]));
-                    }
-                }
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Delete))
-            {
-                landingPositionsCache.InvalidateCache(Camera.CurrentScreen);
-            }
+            //if (Keyboard.GetState().IsKeyDown(Keys.P))
+            //{
+            //    List<Vector2> hitPositions = landingPositionsCache.GetPossibleFloorPositions(Camera.CurrentScreen);
+            //    if (hitPositions.Count > 0)
+            //    {
+            //        for (int i = 0; i < hitPositions.Count; i++)
+            //        {
+            //            ravenContent.BlinkTreasure.Draw(Camera.TransformVector2(hitPositions[i]));
+            //        }
+            //    }
+            //}
+            //if (Keyboard.GetState().IsKeyDown(Keys.Delete))
+            //{
+            //    landingPositionsCache.InvalidateCache(Camera.CurrentScreen);
+            //}
 
             // Base draw call for drawing the sprites
             base.Draw();
