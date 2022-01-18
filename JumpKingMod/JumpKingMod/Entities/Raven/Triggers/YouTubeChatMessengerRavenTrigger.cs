@@ -107,10 +107,6 @@ namespace JumpKingMod.Entities.Raven.Triggers
                             continue;
                         }
 
-                        // Print the message to the console
-                        string displayString = $"{liveChatMessage?.AuthorDetails?.DisplayName}: {liveChatMessage?.Snippet?.DisplayMessage}";
-                        logger.Information(displayString);
-
                         // Skip anything containing an excluded term
                         if (excludedTermFilter.ContainsExcludedTerm(liveChatMessage.Snippet.DisplayMessage))
                         {

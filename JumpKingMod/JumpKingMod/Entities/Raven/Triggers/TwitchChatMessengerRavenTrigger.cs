@@ -71,10 +71,6 @@ namespace JumpKingMod.Entities.Raven.Triggers
         {
             try
             {
-                // Print the message to the console
-                string displayString = $"{e?.ChatMessage?.Username}: {e?.ChatMessage?.Message}";
-                logger.Information(displayString);
-
                 if (e == null || e.ChatMessage == null || string.IsNullOrWhiteSpace(e.ChatMessage.Message))
                 {
                     return;
