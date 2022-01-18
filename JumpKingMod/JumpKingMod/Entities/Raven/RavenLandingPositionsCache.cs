@@ -77,7 +77,7 @@ namespace JumpKingMod.Entities.Raven
             else
             {
                 List<Vector2> floorPositions = new List<Vector2>();
-                TryFindValidGround(
+                bool result = TryFindValidGround(
                     screenIndex, 
                     (int)HitboxWidth, 
                     (int)HitboxHeight, 
@@ -86,6 +86,12 @@ namespace JumpKingMod.Entities.Raven
                     HitboxWidth / 2, 
                     out floorPositions);
                 floorPositionCache.TryAdd(screenIndex, floorPositions);
+
+                if (!result)
+                {
+                    logger.Error($"Failed to find any valid Raven landing position for screen index: '{screenIndex}', Ravens may not spawn during this time");
+                }
+
                 return floorPositions;
             }
         }

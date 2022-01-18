@@ -102,10 +102,13 @@ namespace JumpKingMod.Entities.Raven
                 case RavenLogicState.Starting:
                     // Initialise the landing point we want to go to
                     List<Vector2> possiblePositions = landingPositionsCache.GetPossibleFloorPositions(Camera.CurrentScreen);
-                    landingPosition = possiblePositions[random.Next(0, possiblePositions.Count)];
-                    startingPosition = Transform;
-                    landingProgress = 0;
-                    ravenLogicState = RavenLogicState.FlyingToPoint;
+                    if (possiblePositions.Count > 0)
+                    {
+                        landingPosition = possiblePositions[random.Next(0, possiblePositions.Count)];
+                        startingPosition = Transform;
+                        landingProgress = 0;
+                        ravenLogicState = RavenLogicState.FlyingToPoint;
+                    }
                     break;
                 case RavenLogicState.FlyingToPoint:
                     // Fly to that landing point
