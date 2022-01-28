@@ -11,7 +11,8 @@ Check the [Release](https://github.com/PhantomBadger/JumpKingMod/releases/) page
 This will ensure that the mod loader isn't treated as a harmful application when running.
 - Run the Installer.UI.exe inside the Installer Folder
 
-![image](https://user-images.githubusercontent.com/9095972/147677074-75122f77-a437-4371-a33d-6e2b9d34149d.png)
+![image](https://user-images.githubusercontent.com/9095972/151596678-50dbe51d-e26a-4d24-a6b8-27fc2b9add51.png)
+
 - Click the '...' next to the Game Directory text box and point this at your Jump King Install Directory (the place where JumpKing.exe is)
 - Click the '...' next to the Mod Directory text box and point this at the Mod folder in the Install package
 - Click 'Install', a pop-up should appear confirming it has succeeded
