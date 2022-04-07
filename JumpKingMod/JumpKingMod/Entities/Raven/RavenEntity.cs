@@ -56,8 +56,9 @@ namespace JumpKingMod.Entities
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             
             this.random = new Random();
-            var settings = JKContentManager.RavenSprites.raven_settings;
-            ravenContent = JKContentManager.RavenSprites.GetRavenContent(settings["raven"]) ?? throw new ArgumentNullException($"Unable to load animations for raven");
+            //var settings = JKContentManager.RavenSprites.raven_settings;
+            //ravenContent = JKContentManager.RavenSprites.GetRavenContent(settings["raven"]) ?? throw new ArgumentNullException($"Unable to load animations for raven");
+            ravenContent = ModContentManager.Raven;
 
             // Initialise the animation state machine for the raven
             InitialiseRavenAnimationStates();
