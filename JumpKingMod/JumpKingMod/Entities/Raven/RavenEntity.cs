@@ -133,7 +133,10 @@ namespace JumpKingMod.Entities
             // Get the active sprite from the active animation and draw it with our
             // positions and effects
             Sprite activeSprite = activeAnimation.GetActiveSprite();
-            activeSprite.Draw(Camera.TransformVector2(Transform), spriteEffects);
+
+            // JK+ Changes Draw(Vector2, SpriteEffects) to include an additional parameter, so
+            // we use a different overload and hope for the best
+            activeSprite.Draw(Camera.TransformVector2(Transform).ToPoint(), spriteEffects);
         }
 
         /// <summary>
