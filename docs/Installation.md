@@ -18,7 +18,7 @@ This will ensure that the mod loader isn't treated as a harmful application when
 - Click 'Install', a pop-up should appear confirming it has succeeded
 - Select your Streaming Platform of choice and fill in the desired settings!
 
-![image](https://user-images.githubusercontent.com/9095972/147677631-f3463081-9cb3-4d60-8571-3f357286a8e0.png)
+![image](https://user-images.githubusercontent.com/9095972/162535242-8c1611f2-249d-4272-a157-f4a034fd4f2d.png)
 
 - You can now launch the game normally from Steam/however you normally launch. You can be sure the mod has been installed correctly because a Console Window will open alongside
 
