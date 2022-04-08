@@ -1,4 +1,4 @@
-# This Mod is now no longer compatible with Jump King Plus v1.8.0, we are working on fixing this!
+# For JK+ v1.8.0 please use Pre-Release [v2.1a](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v2.1a)
 
 # Jump King Chat Raven Mod
 This Mod allows your Twitch or YouTube Chat to lend words of encouragement whilst you climb to the babe! 
