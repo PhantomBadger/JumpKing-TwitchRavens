@@ -104,6 +104,7 @@
     <Compile Include="API\IModEntityState.cs" />
     <Compile Include="API\IYouTubeClientConnector.cs" />
     <Compile Include="Components\LoopingAnimationComponent.cs" />
+    <Compile Include="Entities\GunEntity.cs" />
     <Compile Include="Entities\MessengerRavenSpawningEntity.cs" />
     <Compile Include="Entities\ModEntityManager.cs" />
     <Compile Include="Entities\RavenDebugSpawningEntity.cs" />
@@ -157,6 +158,9 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\raven.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\scope.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

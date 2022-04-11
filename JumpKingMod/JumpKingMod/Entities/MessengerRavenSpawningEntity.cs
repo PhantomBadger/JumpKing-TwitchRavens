@@ -225,5 +225,25 @@ namespace JumpKingMod.Entities
             isGameLoopRunning = false;
             ravenLandingPositionsCache.InvalidateCache();
         }
+
+        public MessengerRavenEntity TryGetMessengerRaven(Point screenSpacePosition)
+        {
+            List<MessengerRavenEntity> ravens = new List<MessengerRavenEntity>(messengerRavens.Keys);
+            for (int i = 0; i < ravens.Count; i++)
+            {
+                if (Vector2.Distance(Camera.TransformVector2(ravens[i].Transform), screenSpacePosition.ToVector2()) < 16)
+                {
+                    logger.Information($"IDENTIFIED RAVEN");
+                    return ravens[i];
+                }
+            }
+            return null;
+        }
+
+        public bool DestroyRaven(MessengerRavenEntity ravenToDestroy)
+        {
+            ravenToDestroy.Dispose();
+            return messengerRavens.TryRemove(ravenToDestroy, out _);
+        }
     }
 }

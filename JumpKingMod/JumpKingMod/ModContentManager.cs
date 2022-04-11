@@ -23,6 +23,8 @@ namespace JumpKingMod
 
         public static RavenContent Raven;
 
+        public static Texture2D ScopeTexture;
+
         /// <summary>
         /// Load all the Mod-specific content
         /// </summary>
@@ -33,6 +35,9 @@ namespace JumpKingMod
                 ArialUnicodeMS = JumpKing.Game1.instance.Content.Load<SpriteFont>("Mods/Resources/arial-unicode-ms");
                 ArialUnicodeMS.DefaultCharacter = '#';
                 logger.Information($"Loaded Arial Unicode MS Fallback Font");
+
+                ScopeTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/scope");
+                logger.Information($"Loaded Scope Texture");
 
                 // Constructor for Raven Content is internal, we have to use Activator and reflection to create it
                 // Pass in our raven version and it will split it for us
