@@ -32,6 +32,12 @@ namespace JumpKingMod.Entities
         private bool isGunActive;
         private bool gunToggleCooldown;
         private bool clickCooldown;
+        private float shootCooldownCounter;
+        private Point currentMousePosition;
+
+        private const float CooldownMaxInSeconds = 0.5f;
+        private const float ScopeSpriteMaxScale = 1.25f;
+        private const float ScopeSpriteMinScale = 1.0f;
 
         /// <summary>
         /// Constructor for creating a <see cref="GunEntity"/>
@@ -48,8 +54,11 @@ namespace JumpKingMod.Entities
             isGunActive = false;
             gunToggleCooldown = false;
             toggleGunKey = Keys.F8;
+            shootCooldownCounter = CooldownMaxInSeconds;
 
-            scopeSprite = Sprite.CreateSprite(ModContentManager.ScopeTexture);
+            scopeSprite = Sprite.CreateSpriteWithCenter(ModContentManager.ScopeTexture,
+                new Rectangle(0, 0, ModContentManager.ScopeTexture.Width, ModContentManager.ScopeTexture.Height),
+                new Vector2(0.5f, 0.5f));
             scopeSprite.center = Vector2.One / 2f;
 
             modEntityManager.AddForegroundEntity(this);
@@ -72,36 +81,26 @@ namespace JumpKingMod.Entities
         /// </summary>
         public void ForegroundDraw()
         {
+            // Render the gun at the mouse position
             if (isGunActive)
             {
-                MouseState mouseState = Mouse.GetState();
-                Point mousePosition = (mouseState.Position.ToVector2() / GetScreenScale()).ToPoint();
-                scopeSprite.Draw(mousePosition, SpriteEffects.None);
-
-                if (mouseState.LeftButton == ButtonState.Pressed)
-                {
-                    if (!clickCooldown)
-                    {
-                        MessengerRavenEntity raven = spawningEntity.TryGetMessengerRaven(mousePosition);
-                        if (raven != null)
-                        {
-                            logger.Information($"Killing Raven");
-                            raven.SetKillState();
-                        }
-                        clickCooldown = true;
-                    }
-                }
-                else
-                {
-                    clickCooldown = false;
-                }
+                // Scale the sprite depending on the current cooldown
+                float scale = MathHelper.Lerp(ScopeSpriteMaxScale, ScopeSpriteMinScale, shootCooldownCounter / CooldownMaxInSeconds);
+                Game1.spriteBatch.Draw(scopeSprite.texture,
+                    currentMousePosition.ToVector2() - (scopeSprite.source.Size.ToVector2() * scopeSprite.center * scale),
+                    scopeSprite.source,
+                    scopeSprite.GetColor(),
+                    0f,
+                    Vector2.Zero,
+                    new Vector2(scale, scale),
+                    SpriteEffects.None, 0f);
             }
         }
 
         /// <summary>
         /// Identify if the gun is currently active or not
         /// </summary>
-        public void Update(float p_delta)
+        public void Update(float delta)
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
@@ -119,6 +118,35 @@ namespace JumpKingMod.Entities
             else
             {
                 gunToggleCooldown = false;
+            }
+
+            // Handle the 'Shooting' logic
+            if (isGunActive)
+            {
+                MouseState mouseState = Mouse.GetState();
+                currentMousePosition = (mouseState.Position.ToVector2() / GetScreenScale()).ToPoint();
+
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    if (!clickCooldown)
+                    {
+                        MessengerRavenEntity raven = spawningEntity.TryGetMessengerRaven(currentMousePosition);
+                        if (raven != null)
+                        {
+                            logger.Information($"Killing Raven");
+                            raven.SetKillState();
+                        }
+                        clickCooldown = true;
+                        shootCooldownCounter = 0;
+                    }
+                }
+            }
+
+            // Handle the shooting cooldown
+            if (clickCooldown && (shootCooldownCounter += delta) > CooldownMaxInSeconds)
+            {
+                clickCooldown = false;
+                shootCooldownCounter = CooldownMaxInSeconds;
             }
         }
 
