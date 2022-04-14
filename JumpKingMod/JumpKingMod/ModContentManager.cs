@@ -25,6 +25,10 @@ namespace JumpKingMod
 
         public static Texture2D ScopeTexture;
 
+        public static Texture2D RavenStunnedTexture;
+
+        public static Texture2D RavenFallingTexture;
+
         /// <summary>
         /// Load all the Mod-specific content
         /// </summary>
@@ -38,6 +42,12 @@ namespace JumpKingMod
 
                 ScopeTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/scope");
                 logger.Information($"Loaded Scope Texture");
+
+                RavenStunnedTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/raven_stunned");
+                logger.Information($"Loaded Raven Stun Texture");
+
+                RavenFallingTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/raven_falling");
+                logger.Information($"Loaded Raven Fall Texture");
 
                 // Constructor for Raven Content is internal, we have to use Activator and reflection to create it
                 // Pass in our raven version and it will split it for us

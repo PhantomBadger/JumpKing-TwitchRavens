@@ -82,11 +82,11 @@ namespace JumpKingMod.Entities
                 {
                     if (!clickCooldown)
                     {
-                        logger.Information($"{mousePosition.X}, {mousePosition.Y}");
                         MessengerRavenEntity raven = spawningEntity.TryGetMessengerRaven(mousePosition);
                         if (raven != null)
                         {
-                            spawningEntity.DestroyRaven(raven);
+                            logger.Information($"Killing Raven");
+                            raven.SetKillState();
                         }
                         clickCooldown = true;
                     }

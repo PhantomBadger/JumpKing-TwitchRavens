@@ -233,7 +233,6 @@ namespace JumpKingMod.Entities
             {
                 if (Vector2.Distance(Camera.TransformVector2(ravens[i].Transform), screenSpacePosition.ToVector2()) < 16)
                 {
-                    logger.Information($"IDENTIFIED RAVEN");
                     return ravens[i];
                 }
             }

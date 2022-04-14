@@ -160,6 +160,12 @@
     <None Include="Resources\raven.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\raven_falling.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\raven_stunned.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\scope.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
