@@ -34,10 +34,14 @@ namespace JumpKingMod.Entities
         private bool clickCooldown;
         private float shootCooldownCounter;
         private Point currentMousePosition;
+        private float score;
+        private UITextEntity scoreTextEntity;
 
         private const float CooldownMaxInSeconds = 0.5f;
         private const float ScopeSpriteMaxScale = 1.25f;
         private const float ScopeSpriteMinScale = 1.0f;
+        private const float ScoreIncrement = 100;
+        private const float MaxScore = 99999;
 
         /// <summary>
         /// Constructor for creating a <see cref="GunEntity"/>
@@ -112,6 +116,20 @@ namespace JumpKingMod.Entities
                     logger.Information($"{toggleGunKey.ToString()} Pressed - Toggling Gun State to {!isGunActive}");
                     isGunActive = !isGunActive;
 
+                    if (isGunActive)
+                    {
+                        scoreTextEntity = new UITextEntity(modEntityManager, 
+                            new Vector2(450, 20), 
+                            "0", 
+                            Color.White, 
+                            UITextEntityAnchor.Center);
+                    }
+                    else
+                    {
+                        scoreTextEntity.Dispose();
+                        scoreTextEntity = null;
+                    }
+
                     gunToggleCooldown = true;
                 }
             }
@@ -120,12 +138,12 @@ namespace JumpKingMod.Entities
                 gunToggleCooldown = false;
             }
 
-            // Handle the 'Shooting' logic
+            MouseState mouseState = Mouse.GetState();
             if (isGunActive)
             {
-                MouseState mouseState = Mouse.GetState();
                 currentMousePosition = (mouseState.Position.ToVector2() / GetScreenScale()).ToPoint();
 
+                // Handle the 'Shooting' logic
                 if (mouseState.LeftButton == ButtonState.Pressed)
                 {
                     if (!clickCooldown)
@@ -135,18 +153,30 @@ namespace JumpKingMod.Entities
                         {
                             logger.Information($"Killing Raven");
                             raven.SetKillState();
+
+                            score += ScoreIncrement;
+                            score = Math.Min(score, MaxScore);
                         }
                         clickCooldown = true;
                         shootCooldownCounter = 0;
                     }
+                }
+
+                // Update the score
+                if (scoreTextEntity != null)
+                {
+                    scoreTextEntity.TextValue = score.ToString().PadLeft(5, '0');
                 }
             }
 
             // Handle the shooting cooldown
             if (clickCooldown && (shootCooldownCounter += delta) > CooldownMaxInSeconds)
             {
-                clickCooldown = false;
-                shootCooldownCounter = CooldownMaxInSeconds;
+                if (mouseState.LeftButton == ButtonState.Released)
+                {
+                    clickCooldown = false;
+                    shootCooldownCounter = CooldownMaxInSeconds;
+                }
             }
         }
 
