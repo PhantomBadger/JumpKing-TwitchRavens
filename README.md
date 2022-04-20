@@ -68,4 +68,4 @@ You can reach out to me on [Twitter](https://twitter.com/PhantomBadger_)
 - [x] Runtime Sub-Only Toggles [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
 - [ ] Twitch Emote Support
 - [ ] Support for Different Raven Sprites
-- [x] YouTube Chat Support
+- [x] YouTube Chat Support [Supported in v2.0](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v2.0)
