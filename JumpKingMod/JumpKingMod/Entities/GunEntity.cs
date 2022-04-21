@@ -3,10 +3,12 @@ using JumpKing;
 using JumpKing.PlayerPreferences.Persocom;
 using JumpKingMod.API;
 using JumpKingMod.Entities.Raven;
+using JumpKingMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +25,7 @@ namespace JumpKingMod.Entities
     {
         private readonly MessengerRavenSpawningEntity spawningEntity;
         private readonly ModEntityManager modEntityManager;
+        private readonly UserSettings userSettings;
         private readonly Keys toggleGunKey;
         private readonly ILogger logger;
         private readonly Sprite scopeSprite;
@@ -49,15 +52,16 @@ namespace JumpKingMod.Entities
         /// <param name="spawningEntity">The <see cref="MessengerRavenSpawningEntity"/> to use to poll existing ravens</param>
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register to</param>
         /// <param name="logger">An <see cref="ILogger"/> implementation to log to</param>
-        public GunEntity(MessengerRavenSpawningEntity spawningEntity, ModEntityManager modEntityManager, ILogger logger)
+        public GunEntity(MessengerRavenSpawningEntity spawningEntity, ModEntityManager modEntityManager, UserSettings userSettings, ILogger logger)
         {
             this.spawningEntity = spawningEntity ?? throw new ArgumentNullException(nameof(spawningEntity));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             isGunActive = false;
             gunToggleCooldown = false;
-            toggleGunKey = Keys.F8;
+            toggleGunKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunToggleKeyKey, Keys.F8);
             shootCooldownCounter = CooldownMaxInSeconds;
 
             scopeSprite = Sprite.CreateSpriteWithCenter(ModContentManager.ScopeTexture,

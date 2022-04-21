@@ -629,6 +629,10 @@ namespace JumpKingMod.Install.UI
 
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenInsultSpawnCountKey, Ravens.InsultRavenSpawnCount.ToString());
 
+            // Gun Mode
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.GunEnabledKey, Ravens.GunEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.GunToggleKeyKey, Ravens.GunToggleKey.ToString());
+
             MessageBox.Show($"Settings updated successfully!");
         }
 
@@ -672,6 +676,10 @@ namespace JumpKingMod.Install.UI
                 // Free Fly
                 FreeFlyingEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false);
                 FreeFlyToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
+
+                // Gun
+                Ravens.GunEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunEnabledKey, false);
+                Ravens.GunToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunToggleKeyKey, Keys.F8);
             }
 
             // Load in Exclusion List

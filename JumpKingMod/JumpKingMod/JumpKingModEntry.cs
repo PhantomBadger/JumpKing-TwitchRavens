@@ -220,8 +220,13 @@ namespace JumpKingMod
                                 Logger.Information($"Initialising Messenger Ravens");
                                 MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTriggers, isGameLoopRunning: true, Logger);
 
-                                Logger.Information($"Initialising Gun");
-                                GunEntity gunEntity = new GunEntity(spawningEntity, modEntityManager, Logger);
+                                // Initialise the Gun
+                                bool gunEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunEnabledKey, false);
+                                if (gunEnabled)
+                                {
+                                    Logger.Information($"Initialising Gun");
+                                    GunEntity gunEntity = new GunEntity(spawningEntity, modEntityManager, userSettings, Logger);
+                                }
 
                                 // Bind to the events so we can start/stop ravens and invalidate caches
                                 gameStateObserver.OnGameLoopRunning += spawningEntity.OnGameLoopStarted;
