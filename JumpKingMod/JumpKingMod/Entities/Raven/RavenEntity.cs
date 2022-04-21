@@ -22,15 +22,6 @@ namespace JumpKingMod.Entities
     /// </summary>
     public class RavenEntity : IModEntity, IDisposable
     {
-        public enum RavenLogicState
-        {
-            Starting,
-            FlyingToPoint,
-            Messaging,
-            FlyingAway,
-            Ending
-        }
-
         public Vector2 Transform;
         public Vector2 Velocity;
         public bool ReadyToBeDestroyed;
@@ -41,6 +32,7 @@ namespace JumpKingMod.Entities
         protected readonly Random random;
 
         protected IModEntityState activeAnimationState;
+        protected LoopingAnimationComponent overrideAnimation;
         protected LoopingAnimationComponent activeAnimation;
         protected float width;
         protected float height;
@@ -125,14 +117,14 @@ namespace JumpKingMod.Entities
         public virtual void Draw()
         {
             // If we have no active animation - there's nothing to draw!
-            if (activeAnimation == null)
+            if (activeAnimation == null && overrideAnimation == null)
             {
                 return;
             }
 
             // Get the active sprite from the active animation and draw it with our
             // positions and effects
-            Sprite activeSprite = activeAnimation.GetActiveSprite();
+            Sprite activeSprite = overrideAnimation?.GetActiveSprite() ?? activeAnimation.GetActiveSprite();
 
             // JK+ Changes Draw(Vector2, SpriteEffects) to include an additional parameter, so
             // we use a different overload and hope for the best
@@ -178,6 +170,15 @@ namespace JumpKingMod.Entities
                 // Update our active state
                 activeAnimationState = state;
             }
+        }
+
+        /// <summary>
+        /// Sets the override animation, if not null it will be used instead of the state machine's animation
+        /// </summary>
+        /// <param name="overrideAnimation"></param>
+        protected void SetOverrideAnimation(LoopingAnimationComponent overrideAnimation)
+        {
+            this.overrideAnimation = overrideAnimation;
         }
 
         /// <summary>

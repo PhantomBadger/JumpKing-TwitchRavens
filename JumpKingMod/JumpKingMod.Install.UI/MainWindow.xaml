@@ -235,6 +235,13 @@
                                     <RowDefinition Height="Auto"/>
                                     <!-- Trigger Settings Row 3 -->
                                     <RowDefinition Height="Auto"/>
+                                    <!-- Gun Seperator -->
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Gun Enabled-->
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Gun Toggle -->
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
                                     <ObjectDataProvider x:Key="twitchRavenTriggerTypeEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
@@ -284,9 +291,20 @@
                                     </ToolTip>
                                     <ToolTip x:Key="ravenSubToggleKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
                                         <TextBlock>
-                                            Provides a key you can press to toggle Sub Mode for the Twitch Messages.
+                                            Provides a key you can press to toggle Sub Mode for the Stream Messages.
                                             Useful if you want to gate interaction behind subs in the event of a 
                                             raid or similar.
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="gunEnabledTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            If Enabled, you will be able to enter a "Gun Mode" and shoot down the 
+                                            Ravens during the game using your mouse.
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="gunKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            Provides a key you can press to enter or exit the "Gun Mode".
                                         </TextBlock>
                                     </ToolTip>
                                 </Grid.Resources>
@@ -296,7 +314,7 @@
                                 <!-- Separator -->
                                 <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
                                 <!-- Toggle Active Key -->
-                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Active Key:" />
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Raven Spawning Key:" />
                                 <ComboBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource ravenDebugToggleKeyTooltip}" IsEnabled="{Binding AreModSettingsLoaded}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding Ravens.RavenToggleDebugKey, Mode=TwoWay}"/>
                                 <!-- Clear Key -->
                                 <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource ravenDebugClearKeyTooltip}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Clear Key:" />
@@ -532,8 +550,17 @@
                                              ItemsSource="{Binding Ravens.RavenInsults, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                              SelectedIndex="{Binding Ravens.SelectedRavenInsultIndex, Mode=TwoWay}"/>
                                 </Grid>
+                                <!-- Gun Seperator -->
+                                <Separator Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,5" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
+                                <!-- Gun Enabled -->
+                                <TextBlock Grid.Row="16" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource gunEnabledTooltip}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Gun Mode Enabled: " />
+                                <CheckBox Grid.Row="16" Grid.Column="1" Margin="5,2,10,2" ToolTip="{StaticResource gunEnabledTooltip}" Visibility="{Binding Ravens.RavenEnabled, Converter={StaticResource boolToVisibilityConverter}}" HorizontalAlignment="Right" IsChecked="{Binding Ravens.GunEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
+                                <!-- Gun Toggle Key -->
+                                <TextBlock Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource gunKeyTooltip}" Visibility="{Binding Ravens.GunSettingsVisible, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Gun Key:" />
+                                <ComboBox Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource gunKeyTooltip}" Visibility="{Binding Ravens.GunSettingsVisible, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding Ravens.GunToggleKey, Mode=TwoWay}"/>
                             </Grid>
                         </TabItem>
+                        <!--
                         <TabItem x:Name="tabItemChatDisplay" Header="Chat Display">
                             <TabItem.Style>
                                 <Style TargetType="{x:Type TabItem}">
@@ -553,11 +580,11 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <!-- Chat Display Enabled -->
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" Text="Enabled: " />
                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding ChatDisplayEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
                             </Grid>
                         </TabItem>
+                        -->
                         <TabItem x:Name="tabItemFly" Header="Fly">
                             <Grid>
                                 <Grid.ColumnDefinitions>

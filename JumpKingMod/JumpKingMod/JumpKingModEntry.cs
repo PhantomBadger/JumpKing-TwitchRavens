@@ -93,16 +93,16 @@ namespace JumpKingMod
                         // Get the Streaming Platform being used
                         AvailableStreamingPlatforms selectedStreamingPlatform = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
                         
-                        // Twitch Chat Relay
-                        if (selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch)
-                        {
-                            bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
-                            if (relayEnabled)
-                            {
-                                Logger.Information($"Initialising Twitch Chat UI Display");
-                                var relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
-                            }
-                        }
+                        // Twitch Chat Relay - DEPRECATED
+                        //if (selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch)
+                        //{
+                        //    bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
+                        //    if (relayEnabled)
+                        //    {
+                        //        Logger.Information($"Initialising Twitch Chat UI Display");
+                        //        var relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
+                        //    }
+                        //}
 
                         // Ravens
                         bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false);
@@ -219,6 +219,14 @@ namespace JumpKingMod
                             {
                                 Logger.Information($"Initialising Messenger Ravens");
                                 MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTriggers, isGameLoopRunning: true, Logger);
+
+                                // Initialise the Gun
+                                bool gunEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunEnabledKey, false);
+                                if (gunEnabled)
+                                {
+                                    Logger.Information($"Initialising Gun");
+                                    GunEntity gunEntity = new GunEntity(spawningEntity, modEntityManager, userSettings, Logger);
+                                }
 
                                 // Bind to the events so we can start/stop ravens and invalidate caches
                                 gameStateObserver.OnGameLoopRunning += spawningEntity.OnGameLoopStarted;

@@ -29,6 +29,7 @@ namespace JumpKingMod.Install.UI
                 {
                     ravenEnabled = value;
                     RaisePropertyChanged(nameof(RavenEnabled));
+                    RaisePropertyChanged(nameof(GunSettingsVisible));
                 }
             }
         }
@@ -339,10 +340,59 @@ namespace JumpKingMod.Install.UI
                         insultRavenSpawnCount = newVal;
                     }
                 }
-                RaisePropertyChanged(nameof(insultRavenSpawnCount));
+                RaisePropertyChanged(nameof(InsultRavenSpawnCount));
             }
         }
         private int insultRavenSpawnCount;
+
+        /// <summary>
+        /// Whether the Gun mode can be enabled or not
+        /// </summary>
+        public bool GunEnabled
+        {
+            get
+            {
+                return gunEnabled;
+            }
+            set
+            {
+                if (gunEnabled != value)
+                {
+                    gunEnabled = value;
+                    RaisePropertyChanged(nameof(GunEnabled));
+                    RaisePropertyChanged(nameof(GunSettingsVisible));
+                }
+            }
+        }
+        private bool gunEnabled;
+
+        public bool GunSettingsVisible
+        {
+            get
+            {
+                return gunEnabled && ravenEnabled;
+            }
+        }
+
+        /// <summary>
+        /// The key to press to toggle the gun mode
+        /// </summary>
+        public Keys GunToggleKey
+        {
+            get
+            {
+                return gunToggleKey;
+            }
+            set
+            {
+                if (gunToggleKey != value)
+                {
+                    gunToggleKey = value;
+                    RaisePropertyChanged(nameof(GunToggleKey));
+                }
+            }
+        }
+        private Keys gunToggleKey;
 
         /// <summary>
         /// Constructor for creating a <see cref="RavensSettings"/>

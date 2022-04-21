@@ -73,10 +73,10 @@ namespace JumpKingMod.Install.UI
                     tabControl.SelectedItem = tabItemYouTube;
                 }
 
-                if (tabControl.SelectedItem == tabItemChatDisplay)
-                {
-                    tabControl.SelectedItem = tabItemYouTube;
-                }
+                //if (tabControl.SelectedItem == tabItemChatDisplay)
+                //{
+                //    tabControl.SelectedItem = tabItemYouTube;
+                //}
             }
         }
     }

@@ -41,6 +41,10 @@ namespace Settings
         public const string FreeFlyEnabledKey = "FreeFlyEnabled";
         public const string FreeFlyToggleKeyKey = "FreeFlyToggleKey";
 
+        // Gun
+        public const string GunEnabledKey = "GunEnabled";
+        public const string GunToggleKeyKey = "GunToggleKey";
+
         public static Dictionary<string, string> GetDefaultSettings()
         {
             return new Dictionary<string, string>()
@@ -78,7 +82,10 @@ namespace Settings
                 { RavenEasterEggEnabledKey, true.ToString() },
                 // Free Fly
                 { FreeFlyEnabledKey, false.ToString() },
-                { FreeFlyToggleKeyKey, Keys.F1.ToString() }
+                { FreeFlyToggleKeyKey, Keys.F1.ToString() },
+                // Gun
+                { GunEnabledKey, false.ToString() },
+                { GunToggleKeyKey, Keys.F8.ToString() }
             };
         }
 

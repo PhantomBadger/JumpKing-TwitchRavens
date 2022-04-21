@@ -1,5 +1,6 @@
 ﻿using JumpKing;
 using JumpKingMod.API;
+using JumpKingMod.Components;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -17,11 +18,22 @@ namespace JumpKingMod.Entities.Raven
     /// </summary>
     public class MessengerRavenEntity : RavenEntity
     {
+        public enum RavenLogicState
+        {
+            Starting,
+            FlyingToPoint,
+            Messaging,
+            FlyingAway,
+            Ending,
+            Killed,
+            KilledFalling,
+        }
+
         protected readonly IRavenLandingPositionsCache landingPositionsCache;
         protected readonly string ravenName;
         protected readonly Color ravenNameColour;
-        protected readonly UITextEntity ravenNameEntity;
 
+        protected UITextEntity ravenNameEntity;
         protected RavenLogicState ravenLogicState;
         protected Vector2 startingPosition;
         protected Vector2 landingPosition;
@@ -29,12 +41,19 @@ namespace JumpKingMod.Entities.Raven
         protected string landingMessage;
         protected UITextEntity messageEntity;
         protected float messageTimer;
+        protected float killStunTimer;
+        protected float killFallTimer;
         protected Vector2 entryVector;
         protected float nameYOffset;
+        protected Sprite killFallSprite;
+        protected Sprite killStunSprite;
 
         protected const float LandingDistanceThreshold = 0.001f;
         protected const float MaxMessageTimeInSeconds = 3.0f;
+        protected const float MaxKillStunTimeInSeconds = 0.25f; // should be like 0.25f
+        protected const float MaxKillFallTimeInSeconds = 3.0f;
         protected const float RavenSpeed = 3f;
+        protected const float RavenFallSpeed = 5f;
         protected const float HardcodedNameYOffset = 20;
 
         /// <summary>
@@ -73,6 +92,9 @@ namespace JumpKingMod.Entities.Raven
             ravenLogicState = RavenLogicState.Starting;
             landingMessage = messageText;
             ReadyToBeDestroyed = false;
+            messageTimer = 0;
+            killStunTimer = 0;
+            killFallTimer = 0;
 
             if (!string.IsNullOrWhiteSpace(ravenName))
             {
@@ -80,6 +102,13 @@ namespace JumpKingMod.Entities.Raven
                     ravenName, ravenNameColour, UITextEntityAnchor.Center, JKContentManager.Font.MenuFontSmall);
                 nameYOffset = (ravenNameEntity.Size.Y / 2) + HardcodedNameYOffset;
             }
+
+            killStunSprite = Sprite.CreateSpriteWithCenter(ModContentManager.RavenStunnedTexture, 
+                new Rectangle(0, 0, ModContentManager.RavenStunnedTexture.Width, ModContentManager.RavenStunnedTexture.Height),
+                new Vector2(0.5f, 0.5f));
+            killFallSprite = Sprite.CreateSpriteWithCenter(ModContentManager.RavenFallingTexture,
+                new Rectangle(0, 0, ModContentManager.RavenFallingTexture.Width, ModContentManager.RavenFallingTexture.Height),
+                new Vector2(0.5f, 0.5f));
         }
 
         /// <summary>
@@ -173,6 +202,33 @@ namespace JumpKingMod.Entities.Raven
                 case RavenLogicState.Ending:
                     ReadyToBeDestroyed = true;
                     break;
+                case RavenLogicState.Killed:
+                    // After a pre-set time, start falling
+                    if ((killStunTimer += delta) > MaxKillStunTimeInSeconds)
+                    {
+                        SetOverrideAnimation(new LoopingAnimationComponent(new Sprite[] { killFallSprite }, 1f));
+                        ravenLogicState = RavenLogicState.KilledFalling;
+
+                        // Dispose of the name early
+                        ravenNameEntity?.Dispose();
+                        ravenNameEntity = null;
+
+                        // Dispose of the text early
+                        messageEntity?.Dispose();
+                        messageEntity = null;
+                    }
+                    break;
+                case RavenLogicState.KilledFalling:
+                    // Fall off screen
+                    Vector2 downVector = new Vector2(0, 1);
+                    Velocity = downVector * RavenFallSpeed;
+
+                    // After a pre-set time, destroy the raven
+                    if ((killFallTimer += delta) > MaxKillFallTimeInSeconds)
+                    {
+                        ravenLogicState = RavenLogicState.Ending;
+                    }
+                    break;
                 default:
                     throw new NotImplementedException($"No logic supporting a state of {ravenLogicState.ToString()}");
             }
@@ -185,6 +241,16 @@ namespace JumpKingMod.Entities.Raven
             {
                 ravenNameEntity.ScreenSpacePosition = Camera.TransformVector2(Transform + new Vector2(0, nameYOffset));
             }
+        }
+
+        /// <summary>
+        /// If called will set the Raven's internal state to 'Killed' which will cause
+        /// it to fall for a set time
+        /// </summary>
+        public void SetKillState()
+        {
+            SetOverrideAnimation(new LoopingAnimationComponent(new Sprite[] { killStunSprite }, 1f));
+            ravenLogicState = RavenLogicState.Killed;
         }
 
         /// <summary>
