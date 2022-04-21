@@ -93,16 +93,16 @@ namespace JumpKingMod
                         // Get the Streaming Platform being used
                         AvailableStreamingPlatforms selectedStreamingPlatform = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
                         
-                        // Twitch Chat Relay
-                        if (selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch)
-                        {
-                            bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
-                            if (relayEnabled)
-                            {
-                                Logger.Information($"Initialising Twitch Chat UI Display");
-                                var relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
-                            }
-                        }
+                        // Twitch Chat Relay - DEPRECATED
+                        //if (selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch)
+                        //{
+                        //    bool relayEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
+                        //    if (relayEnabled)
+                        //    {
+                        //        Logger.Information($"Initialising Twitch Chat UI Display");
+                        //        var relay = new TwitchChatUIDisplay(twitchClientFactory.GetTwitchClient(), modEntityManager, gameStateObserver, Logger);
+                        //    }
+                        //}
 
                         // Ravens
                         bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, false);

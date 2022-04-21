@@ -534,6 +534,7 @@
                                 </Grid>
                             </Grid>
                         </TabItem>
+                        <!--
                         <TabItem x:Name="tabItemChatDisplay" Header="Chat Display">
                             <TabItem.Style>
                                 <Style TargetType="{x:Type TabItem}">
@@ -553,11 +554,11 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <!-- Chat Display Enabled -->
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" Text="Enabled: " />
                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" IsChecked="{Binding ChatDisplayEnabled, Mode=TwoWay}" IsEnabled="{Binding AreModSettingsLoaded}"/>
                             </Grid>
                         </TabItem>
+                        -->
                         <TabItem x:Name="tabItemFly" Header="Fly">
                             <Grid>
                                 <Grid.ColumnDefinitions>
