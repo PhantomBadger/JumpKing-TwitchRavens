@@ -15,12 +15,6 @@ The Ravens can be triggered through different ways to suit your chat
 - **Channel Point:** Spawns a Raven when a chatter redeems a specified Channel Point (Uses the text from that channel point!) *(Twitch Only)*
 - **Insult:** Spawns Ravens when you fall, they choose from a pre-determined list of insults *(Twitch Only)*
 
-### Chat Display *(Twitch Only)*
-Alternatively, you can opt to display the Twitch Chat directly in your game instead!
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/9095972/135768756-8af8db85-4c54-4ea3-9cbe-fafcebb6bf27.gif" width="75%" height="75%"/>
-</p>
-
 ### Free Flying
 Toggle a 'free flying' mode for the Jump King, which will let you explore or practice jumps without consequence!
 
