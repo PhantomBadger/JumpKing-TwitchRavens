@@ -7,13 +7,19 @@ This Mod allows your Twitch or YouTube Chat to lend words of encouragement whils
 ### Twitch & YouTube Ravens
 Both Twitch and YouTube Chat can now communicate with you within the world of Jump King! Messages from chat will be parroted by small ravens that land on the stage as you traverse it. You have the option of gating this behind a Channel Point reward for busier chats!
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/9095972/135728881-c4a61ccb-663b-4218-8f22-9ece0366592a.gif" width="75%" height="75%" alt="Ravens land on the stage to relay messages from Twitch Chat!"/>
+  <img src="https://user-images.githubusercontent.com/9095972/135728881-c4a61ccb-663b-4218-8f22-9ece0366592a.gif" width="75%" height="75%" alt="Ravens land on the stage to relay messages from Stream Chat!"/>
 </p>
 
 The Ravens can be triggered through different ways to suit your chat
 - **Chat Message:** Spawns a Raven for every Chat Message that appears
 - **Channel Point:** Spawns a Raven when a chatter redeems a specified Channel Point (Uses the text from that channel point!) *(Twitch Only)*
 - **Insult:** Spawns Ravens when you fall, they choose from a pre-determined list of insults *(Twitch Only)*
+
+### Gun Mode
+Are your chat ravens dunking on you a bit _too_ hard for that last fall? Use the mouse-controlled Ravens Gun to blast them out of the sky and take out some of your rage!
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/9095972/164544496-50060983-da29-4b0c-89bb-7bdcc1011a25.gif" width="75%" height="75%" alt="Shoot Ravens out fo the sky using your mouse to control a gun for a bit of stress relief!"/>
+</p>
 
 ### Free Flying
 Toggle a 'free flying' mode for the Jump King, which will let you explore or practice jumps without consequence!
