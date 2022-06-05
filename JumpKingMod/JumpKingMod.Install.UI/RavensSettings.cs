@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -169,6 +170,42 @@ namespace JumpKingMod.Install.UI
             }
         }
         private int maxRavensCount;
+
+        /// <summary>
+        /// The time a raven should spend displaying a message in seconds
+        /// </summary>
+        public string MessageDurationInSeconds
+        {
+            get
+            {
+                return messageDurationInSeconds.ToString();
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    messageDurationInSeconds = DefaultMessageDurationInSeconds;
+                }
+                else
+                {
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        if (newVal > 100)
+                        {
+                            newVal = 100;
+                        }
+                        messageDurationInSeconds = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(MessageDurationInSeconds));
+            }
+        }
+        private float messageDurationInSeconds;
+        private const float DefaultMessageDurationInSeconds = 3.0f;
 
         /// <summary>
         /// The ID of the Channel Point Reward to use for the Raven Trigger

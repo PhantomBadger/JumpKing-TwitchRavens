@@ -116,7 +116,7 @@ namespace JumpKingMod.Entities
             float xPos = leftSide ? -50 : 530;
             Vector2 spawnPos = new Vector2(xPos, (-((Camera.CurrentScreen - 1) * 360) - 350));
             messengerRavens.TryAdd(new MessengerRavenEntity(spawnPos, ravenMessage, ravenName, ravenNameColour,
-                modEntityManager, ravenLandingPositionsCache, logger), 0);
+                modEntityManager, ravenLandingPositionsCache, logger, userSettings), 0);
         }
 
         /// <summary>

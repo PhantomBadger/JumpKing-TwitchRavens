@@ -609,6 +609,7 @@ namespace JumpKingMod.Install.UI
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensClearDebugKeyKey, Ravens.RavenClearDebugKey.ToString());
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Ravens.RavenSubModeToggleKey.ToString());
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensMaxCountKey, Ravens.MaxRavensCount);
+            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensDisplayTimeInSecondsKey, Ravens.MessageDurationInSeconds);
 
             // Chat Display
             ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
@@ -668,6 +669,7 @@ namespace JumpKingMod.Install.UI
                 Ravens.RavenToggleDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
                 Ravens.RavenSubModeToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
                 Ravens.MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5.ToString());
+                Ravens.MessageDurationInSeconds = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensDisplayTimeInSecondsKey, 3.0f.ToString());
                 Ravens.InsultRavenSpawnCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
 
                 // Chat Display Info

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -116,6 +117,24 @@ namespace JumpKingMod.Settings
             else
             {
                 logger.Warning($"Unable to parse found setting for '{key}' into int, found value was '{rawValue}', using default of {defaultValue.ToString()} instead");
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets a float variation of the setting, or the default value if the key is not present
+        /// or the value is invalid
+        /// </summary>
+        public float GetSettingOrDefault(string key, float defaultValue)
+        {
+            string rawValue = GetSettingOrDefault(key, defaultValue.ToString());
+            if (float.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
+            {
+                return parsedValue;
+            }
+            else
+            {
+                logger.Warning($"Unable to parse found setting for '{key}' into float, found value was '{rawValue}', using default of {defaultValue.ToString()} instead");
                 return defaultValue;
             }
         }

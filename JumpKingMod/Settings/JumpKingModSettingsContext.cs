@@ -33,6 +33,7 @@ namespace Settings
         public const string RavensToggleDebugKeyKey = "RavensToggleDebugKey";
         public const string RavensSubModeToggleKeyKey = "RavensSubModeToggleKey";
         public const string RavensMaxCountKey = "RavensMaxCount";
+        public const string RavensDisplayTimeInSecondsKey = "RavensDisplayTimeInSeconds";
         public const string RavenChannelPointRewardIDKey = "RavenChannelPointRewardID";
         public const string RavenInsultSpawnCountKey = "RavenInsultSpawnCount";
         public const string RavenEasterEggEnabledKey = "RavenEasterEggEnabled";

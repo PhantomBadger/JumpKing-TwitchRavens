@@ -1,9 +1,11 @@
 ﻿using JumpKing;
 using JumpKingMod.API;
 using JumpKingMod.Components;
+using JumpKingMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +43,7 @@ namespace JumpKingMod.Entities.Raven
         protected string landingMessage;
         protected UITextEntity messageEntity;
         protected float messageTimer;
+        protected float maxMessageTimeInSeconds;
         protected float killStunTimer;
         protected float killFallTimer;
         protected Vector2 entryVector;
@@ -49,7 +52,7 @@ namespace JumpKingMod.Entities.Raven
         protected Sprite killStunSprite;
 
         protected const float LandingDistanceThreshold = 0.001f;
-        protected const float MaxMessageTimeInSeconds = 3.0f;
+        protected const float DefaultMessageTimeInSeconds = 3.0f;
         protected const float MaxKillStunTimeInSeconds = 0.25f; // should be like 0.25f
         protected const float MaxKillFallTimeInSeconds = 3.0f;
         protected const float RavenSpeed = 3f;
@@ -65,8 +68,8 @@ namespace JumpKingMod.Entities.Raven
         /// <param name="landingPositionsCache">The <see cref="IRavenLandingPositionsCache"/> implementation to use for floor positions</param>
         /// <param name="logger">An <see cref="ILogger"/> implementation for logging</param>
         public MessengerRavenEntity(Vector2 startingPosition, string messageText, ModEntityManager modEntityManager, 
-            IRavenLandingPositionsCache landingPositionsCache, ILogger logger)
-            : this(startingPosition, messageText, null, Color.White, modEntityManager, landingPositionsCache, logger)
+            IRavenLandingPositionsCache landingPositionsCache, ILogger logger, UserSettings settings)
+            : this(startingPosition, messageText, null, Color.White, modEntityManager, landingPositionsCache, logger, settings)
         {
 
         }
@@ -82,7 +85,7 @@ namespace JumpKingMod.Entities.Raven
         /// <param name="landingPositionsCache">The <see cref="IRavenLandingPositionsCache"/> implementation to use for floor positions</param>
         /// <param name="logger">An <see cref="ILogger"/> implementation for logging</param>
         public MessengerRavenEntity(Vector2 startingPosition, string messageText, string ravenName, Color ravenNameColour,
-            ModEntityManager modEntityManager, IRavenLandingPositionsCache landingPositionsCache, ILogger logger) 
+            ModEntityManager modEntityManager, IRavenLandingPositionsCache landingPositionsCache, ILogger logger, UserSettings settings) 
             : base(startingPosition, modEntityManager, logger)
         {
             this.ravenName = ravenName;
@@ -95,6 +98,8 @@ namespace JumpKingMod.Entities.Raven
             messageTimer = 0;
             killStunTimer = 0;
             killFallTimer = 0;
+
+            maxMessageTimeInSeconds = settings.GetSettingOrDefault(JumpKingModSettingsContext.RavensDisplayTimeInSecondsKey, DefaultMessageTimeInSeconds);
 
             if (!string.IsNullOrWhiteSpace(ravenName))
             {
@@ -179,7 +184,7 @@ namespace JumpKingMod.Entities.Raven
                     }
 
                     // After a pre-set time, dispose of the message
-                    if ((messageTimer += delta) > MaxMessageTimeInSeconds)
+                    if ((messageTimer += delta) > maxMessageTimeInSeconds)
                     {
                         messageEntity?.Dispose();
                         messageEntity = null;
