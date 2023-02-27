@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BF7E47BA-B7E7-4FDC-B159-8F97AE4C2E58}</ProjectGuid>
+    <ProjectGuid>{DE2B97BE-F646-4158-A63B-330DAFEF06E2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JumpKingModLoader</RootNamespace>
-    <AssemblyName>JumpKingModLoader</AssemblyName>
+    <RootNamespace>PBJKModBase</RootNamespace>
+    <AssemblyName>PBJKModBase</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -33,7 +33,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,18 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Loader.cs" />
-    <Compile Include="ModAssembly.cs" />
+    <Compile Include="JumpKingModAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PBJKModBase\PBJKModBase.csproj">
-      <Project>{DE2B97BE-F646-4158-A63B-330DAFEF06E2}</Project>
-      <Name>PBJKModBase</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /E /C /S "$(SolutionDir)JumpKingModLoader\bin\$(ConfigurationName)\*" "D:\SteamLibrary\steamapps\common\Jump King\Content\Mods"</PostBuildEvent>
-  </PropertyGroup>
 </Project>

@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingModLoader", "JumpKi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingMod.Install.UI", "JumpKingMod.Install.UI\JumpKingMod.Install.UI.csproj", "{33C19256-5D89-4EAA-B72D-8EB27FFD0736}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase", "PBJKModBase\PBJKModBase.csproj", "{DE2B97BE-F646-4158-A63B-330DAFEF06E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +37,6 @@ Global
 		{D7318C86-51EA-40A6-A541-AC5D0D46D95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7318C86-51EA-40A6-A541-AC5D0D46D95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7318C86-51EA-40A6-A541-AC5D0D46D95A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE83A7E4-4352-413E-8027-D69BB18E5EED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE83A7E4-4352-413E-8027-D69BB18E5EED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE83A7E4-4352-413E-8027-D69BB18E5EED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE83A7E4-4352-413E-8027-D69BB18E5EED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D9C89840-A346-4334-99F2-CF323015C206}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D9C89840-A346-4334-99F2-CF323015C206}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9C89840-A346-4334-99F2-CF323015C206}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,13 +49,16 @@ Global
 		{33C19256-5D89-4EAA-B72D-8EB27FFD0736}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33C19256-5D89-4EAA-B72D-8EB27FFD0736}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33C19256-5D89-4EAA-B72D-8EB27FFD0736}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE2B97BE-F646-4158-A63B-330DAFEF06E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE2B97BE-F646-4158-A63B-330DAFEF06E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE2B97BE-F646-4158-A63B-330DAFEF06E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE2B97BE-F646-4158-A63B-330DAFEF06E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D7318C86-51EA-40A6-A541-AC5D0D46D95A} = {EB64DA4F-F368-4172-9BA1-13557860005A}
-		{CE83A7E4-4352-413E-8027-D69BB18E5EED} = {EB64DA4F-F368-4172-9BA1-13557860005A}
 		{33C19256-5D89-4EAA-B72D-8EB27FFD0736} = {EB64DA4F-F368-4172-9BA1-13557860005A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

@@ -12,10 +12,12 @@ using JumpKingRavensMod.Twitch;
 using JumpKingRavensMod.YouTube;
 using Logging;
 using Logging.API;
+using PBJKModBase;
 using Settings;
 
 namespace JumpKingRavensMod
 {
+    [JumpKingMod("Jump King Ravens", "Init")]
     public class JumpKingRavensModEntry
     {
         public static ILogger Logger;
