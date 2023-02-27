@@ -1,4 +1,4 @@
-﻿using JumpKingMod.Settings;
+﻿using JumpKingRavensMod.Settings;
 using Logging;
 using Logging.API;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -16,7 +16,7 @@ using System.Windows;
 using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
 
-namespace JumpKingMod.Install.UI
+namespace JumpKingRavensMod.Install.UI
 {
     public class InstallerViewModel : INotifyPropertyChanged
     {

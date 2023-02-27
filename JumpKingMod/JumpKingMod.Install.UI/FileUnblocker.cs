@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingMod.Install.UI
+namespace JumpKingRavensMod.Install.UI
 {
     public class FileUnblocker
     {

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingMod.Install.UI
+namespace JumpKingRavensMod.Install.UI
 {
     public class RavensSettings : INotifyPropertyChanged
     {

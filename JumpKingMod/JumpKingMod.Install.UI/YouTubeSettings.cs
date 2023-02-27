@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System.ComponentModel;
 
-namespace JumpKingMod.Install.UI
+namespace JumpKingRavensMod.Install.UI
 {
     /// <summary>
     /// An aggregatce alss of YouTube Settings

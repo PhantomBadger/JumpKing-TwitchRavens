@@ -22,7 +22,7 @@ namespace JumpKingModLoader
         {
             List<string> loadLog = new List<string>();
             string basePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            Assembly entryAssembly = Assembly.LoadFrom(Path.Combine(basePath, "JumpKingMod.dll"));
+            Assembly entryAssembly = Assembly.LoadFrom(Path.Combine(basePath, "JumpKingRavensMod.dll"));
             AssemblyName[] referencedAssemblies = entryAssembly.GetReferencedAssemblies();
             for (int i = 0; i < referencedAssemblies.Length; i++)
             {
@@ -57,7 +57,7 @@ namespace JumpKingModLoader
                 }
             }
 
-            Type type = entryAssembly?.GetType("JumpKingMod.JumpKingModEntry");
+            Type type = entryAssembly?.GetType("JumpKingRavensMod.JumpKingRavensModEntry");
             MethodInfo methodInfo = type?.GetMethod("Init");
             methodInfo?.Invoke(null, null);
 

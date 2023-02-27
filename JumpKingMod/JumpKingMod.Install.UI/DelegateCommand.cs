@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace JumpKingMod.Install.UI
+namespace JumpKingRavensMod.Install.UI
 {
     /// <summary>
     /// An implementation of <see cref="ICommand"/> which wraps a delegate call

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingMod.Settings
+namespace JumpKingRavensMod.Settings
 {
     /// <summary>
     /// A simple settings file implementation which can read and write JSON settings from a file
