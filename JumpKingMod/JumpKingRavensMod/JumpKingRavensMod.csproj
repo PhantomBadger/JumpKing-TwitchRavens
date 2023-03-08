@@ -125,7 +125,6 @@
     <Compile Include="Patching\AchievementRegisterDisableManualPatch.cs" />
     <Compile Include="Patching\GameStateObserverManualPatch.cs" />
     <Compile Include="JumpKingRavensModEntry.cs" />
-    <Compile Include="API\IManualPatch.cs" />
     <Compile Include="Patching\FreeFlyManualPatch.cs" />
     <Compile Include="Patching\ModEntityManagerManualPatch.cs" />
     <Compile Include="Entities\Raven\Triggers\PlayerFallMessengerRavenTrigger.cs" />

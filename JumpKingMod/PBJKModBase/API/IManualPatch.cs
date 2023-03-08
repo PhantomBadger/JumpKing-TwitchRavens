@@ -1,12 +1,11 @@
 ﻿using HarmonyLib;
-using Logging.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.Patching
+namespace PBJKModBase.API
 {
     /// <summary>
     /// Interface representing a manual patch of some game code using Harmony
