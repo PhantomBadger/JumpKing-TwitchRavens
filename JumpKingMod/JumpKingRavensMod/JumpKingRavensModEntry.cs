@@ -27,7 +27,7 @@ namespace JumpKingRavensMod
         /// </summary>
         public static void Init()
         {
-            Logger = new ConsoleLogger();
+            Logger = ConsoleLogger.Instance;
 
             try
             {
@@ -238,10 +238,10 @@ namespace JumpKingRavensMod
             }
             catch (Exception e)
             {
-                Logger.Error($"Error on Init {e.ToString()}");
+                Logger.Error($"Error on Ravens Init {e.ToString()}");
             }
 
-            Logger.Information("Init Called!");
+            Logger.Information("Ravens Init Called!");
         }
 
         private static bool TryGetAndStartEasterEggTrigger(string channelId, out FakeMessageEasterEggMessengerRavenTrigger trigger)
