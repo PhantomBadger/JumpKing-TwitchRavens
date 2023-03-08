@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingMod.Install.UI", "J
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase", "PBJKModBase\PBJKModBase.csproj", "{DE2B97BE-F646-4158-A63B-330DAFEF06E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingModifiersMod", "JumpKingModifiersMod\JumpKingModifiersMod.csproj", "{0B06258C-47D2-4E48-9C15-2A003AA5B678}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{DE2B97BE-F646-4158-A63B-330DAFEF06E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE2B97BE-F646-4158-A63B-330DAFEF06E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE2B97BE-F646-4158-A63B-330DAFEF06E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B06258C-47D2-4E48-9C15-2A003AA5B678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B06258C-47D2-4E48-9C15-2A003AA5B678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B06258C-47D2-4E48-9C15-2A003AA5B678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B06258C-47D2-4E48-9C15-2A003AA5B678}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
