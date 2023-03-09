@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.API
+namespace PBJKModBase.API
 {
     /// <summary>
     /// An interface representing a component attached to an <see cref="IModEntity"/>

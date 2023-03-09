@@ -4,6 +4,7 @@ using JumpKingRavensMod.Entities;
 using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
+using PBJKModBase.Entities;
 using Settings;
 using System;
 using System.Collections.Concurrent;

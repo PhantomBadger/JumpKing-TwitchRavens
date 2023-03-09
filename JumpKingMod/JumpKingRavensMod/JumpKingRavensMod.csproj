@@ -97,16 +97,11 @@
     <Compile Include="API\IInsultGetter.cs" />
     <Compile Include="API\IMessengerRavenTrigger.cs" />
     <Compile Include="API\IRavenLandingPositionsCache.cs" />
-    <Compile Include="API\IModComponent.cs" />
-    <Compile Include="API\IForegroundModEntity.cs" />
     <Compile Include="API\IGameStateObserver.cs" />
-    <Compile Include="API\IModEntity.cs" />
-    <Compile Include="API\IModEntityState.cs" />
     <Compile Include="API\IYouTubeClientConnector.cs" />
     <Compile Include="Components\LoopingAnimationComponent.cs" />
     <Compile Include="Entities\GunEntity.cs" />
     <Compile Include="Entities\MessengerRavenSpawningEntity.cs" />
-    <Compile Include="Entities\ModEntityManager.cs" />
     <Compile Include="Entities\RavenDebugSpawningEntity.cs" />
     <Compile Include="Entities\Raven\MessengerRavenEntity.cs" />
     <Compile Include="Entities\Raven\RavenEntity.cs" />
@@ -126,7 +121,6 @@
     <Compile Include="Patching\GameStateObserverManualPatch.cs" />
     <Compile Include="JumpKingRavensModEntry.cs" />
     <Compile Include="Patching\FreeFlyManualPatch.cs" />
-    <Compile Include="Patching\ModEntityManagerManualPatch.cs" />
     <Compile Include="Entities\Raven\Triggers\PlayerFallMessengerRavenTrigger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\Raven\Triggers\TwitchChatMessengerRavenTrigger.cs" />

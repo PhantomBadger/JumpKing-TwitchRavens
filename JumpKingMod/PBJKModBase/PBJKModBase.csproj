@@ -44,8 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\IForegroundModEntity.cs" />
     <Compile Include="API\IManualPatch.cs" />
+    <Compile Include="API\IModComponent.cs" />
+    <Compile Include="API\IModEntity.cs" />
+    <Compile Include="API\IModEntityState.cs" />
+    <Compile Include="Entities\ModEntityManager.cs" />
     <Compile Include="JumpKingModAttribute.cs" />
+    <Compile Include="Patching\ModEntityManagerManualPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

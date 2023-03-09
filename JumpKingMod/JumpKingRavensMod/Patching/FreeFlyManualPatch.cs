@@ -13,6 +13,7 @@ using JumpKingRavensMod.Settings;
 using Microsoft.Xna.Framework.Input;
 using Settings;
 using PBJKModBase.API;
+using PBJKModBase.Entities;
 
 namespace JumpKingRavensMod.Patching
 {

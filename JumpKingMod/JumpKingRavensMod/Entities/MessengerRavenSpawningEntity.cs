@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using JumpKingRavensMod.Settings;
 using Settings;
 using JumpKingRavensMod.Patching;
+using PBJKModBase.API;
+using PBJKModBase.Entities;
 
 namespace JumpKingRavensMod.Entities
 {

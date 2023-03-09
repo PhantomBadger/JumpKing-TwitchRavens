@@ -5,6 +5,7 @@ using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using PBJKModBase.Entities;
 using Settings;
 using System;
 using System.Collections.Generic;

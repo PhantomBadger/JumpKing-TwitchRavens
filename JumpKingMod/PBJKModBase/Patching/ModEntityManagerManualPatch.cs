@@ -1,13 +1,13 @@
 ﻿using HarmonyLib;
-using JumpKingRavensMod.Entities;
 using PBJKModBase.API;
+using PBJKModBase.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.Patching
+namespace PBJKModBase.Patching
 {
     /// <summary>
     /// An implementation of <see cref="IManualPatch"/> which hooks up the ModEntityManager to the appropriate
@@ -16,6 +16,7 @@ namespace JumpKingRavensMod.Patching
     public class ModEntityManagerManualPatch : IManualPatch
     {
         private static ModEntityManager modEntityManager;
+        private static bool isSetup = false;
 
         public ModEntityManagerManualPatch(ModEntityManager modEntityManager)
         {
@@ -24,6 +25,12 @@ namespace JumpKingRavensMod.Patching
 
         public void SetUpManualPatch(Harmony harmony)
         {
+            // TODO: Actually solve this instead of this jank-ness
+            if (isSetup)
+            {
+                return;
+            }
+            isSetup = true;
             var entityManagerDrawMethod = AccessTools.Method("EntityComponent.EntityManager:Draw");
             var modEntityDrawMethod = this.GetType().GetMethod("DrawWrapper");
 
@@ -36,6 +43,7 @@ namespace JumpKingRavensMod.Patching
             harmony.Patch(entityManagerDrawMethod, postfix: new HarmonyMethod(modEntityDrawMethod));
             harmony.Patch(entityManagerUpdateMethod, postfix: new HarmonyMethod(modEntityUpdateMethod));
             harmony.Patch(jumpKingGameDrawMethod, postfix: new HarmonyMethod(modEntityForegroundDrawMethod));
+
         }
 
         public static void DrawWrapper()

@@ -13,6 +13,9 @@ using JumpKingRavensMod.YouTube;
 using Logging;
 using Logging.API;
 using PBJKModBase;
+using PBJKModBase.API;
+using PBJKModBase.Entities;
+using PBJKModBase.Patching;
 using Settings;
 
 namespace JumpKingRavensMod
@@ -54,8 +57,7 @@ namespace JumpKingRavensMod
                 gameStateObserver.SetUpManualPatch(harmony);
 
                 // Make our Mod Entity Manager and patch it
-                var modEntityManager = new ModEntityManager();
-                IManualPatch modEntityManagerPatch = new ModEntityManagerManualPatch(modEntityManager);
+                IManualPatch modEntityManagerPatch = new ModEntityManagerManualPatch(ModEntityManager.Instance);
                 modEntityManagerPatch.SetUpManualPatch(harmony);
 
                 // Twitch Chat Client
@@ -69,7 +71,7 @@ namespace JumpKingRavensMod
                 if (freeFlyEnabled)
                 {
                     Logger.Information($"Initialising Free Fly Mod");
-                    IManualPatch freeFlyPatch = new FreeFlyManualPatch(userSettings, modEntityManager, Logger);
+                    IManualPatch freeFlyPatch = new FreeFlyManualPatch(userSettings, ModEntityManager.Instance, Logger);
                     freeFlyPatch.SetUpManualPatch(harmony);
 
                     IManualPatch achievementDisablePatch = new AchievementRegisterDisableManualPatch();
@@ -197,7 +199,7 @@ namespace JumpKingRavensMod
 
                                             // Create the YouTube Client and kick off the connection process
                                             YouTubeChatClient youtubeClient = youtubeChatClientFactory.GetYouTubeClient();
-                                            IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, modEntityManager, userSettings, Logger);
+                                            IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, ModEntityManager.Instance, userSettings, Logger);
                                             clientController.StartAttemptingConnection();
 
                                             // Create the Trigger
@@ -214,14 +216,14 @@ namespace JumpKingRavensMod
                             if (ravenTriggers != null && ravenTriggers.Count > 0)
                             {
                                 Logger.Information($"Initialising Messenger Ravens");
-                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, modEntityManager, ravenTriggers, isGameLoopRunning: true, Logger);
+                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, ModEntityManager.Instance, ravenTriggers, isGameLoopRunning: true, Logger);
 
                                 // Initialise the Gun
                                 bool gunEnabled = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunEnabledKey, false);
                                 if (gunEnabled)
                                 {
                                     Logger.Information($"Initialising Gun");
-                                    GunEntity gunEntity = new GunEntity(spawningEntity, modEntityManager, userSettings, Logger);
+                                    GunEntity gunEntity = new GunEntity(spawningEntity, ModEntityManager.Instance, userSettings, Logger);
                                 }
 
                                 // Bind to the events so we can start/stop ravens and invalidate caches

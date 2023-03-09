@@ -1,6 +1,4 @@
-﻿using EntityComponent;
-using JumpKing.Util.Tags;
-using JumpKingRavensMod.API;
+﻿using PBJKModBase.API;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.Entities
+namespace PBJKModBase.Entities
 {
     /// <summary>
     /// A wrapper for our own entity system which handles the batch drawing of custom
@@ -19,6 +17,23 @@ namespace JumpKingRavensMod.Entities
     {
         private readonly ConcurrentDictionary<IModEntity, byte> entities;
         private readonly ConcurrentDictionary<IForegroundModEntity, byte> foregroundEntities;
+
+        /// <summary>
+        /// Singleton for accessing the ModEntityManager
+        /// </summary>
+        public static ModEntityManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new ModEntityManager();
+                }
+
+                return instance;
+            }
+        }
+        private static ModEntityManager instance;
 
         /// <summary>
         /// Default ctor for creating a <see cref="ModEntityManager"/>

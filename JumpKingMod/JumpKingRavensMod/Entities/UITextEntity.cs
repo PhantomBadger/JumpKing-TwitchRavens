@@ -6,6 +6,8 @@ using JumpKing.Util.Tags;
 using JumpKingRavensMod.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PBJKModBase.API;
+using PBJKModBase.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

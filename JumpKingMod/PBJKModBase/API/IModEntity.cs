@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.API
+namespace PBJKModBase.API
 {
     /// <summary>
-    /// An interface representing a custom entity used by the mod which draws in the foreground
+    /// An interface representing a custom entity used by the mod
     /// </summary>
-    public interface IForegroundModEntity
+    public interface IModEntity
     {
-        void ForegroundDraw();
+        void Draw();
 
         void Update(float p_delta);
     }
