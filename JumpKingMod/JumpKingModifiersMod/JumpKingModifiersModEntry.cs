@@ -45,6 +45,7 @@ namespace JumpKingModifiersMod
 
                 var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
                 var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, walkSpeedModifier);
+                debugTrigger.EnableTrigger();
             }
             catch (Exception e)
             {

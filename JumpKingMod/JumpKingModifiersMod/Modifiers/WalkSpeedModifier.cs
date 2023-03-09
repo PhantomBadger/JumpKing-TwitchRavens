@@ -18,6 +18,12 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly ILogger logger;
         private readonly PlayerValuesManualPatch playerValuesManualPatch;
 
+        /// <summary>
+        /// Ctor for creating a <see cref="WalkSpeedModifier"/>
+        /// </summary>
+        /// <param name="speedModifier">The modifier to apply to the walk speed</param>
+        /// <param name="playerValuesManualPatch">The <see cref="PlayerValuesManualPatch"/> to use for applying the modifier to the game</param>
+        /// <param name="logger">An implementation of <see cref="ILogger"/> for logging</param>
         public WalkSpeedModifier(float speedModifier, PlayerValuesManualPatch playerValuesManualPatch, ILogger logger)
         {
             this.speedModifier = speedModifier;
@@ -25,11 +31,18 @@ namespace JumpKingModifiersMod.Modifiers
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Returns whether the <see cref="WalkSpeedModifier"/> is active or not
+        /// </summary>
         public bool IsModifierEnabled()
         {
             return Math.Abs(playerValuesManualPatch.GetWalkSpeedModifier() - 1f) > float.Epsilon;
         }
 
+        /// <summary>
+        /// Enables the modifier, changing the player's walk speed
+        /// </summary>
+        /// <returns><c>true</c> if successfully applied, <c>false</c> if not</returns>
         public bool EnableModifier()
         {
             logger.Information($"Enable Walk Speed Modifier");
@@ -37,6 +50,10 @@ namespace JumpKingModifiersMod.Modifiers
             return true;
         }
 
+        /// <summary>
+        /// Disables the modifier, resetting the player's walk speed
+        /// </summary>
+        /// <returns><c>true</c> if successfully disabled, <c>false</c> if not</returns>
         public bool DisableModifier()
         {
             logger.Information($"Disable Walk Speed Modifier");
