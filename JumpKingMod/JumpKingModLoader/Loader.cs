@@ -24,6 +24,10 @@ namespace JumpKingModLoader
             List<string> loadLog = new List<string>();
             string basePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
+            // Load and initialise the mod base
+            string pbjkBaseAssemblyPath = Path.Combine(basePath, "PBJKModBase.dll");
+            // TODO: Load and call init, move setup logic for statics to that init
+
             // Gather all mod assemblies
             List<ModAssembly> modAssemblies = GetModAssemblies(basePath, loadLog);
 
@@ -68,6 +72,7 @@ namespace JumpKingModLoader
                     }
                 }
 
+                // call the entry point for each mod
                 MethodInfo methodInfo = modAssembly.EntryType?.GetMethod(modAssembly.ModAttribute.EntryMethod);
                 methodInfo?.Invoke(null, null);
             }
@@ -86,7 +91,7 @@ namespace JumpKingModLoader
         /// Polls all .dll files in the base path and returns a list of all which contain a <see cref="JumpKingModAttribute"/> with the appropriate data aggregated
         /// </summary>
         private static List<ModAssembly> GetModAssemblies(string basePath, List<string> loadLog)
-        {
+        {          
             string[] candidateAssemblyPaths = Directory.GetFiles(basePath, "*.dll");
             List<ModAssembly> assembliesToLoad = new List<ModAssembly>();
             for (int i = 0; i < candidateAssemblyPaths.Length; i++)

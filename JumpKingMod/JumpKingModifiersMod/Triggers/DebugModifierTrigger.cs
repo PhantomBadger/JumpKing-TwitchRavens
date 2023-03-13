@@ -1,4 +1,6 @@
 ﻿using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Modifiers;
+using JumpKingModifiersMod.Patching;
 using Microsoft.Xna.Framework.Input;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
@@ -19,6 +21,7 @@ namespace JumpKingModifiersMod.Triggers
     public class DebugModifierTrigger : IModifierTrigger, IModEntity
     {
         private IModifier modifier;
+        private JumpStateManualPatch jumpState;
         private bool pressedCooldown;
         private bool isTriggerActive;
 
@@ -26,8 +29,9 @@ namespace JumpKingModifiersMod.Triggers
         /// Ctor for creating a <see cref="DebugModifierTrigger"/>
         /// </summary>
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register itself to</param>
-        /// <param name="modifier">The <see cref="IModifier"/> implementation to toggle</param>
-        public DebugModifierTrigger(ModEntityManager modEntityManager, IModifier modifier)
+        /// <param name="modifier">The <see cref="IModifier"/> to toggle</param>
+        public DebugModifierTrigger(ModEntityManager modEntityManager, 
+            IModifier modifier)
         {
             this.modifier = modifier ?? throw new ArgumentNullException(nameof(modifier));
 
@@ -66,6 +70,7 @@ namespace JumpKingModifiersMod.Triggers
                 return;
             }
 
+            // Toggle the modifier
             var keyboardState = Keyboard.GetState();
             if (keyboardState.IsKeyDown(Keys.L))
             {
