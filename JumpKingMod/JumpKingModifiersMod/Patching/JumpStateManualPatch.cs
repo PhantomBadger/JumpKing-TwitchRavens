@@ -21,6 +21,9 @@ namespace JumpKingModifiersMod.Patching
     /// </summary>
     public class JumpStateManualPatch : IManualPatch, IPlayerJumper
     {
+        public event JumpTriggeredDelegate OnPlayerJumped;
+
+        private static IPlayerStateAccessor playerStateAccessor;
         private static ILogger logger;
 
         // Method/Field wrappers
@@ -30,20 +33,27 @@ namespace JumpKingModifiersMod.Patching
         private static FieldInfo dpadLeftField;
         private static FieldInfo dpadRightField;
 
-        private static ConcurrentQueue<JumpState> requestedJumps;
+        private static ConcurrentQueue<RequestedJumpState> requestedJumps;
         private static int? overrideDPad;
+        private static bool suppressOnJumpEvent;
+        private static JumpStateManualPatch instance;
         private static JumpState prevJumpState;
 
         /// <summary>
         /// Ctor for creating a <see cref="JumpStateManualPatch"/>
         /// </summary>
+        /// <param name="playerStateAccessor">An implementation of <see cref="IPlayerStateAccessor"/> to affect the player's state</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/></param>
-        public JumpStateManualPatch(ILogger logger)
+        public JumpStateManualPatch(IPlayerStateAccessor playerStateAccessor, ILogger logger)
         {
+            JumpStateManualPatch.playerStateAccessor = playerStateAccessor ?? throw new ArgumentNullException(nameof(playerStateAccessor));
             JumpStateManualPatch.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            requestedJumps = new ConcurrentQueue<JumpState>();
+            requestedJumps = new ConcurrentQueue<RequestedJumpState>();
             doJumpMethod = null;
             overrideDPad = null;
+            suppressOnJumpEvent = false;
+
+            instance = this;
         }
 
         /// <inheritdoc/>
@@ -70,16 +80,37 @@ namespace JumpKingModifiersMod.Patching
         /// </summary>
         public static bool MyRunPrefixPatchMethod(object __instance, TickData p_data)
         {
-            if (requestedJumps.TryDequeue(out JumpState requestedJump))
+            if (requestedJumps.TryDequeue(out RequestedJumpState requestedJump))
             {
-                // Set the dpad override
-                overrideDPad = requestedJump.XValue;
+                try
+                {
+                    // Set the dpad override
+                    int currentNumPadState = GetXState(__instance);
+                    if (requestedJump.OverrideXValueWithUserInput && currentNumPadState != 0)
+                    {
+                        overrideDPad = GetXState(__instance);
+                    }
+                    else
+                    {
+                        overrideDPad = requestedJump.XValue;
+                    }
+                    if (overrideDPad.HasValue && requestedJump.OverrideDirectionToOppositeX)
+                    {
+                        playerStateAccessor.SetDirectionOverride(isActive: true, -overrideDPad.Value);
+                    }
+                    suppressOnJumpEvent = true;
 
-                logger.Information($"Fake jumping now!");
-                doJumpMethod?.Invoke(__instance, new object[1] { requestedJump.Intensity });
+                    logger.Information($"Fake jumping now!");
 
-                // Unset the dpad override
-                overrideDPad = null;
+                    doJumpMethod?.Invoke(__instance, new object[1] { requestedJump.Intensity });
+                }
+                finally
+                {
+                    // Unset the dpad override
+                    overrideDPad = null;
+                    suppressOnJumpEvent = false;
+                    playerStateAccessor.SetDirectionOverride(isActive: false, 0);
+                }
                 return false;
             }
             return true;
@@ -89,6 +120,20 @@ namespace JumpKingModifiersMod.Patching
         /// Called before 'JumpKing.Player.JumpState:DoJump' and records the state of any jumps made
         /// </summary>
         public static void DoJumpPrefixPatchMethod(object __instance, float p_intensity)
+        {
+            int num = GetXState(__instance);
+            prevJumpState = new JumpState(p_intensity, num);
+            if (!suppressOnJumpEvent)
+            {
+                instance.OnPlayerJumped?.Invoke(prevJumpState);
+            }
+            logger.Information($"Logging jump state of '{p_intensity}' and '{num}'");
+        }
+
+        /// <summary>
+        /// Gets the X state of the player input using a provided JumpState instance
+        /// </summary>
+        private static int GetXState(object __instance)
         {
             object input = getInputMethod.Invoke(__instance, null);
             object state = getStateMethod.Invoke(input, null);
@@ -111,9 +156,7 @@ namespace JumpKingModifiersMod.Patching
             {
                 num--;
             }
-
-            prevJumpState = new JumpState(p_intensity, num);
-            logger.Information($"Logging jump state of '{p_intensity}' and '{num}'");
+            return num;
         }
 
         /// <summary>
@@ -133,7 +176,7 @@ namespace JumpKingModifiersMod.Patching
         /// An implementation of <see cref="IPlayerJumper.RequestJump(JumpState)"/> which queues up a jump to be performed
         /// </summary>
         /// <param name="requestedJump">The <see cref="JumpState"/> to perform</param>
-        public void RequestJump(JumpState requestedJump)
+        public void RequestJump(RequestedJumpState requestedJump)
         {
             logger.Information($"Queueing up a fake jump!");
             JumpStateManualPatch.requestedJumps.Enqueue(requestedJump);

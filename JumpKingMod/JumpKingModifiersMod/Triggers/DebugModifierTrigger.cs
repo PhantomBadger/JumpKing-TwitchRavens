@@ -21,7 +21,6 @@ namespace JumpKingModifiersMod.Triggers
     public class DebugModifierTrigger : IModifierTrigger, IModEntity
     {
         private IModifier modifier;
-        private JumpStateManualPatch jumpState;
         private bool pressedCooldown;
         private bool isTriggerActive;
 

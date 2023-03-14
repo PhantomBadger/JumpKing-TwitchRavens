@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,11 +18,23 @@ namespace JumpKingModifiersMod.Patching
         public bool IsOnGround { get; private set; }
 
         /// <summary>
+        /// The velocity of the player at this point
+        /// </summary>
+        public Vector2 Velocity { get; private set; }
+
+        /// <summary>
+        /// Whether the player is in a knocked state
+        /// </summary>
+        public bool Knocked { get; private set; }
+
+        /// <summary>
         /// Ctor for creating a <see cref="PlayerState"/>
         /// </summary>
-        public PlayerState(bool isOnGround)
+        public PlayerState(bool isOnGround, Vector2 velocity, bool knocked)
         {
             IsOnGround = isOnGround;
+            Velocity = velocity;
+            Knocked = knocked;
         }
     }
 }
