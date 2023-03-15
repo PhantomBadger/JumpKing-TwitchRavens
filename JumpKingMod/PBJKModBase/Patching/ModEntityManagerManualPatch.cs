@@ -16,7 +16,6 @@ namespace PBJKModBase.Patching
     public class ModEntityManagerManualPatch : IManualPatch
     {
         private static ModEntityManager modEntityManager;
-        private static bool isSetup = false;
 
         public ModEntityManagerManualPatch(ModEntityManager modEntityManager)
         {
@@ -25,12 +24,6 @@ namespace PBJKModBase.Patching
 
         public void SetUpManualPatch(Harmony harmony)
         {
-            // TODO: Actually solve this instead of this jank-ness
-            if (isSetup)
-            {
-                return;
-            }
-            isSetup = true;
             var entityManagerDrawMethod = AccessTools.Method("EntityComponent.EntityManager:Draw");
             var modEntityDrawMethod = this.GetType().GetMethod("DrawWrapper");
 
@@ -43,7 +36,6 @@ namespace PBJKModBase.Patching
             harmony.Patch(entityManagerDrawMethod, postfix: new HarmonyMethod(modEntityDrawMethod));
             harmony.Patch(entityManagerUpdateMethod, postfix: new HarmonyMethod(modEntityUpdateMethod));
             harmony.Patch(jumpKingGameDrawMethod, postfix: new HarmonyMethod(modEntityForegroundDrawMethod));
-
         }
 
         public static void DrawWrapper()

@@ -39,10 +39,6 @@ namespace JumpKingModifiersMod
                 var playerValues = new PlayerValuesManualPatch(Logger);
                 playerValues.SetUpManualPatch(harmony);
 
-                // Make our Mod Entity Manager and patch it
-                var modEntityManagerPatch = new ModEntityManagerManualPatch(ModEntityManager.Instance);
-                modEntityManagerPatch.SetUpManualPatch(harmony);
-
                 // Set up player state patching
                 var playerStatePatch = new PlayerStateObserverManualPatch(Logger);
                 playerStatePatch.SetUpManualPatch(harmony);

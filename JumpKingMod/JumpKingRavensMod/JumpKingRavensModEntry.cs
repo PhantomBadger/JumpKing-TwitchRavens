@@ -56,10 +56,6 @@ namespace JumpKingRavensMod
                 var gameStateObserver = new GameStateObserverManualPatch(Logger);
                 gameStateObserver.SetUpManualPatch(harmony);
 
-                // Make our Mod Entity Manager and patch it
-                IManualPatch modEntityManagerPatch = new ModEntityManagerManualPatch(ModEntityManager.Instance);
-                modEntityManagerPatch.SetUpManualPatch(harmony);
-
                 // Twitch Chat Client
                 var twitchClientFactory = new TwitchClientFactory(userSettings, Logger);
 

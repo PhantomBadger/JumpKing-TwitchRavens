@@ -25,10 +25,15 @@ namespace JumpKingModLoader
             string basePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
             // Load and initialise the mod base
+            // This lets us set up a bunch of foundational logic and patching that other mods will use
             string pbjkBaseAssemblyPath = Path.Combine(basePath, "PBJKModBase.dll");
-            // TODO: Load and call init, move setup logic for statics to that init
+            Assembly pbjkBaseAssembly = Assembly.LoadFrom(pbjkBaseAssemblyPath);
+            LoadReferencedAssemblies(basePath, pbjkBaseAssembly.GetReferencedAssemblies(), loadLog);
+            Type pbjkBaseAssemblyEntryType = pbjkBaseAssembly?.GetType("PBJKModBase.PBJKModBaseEntry");
+            MethodInfo pbjkBaseAssemblyEntryMethod = pbjkBaseAssemblyEntryType?.GetMethod("Init");
+            pbjkBaseAssemblyEntryMethod?.Invoke(null, null);
 
-            // Gather all mod assemblies
+            // Gather all the other possible mod assemblies
             List<ModAssembly> modAssemblies = GetModAssemblies(basePath, loadLog);
 
             // Load all the dependencies of each Mod assembly, then invoke it's entry method
@@ -39,38 +44,7 @@ namespace JumpKingModLoader
                 loadLog.Add($"Attempting to load all referenced assemblies!");
 
                 AssemblyName[] referencedAssemblies = modAssembly.Assembly.GetReferencedAssemblies();
-                for (int j = 0; j < referencedAssemblies.Length; j++)
-                {
-                    string assemblyName = referencedAssemblies[j].Name;
-                    string assemblyPath = Path.Combine(basePath, $"{assemblyName}.dll");
-                    loadLog.Add($"\tAttempting to load {assemblyPath}");
-                    if (File.Exists(assemblyPath))
-                    {
-                        try
-                        {
-                            // attempt to load it ourselves now
-                            var loadedAssembly = Assembly.LoadFrom(assemblyPath);
-                            if (loadedAssembly != null)
-                            {
-                                loadLog.Add($"\t\tSuccessfully loaded assembly at '{assemblyPath}'");
-                            }
-                            else
-                            {
-                                loadLog.Add($"\t\tFailed to load the assembly at '{assemblyPath}' for an unknown reason");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            // NOTE: The Harmony0.dll currently throws an exception here due to CAS stuff
-                            loadLog.Add($"\t\tFailed to load the assembly at '{assemblyPath}': {e.ToString()}");
-                        }
-                    }
-                    else
-                    {
-                        // We trust the clr to find it later itself
-                        loadLog.Add($"\t\tAssembly '{assemblyPath}' does not exist at the mod location, trusting the CLR to find it later");
-                    }
-                }
+                LoadReferencedAssemblies(basePath, referencedAssemblies, loadLog);
 
                 // call the entry point for each mod
                 MethodInfo methodInfo = modAssembly.EntryType?.GetMethod(modAssembly.ModAttribute.EntryMethod);
@@ -119,6 +93,45 @@ namespace JumpKingModLoader
             }
 
             return assembliesToLoad;
+        }
+
+        /// <summary>
+        /// Load all the provided assemblies
+        /// </summary>
+        private static void LoadReferencedAssemblies(string basePath, AssemblyName[] referencedAssemblies, List<string> loadLog)
+        {
+            for (int j = 0; j < referencedAssemblies.Length; j++)
+            {
+                string assemblyName = referencedAssemblies[j].Name;
+                string assemblyPath = Path.Combine(basePath, $"{assemblyName}.dll");
+                loadLog.Add($"\tAttempting to load {assemblyPath}");
+                if (File.Exists(assemblyPath))
+                {
+                    try
+                    {
+                        // attempt to load it ourselves now
+                        var loadedAssembly = Assembly.LoadFrom(assemblyPath);
+                        if (loadedAssembly != null)
+                        {
+                            loadLog.Add($"\t\tSuccessfully loaded assembly at '{assemblyPath}'");
+                        }
+                        else
+                        {
+                            loadLog.Add($"\t\tFailed to load the assembly at '{assemblyPath}' for an unknown reason");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // NOTE: The Harmony0.dll currently throws an exception here due to CAS stuff
+                        loadLog.Add($"\t\tFailed to load the assembly at '{assemblyPath}': {e.ToString()}");
+                    }
+                }
+                else
+                {
+                    // We trust the clr to find it later itself
+                    loadLog.Add($"\t\tAssembly '{assemblyPath}' does not exist at the mod location, trusting the CLR to find it later");
+                }
+            }
         }
     }
 }

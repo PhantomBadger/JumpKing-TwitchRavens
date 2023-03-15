@@ -52,7 +52,14 @@
     <Compile Include="Entities\ModEntityManager.cs" />
     <Compile Include="JumpKingModAttribute.cs" />
     <Compile Include="Patching\ModEntityManagerManualPatch.cs" />
+    <Compile Include="PBJKModBaseEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Logging\Logging.csproj">
+      <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
