@@ -22,6 +22,7 @@ namespace JumpKingModifiersMod.Patching
         private static FieldInfo isOnGroundField;
         private static FieldInfo velocityField;
         private static FieldInfo knockedField;
+        private static FieldInfo positionField;
         private static object bodyCompInstance;
         private static bool knockedOverrideIsActive;
         private static bool knockedOverrideValue;
@@ -73,10 +74,15 @@ namespace JumpKingModifiersMod.Patching
             {
                 knockedField = AccessTools.Field(bodyCompInstance.GetType(), "_knocked");
             }
+            if (positionField == null)
+            {
+                positionField = AccessTools.Field(bodyCompInstance.GetType(), "position");
+            }
             bool isOnGroundValue = (bool)isOnGroundField.GetValue(bodyCompInstance);
             Vector2 velocity = (Vector2)velocityField.GetValue(bodyCompInstance);
+            Vector2 position = (Vector2)positionField.GetValue(bodyCompInstance);
             bool knocked = (bool)knockedField.GetValue(bodyCompInstance);
-            PlayerState state = new PlayerState(isOnGroundValue, velocity, knocked);
+            PlayerState state = new PlayerState(isOnGroundValue, velocity, position, knocked);
 
             if (knockedOverrideIsActive)
             {
