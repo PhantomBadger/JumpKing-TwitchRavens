@@ -1,13 +1,8 @@
-﻿using Logging.API;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace JumpKingRavensMod
+namespace PBJKModBase
 {
-    public abstract class JumpKingRavensModUtilities
+    public abstract class JumpKingModUtilities
     {
         /// <summary>
         /// Attempts to perform multiple actions in a row, returning on the first successful one.

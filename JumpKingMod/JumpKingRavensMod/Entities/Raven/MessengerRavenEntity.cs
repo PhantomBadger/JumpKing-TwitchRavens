@@ -109,11 +109,11 @@ namespace JumpKingRavensMod.Entities.Raven
                 nameYOffset = (ravenNameEntity.Size.Y / 2) + HardcodedNameYOffset;
             }
 
-            killStunSprite = Sprite.CreateSpriteWithCenter(ModContentManager.RavenStunnedTexture, 
-                new Rectangle(0, 0, ModContentManager.RavenStunnedTexture.Width, ModContentManager.RavenStunnedTexture.Height),
+            killStunSprite = Sprite.CreateSpriteWithCenter(RavensModContentManager.RavenStunnedTexture, 
+                new Rectangle(0, 0, RavensModContentManager.RavenStunnedTexture.Width, RavensModContentManager.RavenStunnedTexture.Height),
                 new Vector2(0.5f, 0.5f));
-            killFallSprite = Sprite.CreateSpriteWithCenter(ModContentManager.RavenFallingTexture,
-                new Rectangle(0, 0, ModContentManager.RavenFallingTexture.Width, ModContentManager.RavenFallingTexture.Height),
+            killFallSprite = Sprite.CreateSpriteWithCenter(RavensModContentManager.RavenFallingTexture,
+                new Rectangle(0, 0, RavensModContentManager.RavenFallingTexture.Width, RavensModContentManager.RavenFallingTexture.Height),
                 new Vector2(0.5f, 0.5f));
         }
 

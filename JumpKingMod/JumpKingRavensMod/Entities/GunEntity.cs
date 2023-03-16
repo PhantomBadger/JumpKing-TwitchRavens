@@ -66,8 +66,8 @@ namespace JumpKingRavensMod.Entities
             toggleGunKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunToggleKeyKey, Keys.F8);
             shootCooldownCounter = CooldownMaxInSeconds;
 
-            scopeSprite = Sprite.CreateSpriteWithCenter(ModContentManager.ScopeTexture,
-                new Rectangle(0, 0, ModContentManager.ScopeTexture.Width, ModContentManager.ScopeTexture.Height),
+            scopeSprite = Sprite.CreateSpriteWithCenter(RavensModContentManager.ScopeTexture,
+                new Rectangle(0, 0, RavensModContentManager.ScopeTexture.Width, RavensModContentManager.ScopeTexture.Height),
                 new Vector2(0.5f, 0.5f));
             scopeSprite.center = Vector2.One / 2f;
 

@@ -50,7 +50,7 @@ namespace JumpKingRavensMod
 
                 // Load Settings
                 var userSettings = new UserSettings(JumpKingModSettingsContext.SettingsFileName, JumpKingModSettingsContext.GetDefaultSettings(), Logger);
-                ModContentManager.LoadContent(Logger);
+                RavensModContentManager.LoadContent(Logger);
 
                 // Set up observer
                 var gameStateObserver = new GameStateObserverManualPatch(Logger);

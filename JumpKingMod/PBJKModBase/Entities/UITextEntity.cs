@@ -1,22 +1,15 @@
 ﻿using EntityComponent;
-using HarmonyLib;
 using JumpKing;
 using JumpKing.Util;
-using JumpKing.Util.Tags;
-using JumpKingRavensMod.API;
+using PBJKModBase.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PBJKModBase.API;
-using PBJKModBase.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using static Microsoft.Xna.Framework.Graphics.SpriteFont;
 
-namespace JumpKingRavensMod.Entities
+namespace PBJKModBase.Entities
 {
     /// <summary>
     /// An extension of <see cref="Entity"/> which when instantiated

@@ -29,6 +29,8 @@ namespace PBJKModBase
             Logger = ConsoleLogger.Instance;
             try
             {
+                ModContentManager.LoadContent(Logger);
+
                 var harmony = new Harmony("com.phantombadger.pbjkmodbase");
                 harmony.PatchAll();
 

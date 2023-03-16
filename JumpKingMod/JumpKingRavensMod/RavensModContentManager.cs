@@ -1,12 +1,9 @@
 ﻿using HarmonyLib;
 using Logging.API;
 using Microsoft.Xna.Framework.Graphics;
+using PBJKModBase;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using static JumpKing.JKContentManager.RavenSprites;
 
 namespace JumpKingRavensMod
@@ -14,13 +11,8 @@ namespace JumpKingRavensMod
     /// <summary>
     /// A static class which loads the appropriate resources the mod needs
     /// </summary>
-    public static class ModContentManager
+    public static class RavensModContentManager
     {
-        /// <summary>
-        /// An 'Arial-Unicode-MS' font we use for fallbacks
-        /// </summary>
-        public static SpriteFont ArialUnicodeMS;
-
         public static RavenContent Raven;
 
         public static Texture2D ScopeTexture;
@@ -36,10 +28,6 @@ namespace JumpKingRavensMod
         {
             try
             {
-                ArialUnicodeMS = JumpKing.Game1.instance.Content.Load<SpriteFont>("Mods/Resources/arial-unicode-ms");
-                ArialUnicodeMS.DefaultCharacter = '#';
-                logger.Information($"Loaded Arial Unicode MS Fallback Font");
-
                 ScopeTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/scope");
                 logger.Information($"Loaded Scope Texture");
 
@@ -56,7 +44,7 @@ namespace JumpKingRavensMod
 
                 // The RavenContent ctor is internal for base JK but public for JK+, so we need to try both before we 
                 // deem this a failure
-                JumpKingRavensModUtilities.AttemptMultipleActions(
+                JumpKingModUtilities.AttemptMultipleActions(
                     () =>
                     {
                         logger.Error($"Failed to Load Raven Content from any of the known endpoints!");
@@ -95,7 +83,7 @@ namespace JumpKingRavensMod
             }
             catch (Exception e)
             {
-                logger.Error($"Failed to initialise ModContentManager: {e.ToString()}");
+                logger.Error($"Failed to initialise RavensModContentManager: {e.ToString()}");
             }
         }
     }
