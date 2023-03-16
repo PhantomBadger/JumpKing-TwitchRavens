@@ -50,13 +50,21 @@ namespace JumpKingModifiersMod
         /// <returns><c>true</c> if successfully registered, <c>false</c> if not</returns>
         public bool RegisterModifier(IModifier modifier)
         {
-            Type modifierType = modifier.GetType();
-            if (registeredModifiers.ContainsKey(modifierType))
+            if (modifier == null)
             {
                 return false;
             }
 
-            return registeredModifiers.TryAdd(modifierType, modifier);
+            Type modifierType = modifier.GetType();
+            if (registeredModifiers.ContainsKey(modifierType))
+            {
+                logger.Information($"Failed to register '{modifierType.Name}' Modifier as it's already registered!");
+                return false;
+            }
+
+            bool result = registeredModifiers.TryAdd(modifierType, modifier);
+            logger.Information($"Registering the '{modifierType.Name}' Modifier with a result of '{result.ToString()}'!");
+            return result;
         }
 
         /// <summary>
@@ -65,13 +73,21 @@ namespace JumpKingModifiersMod
         /// <returns><c>true</c> if successfully unregistered, <c>false</c> if not</returns>
         public bool UnregisterModifier(IModifier modifier)
         {
-            Type modifierType = modifier.GetType();
-            if (!registeredModifiers.ContainsKey(modifierType))
+            if (modifier == null)
             {
                 return false;
             }
 
-            return registeredModifiers.TryRemove(modifierType, out _);
+            Type modifierType = modifier.GetType();
+            if (!registeredModifiers.ContainsKey(modifierType))
+            {
+                logger.Information($"Failed to unregister '{modifierType.Name}' Modifier as it's already unregistered!");
+                return false;
+            }
+
+            bool result = registeredModifiers.TryRemove(modifierType, out _);
+            logger.Information($"Unregistering the '{modifierType.Name}' Modifier with a result of '{result.ToString()}'!");
+            return result;
         }
 
         /// <summary>
