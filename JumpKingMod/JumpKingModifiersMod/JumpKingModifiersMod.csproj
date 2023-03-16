@@ -60,6 +60,7 @@
     <Compile Include="JumpKingModifiersModEntry.cs" />
     <Compile Include="Modifiers\BouncyFloorModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
+    <Compile Include="ModifierUpdatingEntity.cs" />
     <Compile Include="Patching\States\JumpState.cs" />
     <Compile Include="Patching\JumpStateManualPatch.cs" />
     <Compile Include="Patching\States\PlayerState.cs" />

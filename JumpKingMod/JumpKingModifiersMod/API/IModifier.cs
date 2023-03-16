@@ -28,5 +28,11 @@ namespace JumpKingModifiersMod.API
         /// </summary>
         /// <returns><c>true</c> if enabled, <c>false</c> if disabled</returns>
         bool IsModifierEnabled();
+
+        /// <summary>
+        /// Update the state of the modifier, only called if active.
+        /// Called by the <see cref="ModifierUpdatingEntity"/> as long as it has been registered
+        /// </summary>
+        void Update();
     }
 }

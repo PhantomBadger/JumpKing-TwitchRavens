@@ -47,9 +47,13 @@ namespace JumpKingModifiersMod
                 var jumpStatePatch = new JumpStateManualPatch(playerStatePatch, Logger);
                 jumpStatePatch.SetUpManualPatch(harmony);
 
+                // Make the Modifier Updating Entity
+                var modifierUpdatingEntity = new ModifierUpdatingEntity(ModEntityManager.Instance, Logger);
+
                 // Set up modifiers and trigger
                 var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
-                var bouncyFloorModifier = new BouncyFloorModifier(playerStatePatch, jumpStatePatch, Logger);
+                var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
+
                 var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, bouncyFloorModifier);
                 debugTrigger.EnableTrigger();
             }

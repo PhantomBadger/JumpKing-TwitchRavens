@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using JumpKing.Player;
+using System.Collections.Concurrent;
 
 namespace JumpKingModifiersMod.Modifiers
 {
@@ -16,13 +17,19 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class BouncyFloorModifier : IModifier, IDisposable
     {
+        private readonly ModifierUpdatingEntity modifierUpdatingEntity;
         private readonly IPlayerStateAccessor playerStateAccessor;
         private readonly IPlayerJumper playerJumper;
         private readonly ILogger logger;
 
-        private bool modifierTaskActive;
+        private bool modifierActive;
         private bool playerSplatted;
         private Task currentlyActiveBounceTask;
+
+        private int bounceCounter;
+        private bool isInAir;
+        private PlayerState previousPlayerState;
+        private ConcurrentQueue<JumpState> jumpsToProcess;
 
         private const float BounceJumpModifier = 0.25f;
         private const int MaxNumberOfBounces = 1;
@@ -30,11 +37,13 @@ namespace JumpKingModifiersMod.Modifiers
         /// <summary>
         /// Ctor for creating a <see cref="BouncyFloorModifier"/>
         /// </summary>
+        /// <param name="modifierUpdatingEntity">The <see cref="ModifierUpdatingEntity"/> to register to, which will call out Update method for us</param>
         /// <param name="playerStateAccessor">An implementation of <see cref="IPlayerStateAccessor"/> for interacting with the player state</param>
         /// <param name="playerJumper">An implementation of <see cref="IPlayerJumper"/> for interacting with player jumps</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to log to</param>
-        public BouncyFloorModifier(IPlayerStateAccessor playerStateAccessor, IPlayerJumper playerJumper, ILogger logger)
+        public BouncyFloorModifier(ModifierUpdatingEntity modifierUpdatingEntity, IPlayerStateAccessor playerStateAccessor, IPlayerJumper playerJumper, ILogger logger)
         {
+            this.modifierUpdatingEntity = modifierUpdatingEntity ?? throw new ArgumentNullException(nameof(modifierUpdatingEntity));
             this.playerStateAccessor = playerStateAccessor ?? throw new ArgumentNullException(nameof(playerStateAccessor));
             this.playerJumper = playerJumper ?? throw new ArgumentNullException(nameof(playerJumper));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -43,6 +52,13 @@ namespace JumpKingModifiersMod.Modifiers
             PlayerEntity.OnSplatCall =
                 (PlayerEntity.OnSplat)Delegate.Combine(PlayerEntity.OnSplatCall, 
                 new PlayerEntity.OnSplat(this.OnSplat));
+
+            bounceCounter = MaxNumberOfBounces;
+            isInAir = false;
+            previousPlayerState = null;
+            jumpsToProcess = new ConcurrentQueue<JumpState>();
+
+            modifierUpdatingEntity.RegisterModifier(this);
         }
 
         /// <summary>
@@ -51,6 +67,8 @@ namespace JumpKingModifiersMod.Modifiers
         public void Dispose()
         {
             playerJumper.OnPlayerJumped -= OnPlayerJumped;
+
+            modifierUpdatingEntity.UnregisterModifier(this);
         }
 
         /// <summary>
@@ -64,44 +82,48 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public bool IsModifierEnabled()
         {
-            return modifierTaskActive;
+            return modifierActive;
         }
 
-        /// <summary>
-        /// Disables the Bouncy Floor modifier
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public bool DisableModifier()
         {
-            if (!modifierTaskActive)
+            if (!modifierActive)
             {
                 logger.Warning($"Failed to Disable Bouncy Floor Modifier");
                 return false;
             }
             logger.Information($"Disable Bouncy Floor Modifier");
-            modifierTaskActive = false;
+            modifierActive = false;
+
+            // Ensure we're properly cleaning up
+            currentlyActiveBounceTask = null;
+            playerStateAccessor.SetKnockedStateOverride(isActive: false, newState: false);
+            playerSplatted = false;
+
             return true;
         }
 
-        /// <summary>
-        /// Enables the Bouncy Floor modifier
-        /// </summary>
+        /// <inheritdoc/>
         public bool EnableModifier()
         {
-            if (modifierTaskActive)
+            if (modifierActive)
             {
                 logger.Warning($"Failed to Enable Walk Speed Modifier");
                 return false;
             }
 
             logger.Information($"Enable Bouncy Floor Modifier");
-            modifierTaskActive = true;
+            modifierActive = true;
             return true;
         }
 
+        /// <summary>
+        /// Called when the player jumps
+        /// </summary>
         private void OnPlayerJumped(JumpState jumpState)
         {
-            if (!modifierTaskActive)
+            if (!modifierActive)
             {
                 // Modifier isnt yet active
                 playerSplatted = false;
@@ -114,104 +136,90 @@ namespace JumpKingModifiersMod.Modifiers
                 return;
             }
 
-            // Kick off a task to keep track of the player state and update as appropriate
-            currentlyActiveBounceTask = Task.Run(() =>
+            bounceCounter = MaxNumberOfBounces;
+            isInAir = false;
+            previousPlayerState = null;
+
+            jumpsToProcess.Enqueue(jumpState);
+        }
+
+        /// <inheritdoc/>
+        public void Update()
+        {
+            try
             {
-                try
+                if (playerSplatted)
                 {
-                    // Keep track of the 'global states'
-                    int bounceCounter = MaxNumberOfBounces;
-                    bool isInAir = false;
-                    PlayerState previousPlayerState = null;
+                    playerSplatted = false;
 
-                    // Continue until we shouldnt be active anymore or something exits
-                    while (modifierTaskActive)
+                    // No bounce needed to be processed, consume any lingering jumps
+                    while (jumpsToProcess.TryDequeue(out _)) { }
+                    return;
+                }
+
+                bool justLanded = false;
+
+                // Check to see if the player just landed
+                PlayerState playerState = playerStateAccessor.GetPlayerState();
+                if (playerState.IsOnGround)
+                {
+                    if (isInAir)
                     {
-                        if (playerSplatted)
-                        {
-                            playerSplatted = false;
-
-                            // No longer bouncing
-                            return;
-                        }
-
-                        bool justLanded = false;
-
-                        // Check to see if the player just landed
-                        PlayerState playerState = playerStateAccessor.GetPlayerState();
-                        if (playerState.IsOnGround)
-                        {
-                            if (isInAir)
-                            {
-                                isInAir = false;
-                                justLanded = true;
-                            }
-                        }
-                        else
-                        {
-                            isInAir = true;
-                        }
-
-                        // If we just landed, trigger a jump
-                        if (justLanded && previousPlayerState != null)
-                        {
-                            JumpState previousJumpState = playerJumper.GetPreviousJumpState();
-                            if (previousJumpState != null)
-                            {
-                                // Update the intensity by our modifier
-                                float newIntensity = previousJumpState.Intensity * BounceJumpModifier;
-
-                                // Get a default direction based on the previous state's velocity
-                                int previousVelocityX = 0;
-                                if (previousPlayerState.Velocity.X > 0)
-                                {
-                                    previousVelocityX = 1;
-                                }
-                                else if (previousPlayerState.Velocity.X < 0)
-                                {
-                                    previousVelocityX = -1;
-                                }
-
-                                // If we still have some bounces left, request it
-                                if (bounceCounter-- > 0)
-                                {
-                                    playerStateAccessor.SetKnockedStateOverride(isActive: true, newState: true);
-
-                                    // 'Override X Value' will mean that if the user is holding a direction
-                                    // that X will be used instead of the one we provide, this feels a bit better for a user
-                                    // and gives them some control
-                                    // 'Override Direction Opposite' will flip the player's sprite to be opposite to their
-                                    // X value, this lets us better simulate a knocked state
-                                    RequestedJumpState newJumpState = new RequestedJumpState(
-                                        previousJumpState.Intensity * BounceJumpModifier,
-                                        previousVelocityX,
-                                        overrideXValue: true,
-                                        overrideDirectionOpposite: true);
-                                    playerJumper.RequestJump(newJumpState);
-                                }
-                                else
-                                {
-                                    // Done bouncing, exit the loop
-                                    return;
-                                }
-                            }
-                        }
-
-                        previousPlayerState = playerState;
+                        playerStateAccessor.SetKnockedStateOverride(isActive: false, newState: false);
+                        isInAir = false;
+                        justLanded = true;
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    logger.Error($"Encountered exception during {this.GetType().Name} Modifier Task: {e.ToString()}");
+                    isInAir = true;
                 }
-                finally
+
+                // If we just landed, trigger a jump
+                if (justLanded && previousPlayerState != null &&
+                    jumpsToProcess.TryDequeue(out JumpState previousJumpState))
                 {
-                    // Ensure we're properly cleaning up
-                    currentlyActiveBounceTask = null;
-                    playerStateAccessor.SetKnockedStateOverride(isActive: false, newState: false);
-                    playerSplatted = false;
+                    // Update the intensity by our modifier
+                    float newIntensity = previousJumpState.Intensity * BounceJumpModifier;
+
+                    // Get a default direction based on the previous state's velocity
+                    int previousVelocityX = 0;
+                    if (previousPlayerState.Velocity.X > 0)
+                    {
+                        previousVelocityX = 1;
+                    }
+                    else if (previousPlayerState.Velocity.X < 0)
+                    {
+                        previousVelocityX = -1;
+                    }
+
+                    playerStateAccessor.SetKnockedStateOverride(isActive: true, newState: true);
+
+                    // 'Override X Value' will mean that if the user is holding a direction
+                    // that X will be used instead of the one we provide, this feels a bit better for a user
+                    // and gives them some control
+                    // 'Override Direction Opposite' will flip the player's sprite to be opposite to their
+                    // X value, this lets us better simulate a knocked state
+                    RequestedJumpState newJumpState = new RequestedJumpState(
+                        previousJumpState.Intensity * BounceJumpModifier,
+                        previousVelocityX,
+                        overrideXValue: true,
+                        overrideDirectionOpposite: true);
+                    playerJumper.RequestJump(newJumpState);
+
+                    // If we have bounces remaining, queue up another jump to respond to
+                    if (--bounceCounter > 0)
+                    {
+                        jumpsToProcess.Enqueue(newJumpState);
+                    }
                 }
-            });
+
+                previousPlayerState = playerState;
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Encountered exception during {this.GetType().Name} Modifier Task: {e.ToString()}");
+            }
         }
     }
 }

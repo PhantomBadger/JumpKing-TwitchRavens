@@ -60,5 +60,13 @@ namespace JumpKingModifiersMod.Modifiers
             walkSpeedModifierAccessor.SetWalkSpeedModifer(1f);
             return true;
         }
+
+        /// <summary>
+        /// Called each frame by the <see cref="ModifierUpdatingEntity"/>
+        /// </summary>
+        public void Update()
+        {
+            // do nothing
+        }
     }
 }
