@@ -72,7 +72,7 @@ namespace JumpKingRavensMod.Patching
                     if (freeFlying)
                     {
                         // Make a UI Object to display our position
-                        uiEntity = new UITextEntity(modEntityManager, new Vector2(0, 0), "", Color.White, UITextEntityAnchor.Center);
+                        uiEntity = new UITextEntity(modEntityManager, new Vector2(0, 0), "", Color.White, UIEntityAnchor.Center);
                     }
                     else
                     {

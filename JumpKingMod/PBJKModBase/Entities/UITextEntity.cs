@@ -53,7 +53,7 @@ namespace PBJKModBase.Entities
                 }
             }
         }
-        public UITextEntityAnchor AnchorPoint { get; set; }
+        public UIEntityAnchor AnchorPoint { get; set; }
         public Vector2 Size
         {
             get
@@ -79,8 +79,9 @@ namespace PBJKModBase.Entities
         /// <param name="textValue">The value to display as text</param>
         /// <param name="textColor">The <see cref="Color"/> to draw the text in</param>
         /// <param name="anchorPoint">An enum of possible anchor points of where the position is relative to the text</param>
-        public UITextEntity(ModEntityManager modEntityManager, Vector2 screenSpacePosition, string textValue, Color textColor, UITextEntityAnchor anchorPoint)
-            : this(modEntityManager, screenSpacePosition, textValue, textColor, anchorPoint, JKContentManager.Font.MenuFont)
+        /// <param name="zOrder">The z order to display the entity in the foreground queue. Defaults to zero. Higher number is closer to the screen.</param>
+        public UITextEntity(ModEntityManager modEntityManager, Vector2 screenSpacePosition, string textValue, Color textColor, UIEntityAnchor anchorPoint, int zOrder = 0)
+            : this(modEntityManager, screenSpacePosition, textValue, textColor, anchorPoint, JKContentManager.Font.MenuFont, zOrder)
         {
         }
 
@@ -93,7 +94,8 @@ namespace PBJKModBase.Entities
         /// <param name="textColor">The <see cref="Color"/> to draw the text in</param>
         /// <param name="textFont">The <see cref="SpriteFont"/> to use for drawing the text</param>
         /// <param name="anchorPoint">An enum of possible anchor points of where the position is relative to the text</param>
-        public UITextEntity(ModEntityManager modEntityManager, Vector2 screenSpacePosition, string textValue, Color textColor, UITextEntityAnchor anchorPoint, SpriteFont textFont)
+        /// <param name="zOrder">The z order to display the entity in the foreground queue. Defaults to zero. Higher number is closer to the screen.</param>
+        public UITextEntity(ModEntityManager modEntityManager, Vector2 screenSpacePosition, string textValue, Color textColor, UIEntityAnchor anchorPoint, SpriteFont textFont, int zOrder = 0)
         {
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
 
@@ -103,7 +105,7 @@ namespace PBJKModBase.Entities
             AnchorPoint = anchorPoint;
             TextFont = textFont ?? throw new ArgumentNullException(nameof(textFont));
 
-            modEntityManager.AddForegroundEntity(this);
+            modEntityManager.AddForegroundEntity(this, zOrder);
         }
 
         /// <summary>
@@ -123,15 +125,15 @@ namespace PBJKModBase.Entities
             switch (AnchorPoint)
             {
                 default:
-                case UITextEntityAnchor.Center:
+                case UIEntityAnchor.Center:
                     return new Vector2(0.5f, -0.5f);
-                case UITextEntityAnchor.BottomLeft:
+                case UIEntityAnchor.BottomLeft:
                     return new Vector2(0, 0);
-                case UITextEntityAnchor.BottomRight:
+                case UIEntityAnchor.BottomRight:
                     return new Vector2(1, 0);
-                case UITextEntityAnchor.TopLeft:
+                case UIEntityAnchor.TopLeft:
                     return new Vector2(0, -1);
-                case UITextEntityAnchor.TopRight:
+                case UIEntityAnchor.TopRight:
                     return new Vector2(1, -1);
             }
         }
@@ -144,7 +146,7 @@ namespace PBJKModBase.Entities
         {
             Vector2 textSize = Size;
             Vector2 modifiedPosition = ScreenSpacePosition - new Vector2(0, textSize.Y);
-            if (AnchorPoint == UITextEntityAnchor.Center)
+            if (AnchorPoint == UIEntityAnchor.Center)
             {
                 modifiedPosition.Y -= textSize.Y / 2f;
             }

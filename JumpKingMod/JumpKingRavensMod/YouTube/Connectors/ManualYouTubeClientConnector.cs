@@ -59,7 +59,7 @@ namespace JumpKingRavensMod.YouTube
             // Prime the UI Text
             connectKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
             connectionStatusText = new UITextEntity(modEntityManager, new Vector2(480, 0), string.Empty, Color.Red,
-                            UITextEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall);
+                            UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall);
 
             // Set our initial state
             ChangeState(ManualConnectorStates.Inactive);

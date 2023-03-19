@@ -36,6 +36,10 @@ namespace JumpKingModifiersMod
                 Logger.Information($"Jump King Modifiers Pre-Release!");
                 Logger.Information($"====================================");
 
+                // Load content
+                ModifiersModContentManager.LoadContent(Logger);
+
+                // Set up player values patching
                 var playerValues = new PlayerValuesManualPatch(Logger);
                 playerValues.SetUpManualPatch(harmony);
 

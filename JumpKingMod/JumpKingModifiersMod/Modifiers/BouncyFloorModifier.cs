@@ -145,7 +145,7 @@ namespace JumpKingModifiersMod.Modifiers
         }
 
         /// <inheritdoc/>
-        public void Update()
+        public void Update(float p_delta)
         {
             try
             {

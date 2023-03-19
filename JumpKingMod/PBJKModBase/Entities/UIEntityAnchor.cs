@@ -1,9 +1,9 @@
 ﻿namespace PBJKModBase.Entities
 {
     /// <summary>
-    /// An enum representing possible anchor states for UI Text
+    /// An enum representing possible anchor states for UI Objects
     /// </summary>
-    public enum UITextEntityAnchor
+    public enum UIEntityAnchor
     {
         Center,
         BottomLeft,

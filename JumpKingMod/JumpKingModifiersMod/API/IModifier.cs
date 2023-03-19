@@ -33,6 +33,6 @@ namespace JumpKingModifiersMod.API
         /// Update the state of the modifier, only called if active.
         /// Called by the <see cref="ModifierUpdatingEntity"/> as long as it has been registered
         /// </summary>
-        void Update();
+        void Update(float p_delta);
     }
 }

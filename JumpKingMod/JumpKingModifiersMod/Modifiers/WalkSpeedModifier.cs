@@ -64,7 +64,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// <summary>
         /// Called each frame by the <see cref="ModifierUpdatingEntity"/>
         /// </summary>
-        public void Update()
+        public void Update(float p_delta)
         {
             // do nothing
         }

@@ -100,7 +100,7 @@ namespace JumpKingModifiersMod
                 IModifier modifier = kvp.Value;
                 if (modifier.IsModifierEnabled())
                 {
-                    modifier.Update();
+                    modifier.Update(p_delta);
                 }
             }
         }

@@ -16,7 +16,7 @@ namespace PBJKModBase.Entities
     public class ModEntityManager
     {
         private readonly ConcurrentDictionary<IModEntity, byte> entities;
-        private readonly ConcurrentDictionary<IForegroundModEntity, byte> foregroundEntities;
+        private readonly ConcurrentDictionary<IForegroundModEntity, int> foregroundEntities;
 
         /// <summary>
         /// Singleton for accessing the ModEntityManager
@@ -41,7 +41,7 @@ namespace PBJKModBase.Entities
         public ModEntityManager()
         {
             entities = new ConcurrentDictionary<IModEntity, byte>();
-            foregroundEntities = new ConcurrentDictionary<IForegroundModEntity, byte>();
+            foregroundEntities = new ConcurrentDictionary<IForegroundModEntity, int>();
         }
 
         /// <summary>
@@ -55,9 +55,9 @@ namespace PBJKModBase.Entities
         /// <summary>
         /// Registers a <see cref="IForegroundModEntity"/> entity with this entity manager
         /// </summary>
-        public bool AddForegroundEntity(IForegroundModEntity foregroundEntity)
+        public bool AddForegroundEntity(IForegroundModEntity foregroundEntity, int zOrder = 0)
         {
-            return foregroundEntities.TryAdd(foregroundEntity, 0);
+            return foregroundEntities.TryAdd(foregroundEntity, zOrder);
         }
 
         /// <summary>
@@ -93,7 +93,9 @@ namespace PBJKModBase.Entities
         /// </summary>
         public void DrawForeground()
         {
-            var enumerator = foregroundEntities.GetEnumerator();
+            var copyDictionary = new Dictionary<IForegroundModEntity, int>(foregroundEntities);
+            var sortedDictionary = copyDictionary.OrderBy(x => x.Value);
+            var enumerator = sortedDictionary.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 enumerator.Current.Key?.ForegroundDraw();

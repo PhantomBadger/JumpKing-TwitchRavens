@@ -128,7 +128,7 @@ namespace JumpKingRavensMod.Entities
                             new Vector2(450, 20), 
                             "0", 
                             Color.White, 
-                            UITextEntityAnchor.Center);
+                            UIEntityAnchor.Center);
                     }
                     else
                     {
