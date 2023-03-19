@@ -283,7 +283,7 @@ namespace JumpKingModifiersMod.Modifiers
 
                 youDiedSubtextEntity = new UITextEntity(modEntityManager,
                     new Vector2(240, 245),
-                    "That's gotta be embarassing...",
+                    "That's gotta be embarrassing...",
                     Color.White,
                     UIEntityAnchor.Center,
                     zOrder: 2);
