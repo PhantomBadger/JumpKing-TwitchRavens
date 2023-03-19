@@ -52,9 +52,8 @@ namespace JumpKingRavensMod
                 var userSettings = new UserSettings(JumpKingModSettingsContext.SettingsFileName, JumpKingModSettingsContext.GetDefaultSettings(), Logger);
                 RavensModContentManager.LoadContent(Logger);
 
-                // Set up observer
-                var gameStateObserver = new GameStateObserverManualPatch(Logger);
-                gameStateObserver.SetUpManualPatch(harmony);
+                // Get the observer
+                var gameStateObserver = GameStateObserverManualPatch.Instance;
 
                 // Twitch Chat Client
                 var twitchClientFactory = new TwitchClientFactory(userSettings, Logger);

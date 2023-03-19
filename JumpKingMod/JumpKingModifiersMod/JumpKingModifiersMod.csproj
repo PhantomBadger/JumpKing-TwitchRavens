@@ -55,10 +55,12 @@
     <Compile Include="API\IModifier.cs" />
     <Compile Include="API\IModifierTrigger.cs" />
     <Compile Include="API\IPlayerJumper.cs" />
-    <Compile Include="API\IPlayerStateAccessor.cs" />
+    <Compile Include="API\IPlayerStateObserver.cs" />
     <Compile Include="API\IWalkSpeedModifier.cs" />
     <Compile Include="JumpKingModifiersModEntry.cs" />
+    <Compile Include="Modifiers\BombCountdownModifier.cs" />
     <Compile Include="Modifiers\BouncyFloorModifier.cs" />
+    <Compile Include="Modifiers\FallDamageModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />
     <Compile Include="Patching\States\JumpState.cs" />

@@ -18,7 +18,7 @@ namespace JumpKingModifiersMod.Modifiers
     public class BouncyFloorModifier : IModifier, IDisposable
     {
         private readonly ModifierUpdatingEntity modifierUpdatingEntity;
-        private readonly IPlayerStateAccessor playerStateAccessor;
+        private readonly IPlayerStateObserver playerStateAccessor;
         private readonly IPlayerJumper playerJumper;
         private readonly ILogger logger;
 
@@ -38,10 +38,10 @@ namespace JumpKingModifiersMod.Modifiers
         /// Ctor for creating a <see cref="BouncyFloorModifier"/>
         /// </summary>
         /// <param name="modifierUpdatingEntity">The <see cref="ModifierUpdatingEntity"/> to register to, which will call out Update method for us</param>
-        /// <param name="playerStateAccessor">An implementation of <see cref="IPlayerStateAccessor"/> for interacting with the player state</param>
+        /// <param name="playerStateAccessor">An implementation of <see cref="IPlayerStateObserver"/> for interacting with the player state</param>
         /// <param name="playerJumper">An implementation of <see cref="IPlayerJumper"/> for interacting with player jumps</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to log to</param>
-        public BouncyFloorModifier(ModifierUpdatingEntity modifierUpdatingEntity, IPlayerStateAccessor playerStateAccessor, IPlayerJumper playerJumper, ILogger logger)
+        public BouncyFloorModifier(ModifierUpdatingEntity modifierUpdatingEntity, IPlayerStateObserver playerStateAccessor, IPlayerJumper playerJumper, ILogger logger)
         {
             this.modifierUpdatingEntity = modifierUpdatingEntity ?? throw new ArgumentNullException(nameof(modifierUpdatingEntity));
             this.playerStateAccessor = playerStateAccessor ?? throw new ArgumentNullException(nameof(playerStateAccessor));
@@ -67,6 +67,7 @@ namespace JumpKingModifiersMod.Modifiers
         public void Dispose()
         {
             playerJumper.OnPlayerJumped -= OnPlayerJumped;
+            Delegate.Remove(PlayerEntity.OnSplatCall, new PlayerEntity.OnSplat(this.OnSplat));
 
             modifierUpdatingEntity.UnregisterModifier(this);
         }

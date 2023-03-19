@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\IForegroundModEntity.cs" />
+    <Compile Include="API\IGameStateObserver.cs" />
     <Compile Include="API\IManualPatch.cs" />
     <Compile Include="API\IModComponent.cs" />
     <Compile Include="API\IModEntity.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="JumpKingModAttribute.cs" />
     <Compile Include="JumpKingModUtilities.cs" />
     <Compile Include="ModContentManager.cs" />
+    <Compile Include="Patching\GameStateObserverManualPatch.cs" />
     <Compile Include="Patching\ModEntityManagerManualPatch.cs" />
     <Compile Include="PBJKModBaseEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

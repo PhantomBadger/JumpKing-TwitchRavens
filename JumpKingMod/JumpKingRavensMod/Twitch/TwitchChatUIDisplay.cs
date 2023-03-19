@@ -1,11 +1,8 @@
 ﻿using JumpKing;
-using JumpKingRavensMod.API;
-using JumpKingRavensMod.Entities;
-using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
+using PBJKModBase.API;
 using PBJKModBase.Entities;
-using Settings;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,9 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
-using TwitchLib.Client.Models;
-using TwitchLib.Communication.Clients;
-using TwitchLib.Communication.Models;
 
 namespace JumpKingRavensMod.Twitch
 {

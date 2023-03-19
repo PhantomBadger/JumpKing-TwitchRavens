@@ -1,6 +1,4 @@
 ﻿using HarmonyLib;
-using JumpKingRavensMod.API;
-using JumpKingRavensMod.Patching;
 using Logging.API;
 using PBJKModBase.API;
 using System;
@@ -12,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace JumpKingRavensMod.Patching
+namespace PBJKModBase.Patching
 {
     /// <summary>
     /// An implementation of <see cref="IManualPatch"/> and <see cref="IGameStateObserver"/> which will
@@ -20,8 +18,6 @@ namespace JumpKingRavensMod.Patching
     /// </summary>
     public class GameStateObserverManualPatch : IManualPatch, IGameStateObserver
     {
-        public delegate void GameLoopRunningDelegate();
-        public delegate void GameLoopNotRunningDelegate();
         public event GameLoopRunningDelegate OnGameLoopRunning;
         public event GameLoopNotRunningDelegate OnGameLoopNotRunning;
 
@@ -34,6 +30,19 @@ namespace JumpKingRavensMod.Patching
         private bool prevGameLoopState;
         private Task gameStatePollingTask;
         private CancellationTokenSource cancellationTokenSource;
+
+        public static IGameStateObserver Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    throw new InvalidOperationException($"GameStateObserver was in a null state when requested. This shouldn't happen!");
+                }
+                return instance;
+            }
+        }
+        private static IGameStateObserver instance;
 
         /// <summary>
         /// A latch which lets you wait until the game has been initialised
@@ -64,6 +73,8 @@ namespace JumpKingRavensMod.Patching
         /// </summary>
         public GameStateObserverManualPatch(ILogger newLogger)
         {
+            GameStateObserverManualPatch.instance = this;
+
             gameInitializedLatch = new ManualResetEvent(false);
             assetsLoadedLatch = new ManualResetEvent(false);
             isGameInitialized = false;
@@ -108,11 +119,11 @@ namespace JumpKingRavensMod.Patching
             try
             {
                 var makeBTMethod = AccessTools.Method("JumpKing.JumpGame:MakeBT");
-                var postfixBTPatchMethod = AccessTools.Method($"JumpKingRavensMod.Patching.{this.GetType().Name}:PostfixMakeBTPatchMethod");
+                var postfixBTPatchMethod = AccessTools.Method($"PBJKModBase.Patching.{this.GetType().Name}:PostfixMakeBTPatchMethod");
                 harmony.Patch(makeBTMethod, postfix: new HarmonyMethod(postfixBTPatchMethod));
 
                 var loadAssetsMethod = AccessTools.Method("JumpKing.JKContentManager:LoadAssets");
-                var postfixLoadAssetsMethod = AccessTools.Method($"JumpKingRavensMod.Patching.{this.GetType().Name}:PostfixLoadAssetsPatchMethod");
+                var postfixLoadAssetsMethod = AccessTools.Method($"PBJKModBase.Patching.{this.GetType().Name}:PostfixLoadAssetsPatchMethod");
                 harmony.Patch(loadAssetsMethod, postfix: new HarmonyMethod(postfixLoadAssetsMethod));
             }
             catch (Exception e)

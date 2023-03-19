@@ -97,7 +97,6 @@
     <Compile Include="API\IInsultGetter.cs" />
     <Compile Include="API\IMessengerRavenTrigger.cs" />
     <Compile Include="API\IRavenLandingPositionsCache.cs" />
-    <Compile Include="API\IGameStateObserver.cs" />
     <Compile Include="API\IYouTubeClientConnector.cs" />
     <Compile Include="Components\LoopingAnimationComponent.cs" />
     <Compile Include="Entities\GunEntity.cs" />
@@ -115,7 +114,6 @@
     <Compile Include="Entities\Raven\RavenLandingPositionsCache.cs" />
     <Compile Include="RavensModContentManager.cs" />
     <Compile Include="Patching\AchievementRegisterDisableManualPatch.cs" />
-    <Compile Include="Patching\GameStateObserverManualPatch.cs" />
     <Compile Include="JumpKingRavensModEntry.cs" />
     <Compile Include="Patching\FreeFlyManualPatch.cs" />
     <Compile Include="Entities\Raven\Triggers\PlayerFallMessengerRavenTrigger.cs" />

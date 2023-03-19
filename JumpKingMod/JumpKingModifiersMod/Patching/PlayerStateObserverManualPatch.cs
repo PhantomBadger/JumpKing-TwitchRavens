@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using JumpKing.Player;
+using JumpKing.SaveThread;
 using JumpKingModifiersMod.API;
 using Logging.API;
 using Microsoft.Xna.Framework;
@@ -13,9 +15,9 @@ using System.Threading.Tasks;
 namespace JumpKingModifiersMod.Patching
 {
     /// <summary>
-    /// An implementation of <see cref="IManualPatch"/> and <see cref="IPlayerStateAccessor"/> to keep track of the player state
+    /// An implementation of <see cref="IManualPatch"/> and <see cref="IPlayerStateObserver"/> to keep track of the player state
     /// </summary>
-    public class PlayerStateObserverManualPatch : IManualPatch, IPlayerStateAccessor
+    public class PlayerStateObserverManualPatch : IManualPatch, IPlayerStateObserver
     {
         private static ILogger logger;
 
@@ -24,6 +26,7 @@ namespace JumpKingModifiersMod.Patching
         private static FieldInfo knockedField;
         private static FieldInfo positionField;
         private static object bodyCompInstance;
+        private static PlayerEntity playerEntityInstance;
         private static bool knockedOverrideIsActive;
         private static bool knockedOverrideValue;
         private static bool directionOverrideIsActive;
@@ -51,9 +54,13 @@ namespace JumpKingModifiersMod.Patching
             var postfixBodyCompMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixBodyCompPatchMethod");
             harmony.Patch(bodyCompMethod, new HarmonyMethod(postfixBodyCompMethod));
 
-            var playerEntityMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:SetDirection");
-            var prefixPlayerEntityMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixPlayerEntityPatchMethod");
-            harmony.Patch(playerEntityMethod, prefix: new HarmonyMethod(prefixPlayerEntityMethod));
+            var playerEntitySetDirectionMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:SetDirection");
+            var prefixPlayerSetDirectionEntityMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixPlayerEntityPatchMethod");
+            harmony.Patch(playerEntitySetDirectionMethod, prefix: new HarmonyMethod(prefixPlayerSetDirectionEntityMethod));
+
+            var playerEntityUpdateMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:Update");
+            var postfixPlayerEntityUpdateMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixPlayerEntityUpdatePatchMethod");
+            harmony.Patch(playerEntityUpdateMethod, postfix: new HarmonyMethod(postfixPlayerEntityUpdateMethod));
         }
 
         /// <summary>
@@ -104,6 +111,14 @@ namespace JumpKingModifiersMod.Patching
         }
 
         /// <summary>
+        /// Runs after 'JumpKing.Player.PlayerEntity:Update' and records the instance
+        /// </summary>
+        public static void PostfixPlayerEntityUpdatePatchMethod(object __instance)
+        {
+            playerEntityInstance = (PlayerEntity)__instance;
+        }
+
+        /// <summary>
         /// Returns the cached player state, or null if it hasnt been polled yet
         /// </summary>
         public PlayerState GetPlayerState()
@@ -123,6 +138,16 @@ namespace JumpKingModifiersMod.Patching
         {
             directionOverrideIsActive = isActive;
             directionOverrideValue = newDirection;
+        }
+
+        /// <inheritdoc/>
+        public void RestartPlayerPosition()
+        {
+            if (playerEntityInstance != null)
+            {
+                logger.Information($"Applying Default Save State!");
+                playerEntityInstance.ApplySaveState(SaveState.GetDefault());
+            }
         }
     }
 }

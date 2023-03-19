@@ -10,7 +10,7 @@ namespace JumpKingModifiersMod.API
     /// <summary>
     /// An interface representing an object capable of getting the current player state
     /// </summary>
-    public interface IPlayerStateAccessor
+    public interface IPlayerStateObserver
     {
         /// <summary>
         /// Returns the current <see cref="PlayerState"/>
@@ -26,5 +26,10 @@ namespace JumpKingModifiersMod.API
         /// Sets the direction of the player
         /// </summary>
         void SetDirectionOverride(bool isActive, int newDirection);
+
+        /// <summary>
+        /// Restarts the player's position to the start of the map
+        /// </summary>
+        void RestartPlayerPosition();
     }
 }

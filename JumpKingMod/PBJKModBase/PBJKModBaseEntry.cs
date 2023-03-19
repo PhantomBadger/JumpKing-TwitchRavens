@@ -37,6 +37,10 @@ namespace PBJKModBase
                 // Make our Mod Entity Manager and patch it
                 var modEntityManagerPatch = new ModEntityManagerManualPatch(ModEntityManager.Instance);
                 modEntityManagerPatch.SetUpManualPatch(harmony);
+
+                // Set up observer
+                var gameStateObserver = new GameStateObserverManualPatch(Logger);
+                gameStateObserver.SetUpManualPatch(harmony);
             }
             catch (Exception e)
             {

@@ -5,13 +5,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.API
+namespace PBJKModBase.API
 {
     /// <summary>
     /// An interface representing an object which knows the current game state
     /// </summary>
+    public delegate void GameLoopRunningDelegate();
+    public delegate void GameLoopNotRunningDelegate();
     public interface IGameStateObserver
     {
+        event GameLoopRunningDelegate OnGameLoopRunning;
+        event GameLoopNotRunningDelegate OnGameLoopNotRunning;
         ManualResetEvent GameInitializedLatch { get; }
         ManualResetEvent AssetsLoadedLatch { get; }
 

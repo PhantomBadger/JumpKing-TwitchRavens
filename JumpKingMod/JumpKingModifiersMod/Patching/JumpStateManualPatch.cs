@@ -23,7 +23,7 @@ namespace JumpKingModifiersMod.Patching
     {
         public event JumpTriggeredDelegate OnPlayerJumped;
 
-        private static IPlayerStateAccessor playerStateAccessor;
+        private static IPlayerStateObserver playerStateAccessor;
         private static ILogger logger;
 
         // Method/Field wrappers
@@ -42,9 +42,9 @@ namespace JumpKingModifiersMod.Patching
         /// <summary>
         /// Ctor for creating a <see cref="JumpStateManualPatch"/>
         /// </summary>
-        /// <param name="playerStateAccessor">An implementation of <see cref="IPlayerStateAccessor"/> to affect the player's state</param>
+        /// <param name="playerStateAccessor">An implementation of <see cref="IPlayerStateObserver"/> to affect the player's state</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/></param>
-        public JumpStateManualPatch(IPlayerStateAccessor playerStateAccessor, ILogger logger)
+        public JumpStateManualPatch(IPlayerStateObserver playerStateAccessor, ILogger logger)
         {
             JumpStateManualPatch.playerStateAccessor = playerStateAccessor ?? throw new ArgumentNullException(nameof(playerStateAccessor));
             JumpStateManualPatch.logger = logger ?? throw new ArgumentNullException(nameof(logger));
