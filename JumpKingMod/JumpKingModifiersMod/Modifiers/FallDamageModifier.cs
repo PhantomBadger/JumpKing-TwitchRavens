@@ -2,6 +2,7 @@
 using JumpKing.Player;
 using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Patching;
+using JumpKingModifiersMod.Patching.States;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -54,7 +55,6 @@ namespace JumpKingModifiersMod.Modifiers
         private const float TimeTakenToShowYouDiedInSeconds = 2f;
         private const float TimeTakenToShowYouDiedSubtextInSeconds = 1f;
         private const float UserPromptPulseTimeInSeconds = 0.75f;
-        private const Keys UserPromptKey = Keys.Space;
 
         /// <summary>
         /// Ctor for creating a <see cref="FallDamageModifier"/>
@@ -97,6 +97,8 @@ namespace JumpKingModifiersMod.Modifiers
             youDiedEntity = null;
             youDiedSubtextEntity = null;
             userPromptTextEntity = null;
+
+            playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
             modifierUpdatingEntity.UnregisterModifier(this);
             gameStateObserver.OnGameLoopNotRunning -= OnGameLoopNotRunning;
@@ -193,28 +195,36 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public void Update(float p_delta)
         {
-            switch (fallModifierState)
+            try
             {
-                case FallDamageModifierState.Playing:
-                    {
-                        PlayingUpdate(p_delta);
-                        break;
-                    }
-                case FallDamageModifierState.DisplayingYouDied:
-                    {
-                        DisplayingYouDiedUpdate(p_delta);
-                        break;
-                    }
-                case FallDamageModifierState.DisplayingYouDiedSubtext:
-                    {
-                        DisplayingYouDiedSubtextUpdate(p_delta);
-                        break;
-                    }
-                case FallDamageModifierState.WaitingForInput:
-                    {
-                        WaitingForInputUpdate(p_delta);
-                        break;
-                    }
+                switch (fallModifierState)
+                {
+                    case FallDamageModifierState.Playing:
+                        {
+                            PlayingUpdate(p_delta);
+                            break;
+                        }
+                    case FallDamageModifierState.DisplayingYouDied:
+                        {
+                            DisplayingYouDiedUpdate(p_delta);
+                            break;
+                        }
+                    case FallDamageModifierState.DisplayingYouDiedSubtext:
+                        {
+                            DisplayingYouDiedSubtextUpdate(p_delta);
+                            break;
+                        }
+                    case FallDamageModifierState.WaitingForInput:
+                        {
+                            WaitingForInputUpdate(p_delta);
+                            break;
+                        }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Encountered exception when running FallDamageModifier: {e.ToString()}");
+                DisableModifier();
             }
         }
 
@@ -256,6 +266,9 @@ namespace JumpKingModifiersMod.Modifiers
             // We have died, enter the death state and restart
             if (healthValue <= 0)
             {
+                // Disable walking so user can only jump + pause
+                playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: true);
+
                 Sprite youDiedSprite = Sprite.CreateSprite(ModifiersModContentManager.YouDiedTexture);
                 youDiedEntity = new UIImageEntity(modEntityManager, new Vector2(0, 0), youDiedSprite, zOrder: 1);
                 youDiedEntity.ImageValue.SetAlpha(0);
@@ -341,9 +354,9 @@ namespace JumpKingModifiersMod.Modifiers
                 }
             }
 
-            // TODO: Swap to use actual jump key to account for keyboard users and such
-            KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(UserPromptKey))
+            // Use the game input to account for different controllers
+            InputState inputState = playerStateObserver.GetInputState();
+            if (inputState.Jump)
             {
                 // Clear up the You Died & Text Entities
                 youDiedEntity?.Dispose();
@@ -354,6 +367,9 @@ namespace JumpKingModifiersMod.Modifiers
 
                 userPromptTextEntity?.Dispose();
                 userPromptTextEntity = null;
+
+                // Re-enable user input
+                playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
                 // Restart the player position and reset the health
                 playerStateObserver.RestartPlayerPosition();

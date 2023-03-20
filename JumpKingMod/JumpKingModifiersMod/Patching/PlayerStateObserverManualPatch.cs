@@ -1,7 +1,9 @@
-﻿using HarmonyLib;
+﻿using BehaviorTree;
+using HarmonyLib;
 using JumpKing.Player;
 using JumpKing.SaveThread;
 using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Patching.States;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.API;
@@ -25,14 +27,19 @@ namespace JumpKingModifiersMod.Patching
         private static FieldInfo velocityField;
         private static FieldInfo knockedField;
         private static FieldInfo positionField;
+        private static FieldInfo leftField;
+        private static FieldInfo rightField;
+        private static FieldInfo jumpField;
         private static object bodyCompInstance;
         private static PlayerEntity playerEntityInstance;
         private static bool knockedOverrideIsActive;
         private static bool knockedOverrideValue;
         private static bool directionOverrideIsActive;
         private static int directionOverrideValue;
+        private static bool isWalkingDisabled;
 
         private static PlayerState prevPlayerState;
+        private static InputState prevInputState;
 
         /// <summary>
         /// Ctor for creating a <see cref="PlayerStateObserverManualPatch"/>
@@ -41,10 +48,11 @@ namespace JumpKingModifiersMod.Patching
         public PlayerStateObserverManualPatch(ILogger logger)
         {
             PlayerStateObserverManualPatch.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            PlayerStateObserverManualPatch.prevPlayerState = null;
-
+            
+            prevPlayerState = null;
             knockedOverrideIsActive = false;
             knockedOverrideValue = false;
+            isWalkingDisabled = false;
         }
 
         /// <inheritdoc/>
@@ -61,6 +69,52 @@ namespace JumpKingModifiersMod.Patching
             var playerEntityUpdateMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:Update");
             var postfixPlayerEntityUpdateMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixPlayerEntityUpdatePatchMethod");
             harmony.Patch(playerEntityUpdateMethod, postfix: new HarmonyMethod(postfixPlayerEntityUpdateMethod));
+
+            var walkComponentMyRunMethod = AccessTools.Method("JumpKing.Player.Walk:MyRun");
+            var prefixWalkComponentMyRunMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixWalkComponentMyRunMethod");
+            harmony.Patch(walkComponentMyRunMethod, prefix: new HarmonyMethod(prefixWalkComponentMyRunMethod));
+
+            var inputComponentGetStateMethod = AccessTools.Method("JumpKing.Player.InputComponent:GetState");
+            var postfixInputComponentGetStateMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixInputComponentGetStateMethod");
+            harmony.Patch(inputComponentGetStateMethod, postfix: new HarmonyMethod(postfixInputComponentGetStateMethod));
+        }
+
+        /// <summary>
+        /// Called before 'JumpKing.Player.Walk:MyRun' and optionally skips the method execution
+        /// </summary>
+        public static bool PrefixWalkComponentMyRunMethod(ref BTresult __result, TickData p_data)
+        {
+            // If we want to disable walking then exit early
+            if (isWalkingDisabled)
+            {
+                __result = BTresult.Success;
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Called after 'JumpKing.Player.InputComponent:GetState' and records the last received input state
+        /// </summary>
+        public static void PostfixInputComponentGetStateMethod(ref object __result)
+        {
+            if (leftField == null)
+            {
+                leftField = AccessTools.Field(__result.GetType(), "left");
+            }
+            if (rightField == null)
+            {
+                rightField = AccessTools.Field(__result.GetType(), "right");
+            }
+            if (jumpField == null)
+            {
+                jumpField = AccessTools.Field(__result.GetType(), "jump");
+            }
+            bool left = (bool)leftField.GetValue(__result);
+            bool right = (bool)rightField.GetValue(__result);
+            bool jump = (bool)jumpField.GetValue(__result);
+
+            prevInputState = new InputState(left, right, jump);
         }
 
         /// <summary>
@@ -148,6 +202,20 @@ namespace JumpKingModifiersMod.Patching
                 logger.Information($"Applying Default Save State!");
                 playerEntityInstance.ApplySaveState(SaveState.GetDefault());
             }
+        }
+
+        /// <inheritdoc/>
+        public void DisablePlayerWalking(bool isWalkingDisabled)
+        {
+            PlayerStateObserverManualPatch.isWalkingDisabled = isWalkingDisabled;
+            // TODO: Also reset player velocity
+            // TODO: Player Walk anim still executes under this, also add a patch to that
+        }
+
+        /// <inheritdoc/>
+        public InputState GetInputState()
+        {
+            return prevInputState;
         }
     }
 }

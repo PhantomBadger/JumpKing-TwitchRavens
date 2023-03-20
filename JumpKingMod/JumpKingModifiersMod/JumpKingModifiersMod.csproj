@@ -63,6 +63,7 @@
     <Compile Include="Modifiers\FallDamageModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />
+    <Compile Include="Patching\States\InputState.cs" />
     <Compile Include="Patching\States\JumpState.cs" />
     <Compile Include="Patching\JumpStateManualPatch.cs" />
     <Compile Include="Patching\States\PlayerState.cs" />

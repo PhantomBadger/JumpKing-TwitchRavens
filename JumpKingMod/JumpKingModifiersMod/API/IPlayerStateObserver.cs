@@ -1,4 +1,5 @@
 ﻿using JumpKingModifiersMod.Patching;
+using JumpKingModifiersMod.Patching.States;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,11 @@ namespace JumpKingModifiersMod.API
         PlayerState GetPlayerState();
 
         /// <summary>
+        /// Returns the last <see cref="InputState"/> polled by the game
+        /// </summary>
+        InputState GetInputState();
+
+        /// <summary>
         /// Sets the player to be in a knocked state
         /// </summary>
         void SetKnockedStateOverride(bool isActive, bool newState);
@@ -31,5 +37,10 @@ namespace JumpKingModifiersMod.API
         /// Restarts the player's position to the start of the map
         /// </summary>
         void RestartPlayerPosition();
+
+        /// <summary>
+        /// Disables (or re-enables) player walking
+        /// </summary>
+        void DisablePlayerWalking(bool isWalkingDisabled);
     }
 }
