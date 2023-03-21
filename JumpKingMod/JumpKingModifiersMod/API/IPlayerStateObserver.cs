@@ -41,6 +41,13 @@ namespace JumpKingModifiersMod.API
         /// <summary>
         /// Disables (or re-enables) player walking
         /// </summary>
-        void DisablePlayerWalking(bool isWalkingDisabled);
+        /// <param name="isWalkingDisabled">If <c>true</c> then the player will be unable to walk left/right</param>
+        /// <param name="isXVelocityDisabled">
+        /// If <c>true</c> then we will also set the X velocity to 0. This is useful as X velocity resetting is handled by the Walk
+        /// component, which we disable when disabling walking, meaning if the player has X velocity when you disable walking
+        /// they may slide unexpectedly.
+        /// This is automatically set back to <c>false</c> internally if <paramref name="isWalkingDisabled"/> is <c>false</c>
+        /// </param>
+        void DisablePlayerWalking(bool isWalkingDisabled, bool isXVelocityDisabled = false);
     }
 }

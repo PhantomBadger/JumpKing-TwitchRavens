@@ -35,7 +35,6 @@ namespace JumpKingModifiersMod.Patching
             var walkSpeedGetter = AccessTools.Method("JumpKing.PlayerValues:get_WALK_SPEED");
             var postfixwalkSpeedGetter = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixWalkSpeedGetter");
             harmony.Patch(walkSpeedGetter, postfix: new HarmonyMethod(postfixwalkSpeedGetter));
-            logger.Information($"Patching get_WALK_SPEED '{walkSpeedGetter}' to PostfixWalkSpeedGetter '{postfixwalkSpeedGetter}'");
         }
 
         /// <summary>

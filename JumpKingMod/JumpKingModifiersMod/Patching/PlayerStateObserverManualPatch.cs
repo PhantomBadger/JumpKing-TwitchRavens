@@ -37,6 +37,7 @@ namespace JumpKingModifiersMod.Patching
         private static bool directionOverrideIsActive;
         private static int directionOverrideValue;
         private static bool isWalkingDisabled;
+        private static bool isXVelocityDisabled;
 
         private static PlayerState prevPlayerState;
         private static InputState prevInputState;
@@ -53,6 +54,7 @@ namespace JumpKingModifiersMod.Patching
             knockedOverrideIsActive = false;
             knockedOverrideValue = false;
             isWalkingDisabled = false;
+            isXVelocityDisabled = false;
         }
 
         /// <inheritdoc/>
@@ -74,6 +76,10 @@ namespace JumpKingModifiersMod.Patching
             var prefixWalkComponentMyRunMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixWalkComponentMyRunMethod");
             harmony.Patch(walkComponentMyRunMethod, prefix: new HarmonyMethod(prefixWalkComponentMyRunMethod));
 
+            var walkAnimComponentMyRunMethod = AccessTools.Method("JumpKing.Player.WalkAnim:MyRun");
+            var prefixWalkAnimComponentMyRunMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixWalkAnimComponentMyRunMethod");
+            harmony.Patch(walkAnimComponentMyRunMethod, prefix: new HarmonyMethod(prefixWalkAnimComponentMyRunMethod));
+
             var inputComponentGetStateMethod = AccessTools.Method("JumpKing.Player.InputComponent:GetState");
             var postfixInputComponentGetStateMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixInputComponentGetStateMethod");
             harmony.Patch(inputComponentGetStateMethod, postfix: new HarmonyMethod(postfixInputComponentGetStateMethod));
@@ -83,6 +89,26 @@ namespace JumpKingModifiersMod.Patching
         /// Called before 'JumpKing.Player.Walk:MyRun' and optionally skips the method execution
         /// </summary>
         public static bool PrefixWalkComponentMyRunMethod(ref BTresult __result, TickData p_data)
+        {
+            // If we want to disable walking then exit early
+            if (isWalkingDisabled)
+            {
+                if (velocityField != null && bodyCompInstance != null)
+                {
+                    Vector2 curVelocity = (Vector2)velocityField.GetValue(bodyCompInstance);
+                    velocityField.SetValue(bodyCompInstance, new Vector2(0, curVelocity.Y));
+                }
+
+                __result = BTresult.Success;
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Called before 'JumpKing.Player.WalkAnim:MyRun' and optionally skips the method execution
+        /// </summary>
+        public static bool PrefixWalkAnimComponentMyRunMethod(ref BTresult __result, TickData p_data)
         {
             // If we want to disable walking then exit early
             if (isWalkingDisabled)
@@ -205,11 +231,17 @@ namespace JumpKingModifiersMod.Patching
         }
 
         /// <inheritdoc/>
-        public void DisablePlayerWalking(bool isWalkingDisabled)
+        public void DisablePlayerWalking(bool isWalkingDisabled, bool isXVelocityDisabled = false)
         {
             PlayerStateObserverManualPatch.isWalkingDisabled = isWalkingDisabled;
-            // TODO: Also reset player velocity
-            // TODO: Player Walk anim still executes under this, also add a patch to that
+            if (isWalkingDisabled)
+            {
+                PlayerStateObserverManualPatch.isXVelocityDisabled = isXVelocityDisabled;
+            }
+            else
+            {
+                PlayerStateObserverManualPatch.isXVelocityDisabled = false;
+            }
         }
 
         /// <inheritdoc/>

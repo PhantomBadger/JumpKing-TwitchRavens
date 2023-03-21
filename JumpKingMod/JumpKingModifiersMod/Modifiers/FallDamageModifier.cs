@@ -177,6 +177,8 @@ namespace JumpKingModifiersMod.Modifiers
 
             logger.Information($"Disable Fall Damage Modifier");
 
+            playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
+
             healthEntity?.Dispose();
             youDiedEntity?.Dispose();
             youDiedSubtextEntity?.Dispose();
@@ -267,7 +269,7 @@ namespace JumpKingModifiersMod.Modifiers
             if (healthValue <= 0)
             {
                 // Disable walking so user can only jump + pause
-                playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: true);
+                playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: true, isXVelocityDisabled: true);
 
                 Sprite youDiedSprite = Sprite.CreateSprite(ModifiersModContentManager.YouDiedTexture);
                 youDiedEntity = new UIImageEntity(modEntityManager, new Vector2(0, 0), youDiedSprite, zOrder: 1);
