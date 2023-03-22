@@ -194,7 +194,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public bool DisableModifier()
         {
-            if (healthTextEntity == null)
+            if (healthBarBackEntity == null)
             {
                 // Already inactive
                 logger.Information($"Failed to Disable Fall Damage Modifier");
@@ -214,6 +214,8 @@ namespace JumpKingModifiersMod.Modifiers
             userPromptTextEntity?.Dispose();
 
             healthTextEntity = null;
+            healthBarBackEntity = null;
+            healthBarFrontEntity = null;
             youDiedEntity = null;
             youDiedSubtextEntity = null;
             userPromptTextEntity = null;
