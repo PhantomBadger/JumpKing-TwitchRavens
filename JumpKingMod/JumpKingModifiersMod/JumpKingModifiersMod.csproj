@@ -84,6 +84,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\healthbar_back.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\healthbar_front.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\youdied.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

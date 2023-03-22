@@ -39,7 +39,6 @@ namespace JumpKingModifiersMod.Patching
         private static bool isWalkingDisabled;
         private static bool isXVelocityDisabled;
 
-        private static PlayerState prevPlayerState;
         private static InputState prevInputState;
 
         /// <summary>
@@ -50,7 +49,6 @@ namespace JumpKingModifiersMod.Patching
         {
             PlayerStateObserverManualPatch.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             
-            prevPlayerState = null;
             knockedOverrideIsActive = false;
             knockedOverrideValue = false;
             isWalkingDisabled = false;
@@ -93,7 +91,7 @@ namespace JumpKingModifiersMod.Patching
             // If we want to disable walking then exit early
             if (isWalkingDisabled)
             {
-                if (velocityField != null && bodyCompInstance != null)
+                if (velocityField != null && bodyCompInstance != null && isXVelocityDisabled)
                 {
                     Vector2 curVelocity = (Vector2)velocityField.GetValue(bodyCompInstance);
                     velocityField.SetValue(bodyCompInstance, new Vector2(0, curVelocity.Y));
@@ -165,18 +163,11 @@ namespace JumpKingModifiersMod.Patching
             {
                 positionField = AccessTools.Field(bodyCompInstance.GetType(), "position");
             }
-            bool isOnGroundValue = (bool)isOnGroundField.GetValue(bodyCompInstance);
-            Vector2 velocity = (Vector2)velocityField.GetValue(bodyCompInstance);
-            Vector2 position = (Vector2)positionField.GetValue(bodyCompInstance);
-            bool knocked = (bool)knockedField.GetValue(bodyCompInstance);
-            PlayerState state = new PlayerState(isOnGroundValue, velocity, position, knocked);
 
             if (knockedOverrideIsActive)
             {
                 knockedField.SetValue(bodyCompInstance, knockedOverrideValue);
             }
-
-            prevPlayerState = state;
         }
 
         /// <summary>
@@ -203,7 +194,23 @@ namespace JumpKingModifiersMod.Patching
         /// </summary>
         public PlayerState GetPlayerState()
         {
-            return prevPlayerState;
+            if (isOnGroundField     != null &&
+                velocityField       != null &&
+                positionField       != null &&
+                knockedField        != null && 
+                bodyCompInstance    != null)
+            {
+                bool isOnGroundValue = (bool)isOnGroundField.GetValue(bodyCompInstance);
+                Vector2 velocity = (Vector2)velocityField.GetValue(bodyCompInstance);
+                Vector2 position = (Vector2)positionField.GetValue(bodyCompInstance);
+                bool knocked = (bool)knockedField.GetValue(bodyCompInstance);
+                PlayerState state = new PlayerState(isOnGroundValue, velocity, position, knocked);
+                return state;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <inheritdoc/>

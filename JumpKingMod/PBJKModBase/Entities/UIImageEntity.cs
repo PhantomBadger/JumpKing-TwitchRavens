@@ -12,6 +12,7 @@ namespace PBJKModBase.Entities
     public class UIImageEntity : IForegroundModEntity, IDisposable
     {
         public Vector2 ScreenSpacePosition { get; set; }
+        public Rectangle? DestinationRectangle { get; set; }
         public Sprite ImageValue { get; set; }
 
         private readonly ModEntityManager modEntityManager;
@@ -25,6 +26,15 @@ namespace PBJKModBase.Entities
             modEntityManager.AddForegroundEntity(this, zOrder);
         }
 
+        public UIImageEntity(ModEntityManager modEntityManager, Rectangle destinationRectangle, Sprite imageValue, int zOrder = 0)
+        {
+            this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
+            DestinationRectangle = destinationRectangle;
+            ImageValue = imageValue ?? throw new ArgumentNullException(nameof(imageValue));
+
+            modEntityManager.AddForegroundEntity(this, zOrder);
+        }
+
         public void Dispose()
         {
             modEntityManager.RemoveForegroundEntity(this);
@@ -32,7 +42,14 @@ namespace PBJKModBase.Entities
 
         public void ForegroundDraw()
         {
-            ImageValue.Draw(ScreenSpacePosition);
+            if (!DestinationRectangle.HasValue)
+            {
+                ImageValue.Draw(ScreenSpacePosition);
+            }
+            else
+            {
+                ImageValue.Draw(DestinationRectangle.Value);
+            }
         }
 
         public void Update(float p_delta)

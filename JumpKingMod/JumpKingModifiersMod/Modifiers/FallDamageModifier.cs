@@ -36,16 +36,20 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly IGameStateObserver gameStateObserver;
         private readonly ILogger logger;
 
-        // TODO - Swap to be a health bar
-        private UITextEntity healthEntity;
+        private UITextEntity healthTextEntity;
+        private UIImageEntity healthBarFrontEntity;
+        private UIImageEntity healthBarBackEntity;
+
         private UIImageEntity youDiedEntity;
         private UITextEntity youDiedSubtextEntity;
         private UITextEntity userPromptTextEntity;
+
         private int healthValue;
         private Vector2? lastOnGroundPosition;
         private bool processSplat;
         private bool reActivateModifier;
         private FallDamageModifierState fallModifierState;
+
         private float youDiedAlphaLerpCounter = 0;
         private float youDiedSubtextAlphaLerpCounter = 0;
         private float userPromptPulseCounter = 0;
@@ -88,12 +92,14 @@ namespace JumpKingModifiersMod.Modifiers
         /// </summary>
         public void Dispose()
         {
-            healthEntity?.Dispose();
+            healthTextEntity?.Dispose();
+            healthBarFrontEntity?.Dispose();
+            healthBarBackEntity?.Dispose();
             youDiedEntity?.Dispose();
             youDiedSubtextEntity?.Dispose();
             userPromptTextEntity?.Dispose();
 
-            healthEntity = null;
+            healthTextEntity = null;
             youDiedEntity = null;
             youDiedSubtextEntity = null;
             userPromptTextEntity = null;
@@ -130,45 +136,65 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public bool IsModifierEnabled()
         {
-            return healthEntity != null;
+            return healthBarBackEntity != null;
         }
 
         /// <inheritdoc/>
         public bool EnableModifier()
         {
-            if (healthEntity != null)
+            if (healthBarBackEntity != null)
             {
                 // Already active
                 logger.Information($"Failed to Enable Fall Damage Modifier - Effect already active");
                 return false;
             }
 
-            fallModifierState = FallDamageModifierState.Playing;
+            // Get the player state
+            PlayerState playerState = playerStateObserver.GetPlayerState();
+            if (playerState == null)
+            {
+                logger.Information($"Failed to Enable Fall Damage Modifier - Failed to get Player State");
+                return false;
+            }
 
-            Vector2? healthPosition = GetScreenSpacePositionForHealthEntity(out _);
-            if (!healthPosition.HasValue)
+            fallModifierState = FallDamageModifierState.Playing;
+            healthValue = MaxHealthValue;
+
+            //Vector2? healthTextPosition = GetScreenSpacePositionForHealthTextEntity(playerState);
+            //healthTextEntity = new UITextEntity(
+            //    modEntityManager,
+            //    healthPosition.Value,
+            //    healthValue.ToString(),
+            //    Color.Red,
+            //    UIEntityAnchor.Center,
+            //    JKContentManager.Font.MenuFontSmall);
+
+            Vector2? healthBarPosition = GetScreenSpacePositionForHealthBarEntity(playerState);
+            if (!healthBarPosition.HasValue)
             {
                 logger.Information($"Failed to Enable Fall Damage Modifier - Unable to get a player position");
                 return false;
             }
+            Rectangle destRectangle = GetScreenSpaceRectangleForHealthBarFrontEntity(healthBarPosition.Value, healthValue, MaxHealthValue);
+            healthBarBackEntity = new UIImageEntity(
+                modEntityManager,
+                healthBarPosition.Value,
+                Sprite.CreateSprite(ModifiersModContentManager.HealthBarBackTexture),
+                zOrder: 0);
+            healthBarFrontEntity = new UIImageEntity(
+                modEntityManager,
+                destRectangle,
+                Sprite.CreateSprite(ModifiersModContentManager.HealthBarFrontTexture),
+                zOrder: 1);
 
             logger.Information($"Enable Fall Damage Modifier");
-            healthEntity = new UITextEntity(
-                modEntityManager,
-                healthPosition.Value,
-                healthValue.ToString(),
-                Color.Red,
-                UIEntityAnchor.Center,
-                JKContentManager.Font.MenuFontSmall);
-
-            SetDefaultHealthState();
             return true;
         }
 
         /// <inheritdoc/>
         public bool DisableModifier()
         {
-            if (healthEntity == null)
+            if (healthTextEntity == null)
             {
                 // Already inactive
                 logger.Information($"Failed to Disable Fall Damage Modifier");
@@ -179,12 +205,15 @@ namespace JumpKingModifiersMod.Modifiers
 
             playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
-            healthEntity?.Dispose();
+            healthTextEntity?.Dispose();
+            healthBarBackEntity?.Dispose();
+            healthBarFrontEntity?.Dispose();
+
             youDiedEntity?.Dispose();
             youDiedSubtextEntity?.Dispose();
             userPromptTextEntity?.Dispose();
 
-            healthEntity = null;
+            healthTextEntity = null;
             youDiedEntity = null;
             youDiedSubtextEntity = null;
             userPromptTextEntity = null;
@@ -235,9 +264,10 @@ namespace JumpKingModifiersMod.Modifiers
         /// </summary>
         private void PlayingUpdate(float p_delta)
         {
-            Vector2? position = GetScreenSpacePositionForHealthEntity(out PlayerState playerState);
-            if (!position.HasValue)
+            PlayerState playerState = playerStateObserver.GetPlayerState();
+            if (playerState == null)
             {
+                logger.Error($"Failed to get player state during FallDamageModifier Update!");
                 return;
             }
 
@@ -262,8 +292,30 @@ namespace JumpKingModifiersMod.Modifiers
             }
 
             // Update the text
-            healthEntity.ScreenSpacePosition = position.Value;
-            healthEntity.TextValue = healthValue.ToString();
+            if (healthTextEntity != null)
+            {
+                Vector2? textPosition = GetScreenSpacePositionForHealthTextEntity(playerState);
+                if (textPosition != null)
+                {
+                    healthTextEntity.ScreenSpacePosition = textPosition.Value;
+                    healthTextEntity.TextValue = healthValue.ToString();
+                }
+                else
+                {
+                    logger.Error($"Failed to update Health Text Position!");
+                }
+            }
+
+            // Update the health bar
+            Vector2? position = GetScreenSpacePositionForHealthBarEntity(playerState);
+            if (!position.HasValue)
+            {
+                logger.Error($"Failed to update Health Bar Position!");
+                return;
+            }
+            Rectangle destRectForHealth = GetScreenSpaceRectangleForHealthBarFrontEntity(position.Value, healthValue, MaxHealthValue);
+            healthBarBackEntity.ScreenSpacePosition = position.Value;
+            healthBarFrontEntity.DestinationRectangle = destRectForHealth;
 
             // We have died, enter the death state and restart
             if (healthValue <= 0)
@@ -375,7 +427,7 @@ namespace JumpKingModifiersMod.Modifiers
 
                 // Restart the player position and reset the health
                 playerStateObserver.RestartPlayerPosition();
-                SetDefaultHealthState();
+                healthValue = MaxHealthValue;
                 fallModifierState = FallDamageModifierState.Playing;
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
             }
@@ -393,9 +445,23 @@ namespace JumpKingModifiersMod.Modifiers
         /// <summary>
         /// Gets the current position for the health entity based on the player's state
         /// </summary>
-        private Vector2? GetScreenSpacePositionForHealthEntity(out PlayerState playerState)
+        private Vector2? GetScreenSpacePositionForHealthBarEntity(PlayerState playerState)
         {
-            playerState = playerStateObserver.GetPlayerState();
+            if (playerState != null)
+            {
+                // Calculate the offset to center the (presumably larger) back health image above the player
+                Rectangle sourceBackRect = ModifiersModContentManager.HealthBarBackTexture.Bounds;
+                Vector2 healthPosition = playerState.Position + new Vector2(-(sourceBackRect.Width / 4), -20); // Honestly no idea why this is /4, it should be /2 but that is way too far?
+                return Camera.TransformVector2(healthPosition);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the current position for the health entity based on the player's state
+        /// </summary>
+        private Vector2? GetScreenSpacePositionForHealthTextEntity(PlayerState playerState)
+        {
             if (playerState != null)
             {
                 Vector2 healthPosition = playerState.Position + new Vector2(0, -20);
@@ -405,15 +471,23 @@ namespace JumpKingModifiersMod.Modifiers
         }
 
         /// <summary>
-        /// Sets the health value to max and applies it to the health entity
+        /// Gets a <see cref="Rectangle"/> representing the destination of the health bar front
         /// </summary>
-        private void SetDefaultHealthState()
+        private Rectangle GetScreenSpaceRectangleForHealthBarFrontEntity(Vector2 healthPosition, float healthValue, float maxHealth)
         {
-            if (healthEntity != null)
-            {
-                healthValue = MaxHealthValue;
-                healthEntity.TextValue = healthValue.ToString();
-            }
+            // Calculate the offset to center the front rect in the middle of the back rect
+            Rectangle sourceFrontRect = ModifiersModContentManager.HealthBarFrontTexture.Bounds;
+            Rectangle sourceBackRect = ModifiersModContentManager.HealthBarBackTexture.Bounds;
+            float xOffset = (sourceBackRect.Width - sourceFrontRect.Width) / 2f;
+            float yOffset = (sourceBackRect.Height - sourceFrontRect.Height) / 2f;
+
+            // Calculate the percentage of health so we can scale the X from left to right
+            float percentage = (healthValue / maxHealth);
+            float newWidth = sourceFrontRect.Width * percentage;
+            Point newSize = new Point((int)newWidth, sourceFrontRect.Height);
+
+            // Combine the offset and scale with the base position provided
+            return new Rectangle(healthPosition.ToPoint() + new Point((int)xOffset, (int)yOffset), newSize);
         }
     }
 }
