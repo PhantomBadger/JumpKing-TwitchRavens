@@ -15,7 +15,7 @@ namespace PBJKModBase.Entities
     /// </summary>
     public class ModEntityManager
     {
-        private readonly ConcurrentDictionary<IModEntity, byte> entities;
+        private readonly ConcurrentDictionary<IModEntity, int> entities;
         private readonly ConcurrentDictionary<IForegroundModEntity, int> foregroundEntities;
 
         /// <summary>
@@ -40,16 +40,16 @@ namespace PBJKModBase.Entities
         /// </summary>
         public ModEntityManager()
         {
-            entities = new ConcurrentDictionary<IModEntity, byte>();
+            entities = new ConcurrentDictionary<IModEntity, int>();
             foregroundEntities = new ConcurrentDictionary<IForegroundModEntity, int>();
         }
 
         /// <summary>
         /// Registers an <see cref="IModEntity"/> with this entity manager
         /// </summary>
-        public bool AddEntity(IModEntity entity)
+        public bool AddEntity(IModEntity entity, int zOrder)
         {
-            return entities.TryAdd(entity, 0);
+            return entities.TryAdd(entity, zOrder);
         }
 
         /// <summary>
@@ -81,7 +81,9 @@ namespace PBJKModBase.Entities
         /// </summary>
         public void Draw()
         {
-            var enumerator = entities.GetEnumerator();
+            var copyDictionary = new Dictionary<IModEntity, int>(entities);
+            var sortedDictionary = copyDictionary.OrderBy(x => x.Value);
+            var enumerator = sortedDictionary.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 enumerator.Current.Key?.Draw();

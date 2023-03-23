@@ -72,7 +72,7 @@ namespace JumpKingRavensMod.Entities
             {
                 messengerRavenTriggers[i].OnMessengerRavenTrigger += OnMessengerRavenTrigger;
             }
-            modEntityManager.AddEntity(this);
+            modEntityManager.AddEntity(this, 0);
         }
 
         /// <summary>

@@ -40,11 +40,11 @@ namespace JumpKingModifiersMod.Triggers
             this.modifier = modifier ?? throw new ArgumentNullException(nameof(modifier));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
-            toggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerToggleKey, Keys.L);
+            toggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerToggleKey, Keys.F11);
 
             pressedCooldown = false;
             isTriggerActive = false;
-            modEntityManager.AddEntity(this);
+            modEntityManager.AddEntity(this, 0);
         }
 
         /// <inheritdoc/>

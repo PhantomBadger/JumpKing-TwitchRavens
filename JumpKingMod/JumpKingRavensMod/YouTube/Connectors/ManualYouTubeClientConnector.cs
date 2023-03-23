@@ -70,7 +70,7 @@ namespace JumpKingRavensMod.YouTube
             buttonPressedCooldown = false;
 
             // Add ourselves to the Mod Entity Manager
-            modEntityManager.AddEntity(this);
+            modEntityManager.AddEntity(this, 0);
         }
 
         /// <summary>

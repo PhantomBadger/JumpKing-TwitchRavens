@@ -58,6 +58,7 @@
     <Compile Include="API\IModComponent.cs" />
     <Compile Include="API\IModEntity.cs" />
     <Compile Include="API\IModEntityState.cs" />
+    <Compile Include="Entities\WorldspaceImageEntity.cs" />
     <Compile Include="Entities\ModEntityManager.cs" />
     <Compile Include="Entities\UIImageEntity.cs" />
     <Compile Include="Entities\UITextEntity.cs" />

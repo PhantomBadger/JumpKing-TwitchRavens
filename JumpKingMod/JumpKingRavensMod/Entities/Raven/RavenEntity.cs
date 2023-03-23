@@ -64,7 +64,7 @@ namespace JumpKingRavensMod.Entities
             Transform = transform;
             Velocity = new Vector2(0, 0);
 
-            modEntityManager.AddEntity(this);
+            modEntityManager.AddEntity(this, 0);
         }
 
         /// <summary>

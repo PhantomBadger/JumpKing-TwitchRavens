@@ -2,11 +2,13 @@
 using JumpKing.Player;
 using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Entities;
+using JumpKingModifiersMod.Modifiers;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Patching.States;
 using JumpKingModifiersMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
 using Settings;
@@ -39,6 +41,8 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly IYouDiedSubtextGetter subtextGetter;
         private readonly float distanceDamageModifier;
         private readonly List<string> possibleSubtextValues;
+        private readonly BloodSplatterPersistence bloodSplatters;
+        private readonly Keys clearBloodKey;
 
         private UITextEntity healthTextEntity;
         private UIImageEntity healthBarFrontEntity;
@@ -53,6 +57,7 @@ namespace JumpKingModifiersMod.Modifiers
         private bool processSplat;
         private bool reActivateModifier;
         private FallDamageModifierState fallModifierState;
+        private bool clearBloodKeyReset;
 
         private float youDiedAlphaLerpCounter = 0;
         private float youDiedSubtextAlphaLerpCounter = 0;
@@ -84,7 +89,11 @@ namespace JumpKingModifiersMod.Modifiers
             random = new Random(DateTime.Now.Second + DateTime.Now.Millisecond);
 
             distanceDamageModifier = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, 0.1f);
+            clearBloodKey = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
+            clearBloodKeyReset = true;
+
             possibleSubtextValues = new List<string>();
+            bloodSplatters = new BloodSplatterPersistence(modEntityManager, userSettings, random, logger);
             fallModifierState = FallDamageModifierState.Playing;
 
             gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
@@ -196,6 +205,7 @@ namespace JumpKingModifiersMod.Modifiers
                 Sprite.CreateSprite(ModifiersModContentManager.HealthBarFrontTexture),
                 zOrder: 1);
 
+            bloodSplatters.LoadBloodSplatters();
             logger.Information($"Enable Fall Damage Modifier");
             return true;
         }
@@ -231,28 +241,19 @@ namespace JumpKingModifiersMod.Modifiers
 
             lastOnGroundPosition = null;
             processSplat = false;
+
+            bloodSplatters.SaveBloodSplatters();
+            bloodSplatters.ClearAllBloodSplats();
             return true;
         }
 
-        private bool keyReset = true;
         /// <inheritdoc/>
         public void Update(float p_delta)
         {
-            // Temporary Debug Spawner
-            //KeyboardState kbState = Keyboard.GetState();
-            //if (kbState.IsKeyDown(Keys.P) && keyReset)
-            //{
-            //    keyReset = false;
-            //    int randomNumber = random.Next(10) + 1;
-            //    SpawnDamageTextEntity(randomNumber, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
-            //}
-            //else if (!kbState.IsKeyDown(Keys.P))
-            //{
-            //    keyReset = true;
-            //}
-
             try
             {
+                PollClearCommand();
+
                 switch (fallModifierState)
                 {
                     case FallDamageModifierState.Playing:
@@ -285,6 +286,26 @@ namespace JumpKingModifiersMod.Modifiers
         }
 
         /// <summary>
+        /// Polls the clear key to optionally clear the blood
+        /// </summary>
+        private void PollClearCommand()
+        {
+            KeyboardState kbState = Keyboard.GetState();
+            if (kbState.IsKeyDown(clearBloodKey))
+            {
+                if (clearBloodKeyReset)
+                {
+                    clearBloodKeyReset = false;
+                    bloodSplatters.ClearAllBloodSplats();
+                }
+            }
+            else
+            {
+                clearBloodKeyReset = true;
+            }
+        }
+
+        /// <summary>
         /// The update loop for the <see cref="FallDamageModifierState.Playing"/> state
         /// </summary>
         private void PlayingUpdate(float p_delta)
@@ -313,6 +334,9 @@ namespace JumpKingModifiersMod.Modifiers
 
                 // Spawn the damage text
                 SpawnDamageTextEntity(damage, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
+
+                // Spawn a blood splat
+                SpawnBloodSplatEntity(playerState.Position);
             }
             else if (playerState.IsOnGround)
             {
@@ -518,6 +542,12 @@ namespace JumpKingModifiersMod.Modifiers
             float newWidth = sourceFrontRect.Width * percentage;
             Point newSize = new Point((int)newWidth, sourceFrontRect.Height);
 
+            // As long as we have some health, make sure a little bit of the bar is being shown
+            if (healthValue > 0)
+            {
+                newWidth = Math.Max(1, newWidth);
+            }
+
             // Combine the offset and scale with the base position provided
             return new Rectangle(healthPosition.ToPoint() + new Point((int)xOffset, (int)yOffset), newSize);
         }
@@ -528,6 +558,25 @@ namespace JumpKingModifiersMod.Modifiers
         private DamageTextEntity SpawnDamageTextEntity(int damageValue, Vector2 startingScreenSpacePosition)
         {
             return new DamageTextEntity(modEntityManager, startingScreenSpacePosition, $"-{damageValue.ToString()}", Color.Red, JKContentManager.Font.MenuFontSmall, random);
+        }
+
+        /// <summary>
+        /// Spawns a Blood Splat Entity
+        /// </summary>
+        /// <param name="playerPosition">The player position to base the blood splat entity on</param>
+        private WorldspaceImageEntity SpawnBloodSplatEntity(Vector2 playerPosition)
+        {
+            if (ModifiersModContentManager.BloodSplatterSprites == null || ModifiersModContentManager.BloodSplatterSprites.Length == 0)
+            {
+                return null;
+            }
+
+            Vector2 playerFloor = playerPosition + new Vector2(0, 25);
+            Sprite splatSprite = ModifiersModContentManager.BloodSplatterSprites[random.Next(ModifiersModContentManager.BloodSplatterSprites.Length)];
+            
+            var bloodSplatter = new WorldspaceImageEntity(modEntityManager, playerFloor, splatSprite, zOrder: 1);
+            bloodSplatters.BloodSplatters.Add(bloodSplatter);
+            return bloodSplatter;
         }
     }
 }

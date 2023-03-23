@@ -63,8 +63,9 @@
     <Compile Include="Modifiers\BombCountdownModifier.cs" />
     <Compile Include="Modifiers\BouncyFloorModifier.cs" />
     <Compile Include="Modifiers\FallDamageModifier.cs" />
+    <Compile Include="Modifiers\FallDamage\BloodSplatterPersistence.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
-    <Compile Include="Modifiers\YouDiedSubtextFileGetter.cs" />
+    <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />
     <Compile Include="Patching\States\InputState.cs" />
     <Compile Include="Patching\States\JumpState.cs" />
@@ -95,6 +96,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\bloodsplat.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\healthbar_back.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

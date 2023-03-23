@@ -41,7 +41,7 @@ namespace JumpKingRavensMod.Entities
             addEntityCooldown = false;
             removeEntityCooldown = false;
 
-            modEntityManager.AddEntity(this);
+            modEntityManager.AddEntity(this, 0);
         }
 
         /// <summary>
