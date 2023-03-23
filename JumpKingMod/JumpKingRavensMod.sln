@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingRavensMod", "JumpKingRavensMod\JumpKingRavensMod.csproj", "{1AA4FBAA-1186-4148-9428-E9DF9EA50EA9}"
 EndProject
@@ -20,6 +20,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase", "PBJKModBase\PBJKModBase.csproj", "{DE2B97BE-F646-4158-A63B-330DAFEF06E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingModifiersMod", "JumpKingModifiersMod\JumpKingModifiersMod.csproj", "{0B06258C-47D2-4E48-9C15-2A003AA5B678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingRavensMod.Settings", "JumpKingRavensMod.Settings\JumpKingRavensMod.Settings.csproj", "{5D82FBD1-FC33-4116-9355-3D9AA6A17CCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingModifiersMod.Settings", "JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj", "{9544190F-5C10-4C4B-8EB7-FFD8BC3DE76C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +63,14 @@ Global
 		{0B06258C-47D2-4E48-9C15-2A003AA5B678}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B06258C-47D2-4E48-9C15-2A003AA5B678}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B06258C-47D2-4E48-9C15-2A003AA5B678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D82FBD1-FC33-4116-9355-3D9AA6A17CCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D82FBD1-FC33-4116-9355-3D9AA6A17CCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D82FBD1-FC33-4116-9355-3D9AA6A17CCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D82FBD1-FC33-4116-9355-3D9AA6A17CCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9544190F-5C10-4C4B-8EB7-FFD8BC3DE76C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9544190F-5C10-4C4B-8EB7-FFD8BC3DE76C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9544190F-5C10-4C4B-8EB7-FFD8BC3DE76C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9544190F-5C10-4C4B-8EB7-FFD8BC3DE76C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

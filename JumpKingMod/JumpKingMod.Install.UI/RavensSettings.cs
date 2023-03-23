@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using JumpKingRavensMod.Settings;
+using Microsoft.Xna.Framework.Input;
 using Settings;
 using System;
 using System.Collections.Generic;

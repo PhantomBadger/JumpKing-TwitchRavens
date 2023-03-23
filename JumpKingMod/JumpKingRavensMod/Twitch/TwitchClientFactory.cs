@@ -48,18 +48,18 @@ namespace JumpKingRavensMod.Twitch
             else
             {
                 // Initialise the settings and attempt to load the OAuth Token
-                string oAuthToken = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
-                string twitchName = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                string oAuthToken = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.OAuthKey, string.Empty);
+                string twitchName = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
 
                 // If the Oauth Token is bad, exit now
                 if (string.IsNullOrWhiteSpace(oAuthToken))
                 {
-                    logger.Error($"No valid OAuth token found in the {JumpKingModSettingsContext.SettingsFileName} file!");
+                    logger.Error($"No valid OAuth token found in the {JumpKingRavensModSettingsContext.SettingsFileName} file!");
                     return null;
                 }
                 if (string.IsNullOrWhiteSpace(twitchName))
                 {
-                    logger.Error($"No valid TwitchAccountName found in the {JumpKingModSettingsContext.SettingsFileName} file!");
+                    logger.Error($"No valid TwitchAccountName found in the {JumpKingRavensModSettingsContext.SettingsFileName} file!");
                     return null;
                 }
 

@@ -57,7 +57,7 @@ namespace JumpKingRavensMod.YouTube
             youtubeClient.OnDisconnected += OnYouTubeClientDisconnected;
 
             // Prime the UI Text
-            connectKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
+            connectKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
             connectionStatusText = new UITextEntity(modEntityManager, new Vector2(480, 0), string.Empty, Color.Red,
                             UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall);
 

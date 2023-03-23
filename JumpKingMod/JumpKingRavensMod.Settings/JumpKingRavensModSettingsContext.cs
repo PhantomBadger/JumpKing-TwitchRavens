@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 
-namespace Settings
+namespace JumpKingRavensMod.Settings
 {
-    public abstract class JumpKingModSettingsContext
+    public abstract class JumpKingRavensModSettingsContext
     {
         public const string SettingsFileName = "JumpKingMod.settings";
         public const string ExcludedTermFilePath = "Content/Mods/ExcludedTermList.txt";
@@ -48,7 +48,7 @@ namespace Settings
 
         public static Dictionary<string, string> GetDefaultSettings()
         {
-            return new Dictionary<string, string>()
+;           return new Dictionary<string, string>()
             {
                 // Selected Streaming Platform
                 { SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch.ToString() },

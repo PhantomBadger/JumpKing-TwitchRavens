@@ -4,11 +4,14 @@ using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Entities;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Patching.States;
+using JumpKingModifiersMod.Settings;
+using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
 using System;
+using System.Collections.Generic;
 
 namespace JumpKingModifiersMod.Modifiers
 {
@@ -32,6 +35,9 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly IGameStateObserver gameStateObserver;
         private readonly ILogger logger;
         private readonly Random random;
+        private readonly UserSettings userSettings;
+        private readonly float distanceDamageModifier;
+        private readonly List<string> possibleSubtextValues;
 
         private UITextEntity healthTextEntity;
         private UIImageEntity healthBarFrontEntity;
@@ -52,7 +58,6 @@ namespace JumpKingModifiersMod.Modifiers
         private float userPromptPulseCounter = 0;
 
         private const int MaxHealthValue = 100;
-        private const float DistanceDamageModifier = 0.1f;
         private const float TimeTakenToShowYouDiedInSeconds = 2f;
         private const float TimeTakenToShowYouDiedSubtextInSeconds = 1f;
         private const float UserPromptPulseTimeInSeconds = 0.75f;
@@ -65,15 +70,18 @@ namespace JumpKingModifiersMod.Modifiers
         /// <param name="playerStateObserver">An implementation of <see cref="IPlayerStateObserver"/> for getting the current player state</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to log to</param>
         public FallDamageModifier(ModifierUpdatingEntity modifierUpdatingEntity, ModEntityManager modEntityManager,
-            IPlayerStateObserver playerStateObserver, IGameStateObserver gameStateObserver, ILogger logger)
+            IPlayerStateObserver playerStateObserver, IGameStateObserver gameStateObserver, UserSettings userSettings, ILogger logger)
         {
             this.modifierUpdatingEntity = modifierUpdatingEntity ?? throw new ArgumentNullException(nameof(modifierUpdatingEntity));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.playerStateObserver = playerStateObserver ?? throw new ArgumentNullException(nameof(playerStateObserver));
             this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             random = new Random(DateTime.Now.Second + DateTime.Now.Millisecond);
 
+            distanceDamageModifier = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, 0.1f);
+            possibleSubtextValues = new List<string>();
             fallModifierState = FallDamageModifierState.Playing;
 
             gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
@@ -293,7 +301,7 @@ namespace JumpKingModifiersMod.Modifiers
 
                 // Get the distance fallen and turn that into a damage value
                 float yDiff = Math.Abs(lastOnGroundPosition.Value.Y - newSplatPosition.Y);
-                float rawDamage = (yDiff * DistanceDamageModifier);
+                float rawDamage = (yDiff * distanceDamageModifier);
                 int damage = Math.Max(1, (int)rawDamage);
 
                 // Apply the damage to the health

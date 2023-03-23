@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using JumpKingModifiersMod.Modifiers;
 using JumpKingModifiersMod.Patching;
+using JumpKingModifiersMod.Settings;
 using JumpKingModifiersMod.Triggers;
 using Logging;
 using Logging.API;
@@ -36,7 +37,8 @@ namespace JumpKingModifiersMod
                 Logger.Information($"Jump King Modifiers Pre-Release!");
                 Logger.Information($"====================================");
 
-                // Load content
+                // Load content & settings
+                var userSettings = new UserSettings(JumpKingModifiersModSettingsContext.SettingsFileName, JumpKingModifiersModSettingsContext.GetDefaultSettings(), Logger);
                 ModifiersModContentManager.LoadContent(Logger);
 
                 // Set up player values patching

@@ -62,10 +62,10 @@ namespace JumpKingRavensMod.Entities
             isRavenSpawningActive = true;
             this.isGameLoopRunning = isGameLoopRunning;
 
-            maxRavenCount = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5);
-            clearRavensKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
-            toggleRavenSpawningKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
-            toggleSubModeKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
+            maxRavenCount = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensMaxCountKey, 5);
+            clearRavensKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
+            toggleRavenSpawningKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+            toggleSubModeKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
             isInSubMode = false;
 
             for (int i = 0; i < messengerRavenTriggers.Count; i++)

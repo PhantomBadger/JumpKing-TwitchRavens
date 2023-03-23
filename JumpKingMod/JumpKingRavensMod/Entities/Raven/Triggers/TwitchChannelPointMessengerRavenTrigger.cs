@@ -44,7 +44,7 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
             this.relayRequestQueue = new BlockingCollection<OnMessageReceivedArgs>();
 
             // Get the Channel Reward ID we intend to use
-            channelRewardID = settings.GetSettingOrDefault(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
+            channelRewardID = settings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
             if (string.IsNullOrWhiteSpace(channelRewardID))
             {
                 logger.Error($"Unable to identify a valid Channel Reward ID for Raven Spawning from the Settings File!");

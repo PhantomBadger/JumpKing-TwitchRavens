@@ -36,7 +36,7 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
             this.insultGetter = insultGetter ?? throw new ArgumentNullException(nameof(insultGetter));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
-            spawnCount = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenInsultSpawnCountKey, 3);
+            spawnCount = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, 3);
 
             instance = this;
         }

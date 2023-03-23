@@ -40,13 +40,13 @@ namespace JumpKingRavensMod.YouTube
             else
             {
                 // Initialise the settings and attempt to load the api key
-                string channelId = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
-                string apiKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeApiKeyKey, string.Empty);
+                string channelId = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, string.Empty);
+                string apiKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeApiKeyKey, string.Empty);
 
                 // Check if any of the data is bad, exit now
                 if (string.IsNullOrWhiteSpace(channelId))
                 {
-                    logger.Error($"No valid YouTube ChannelName found in the {JumpKingModSettingsContext.SettingsFileName} file!");
+                    logger.Error($"No valid YouTube ChannelName found in the {JumpKingRavensModSettingsContext.SettingsFileName} file!");
                     return null;
                 }
                 if (string.IsNullOrWhiteSpace(apiKey))

@@ -134,6 +134,10 @@
     <Compile Include="YouTube\YouTubeLiveStreamData.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JumpKingRavensMod.Settings\JumpKingRavensMod.Settings.csproj">
+      <Project>{5d82fbd1-fc33-4116-9355-3d9aa6a17ccc}</Project>
+      <Name>JumpKingRavensMod.Settings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{e26ba6e7-fa46-4525-bc28-50f1044ade07}</Project>
       <Name>Logging</Name>

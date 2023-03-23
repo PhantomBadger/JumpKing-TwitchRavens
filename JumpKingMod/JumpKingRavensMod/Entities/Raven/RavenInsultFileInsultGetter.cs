@@ -1,4 +1,5 @@
 ﻿using JumpKingRavensMod.API;
+using JumpKingRavensMod.Settings;
 using Logging.API;
 using Settings;
 using System;
@@ -30,13 +31,13 @@ namespace JumpKingRavensMod.Entities.Raven
             // Parsing Raven Insult List
             try
             {
-                if (File.Exists(JumpKingModSettingsContext.RavenInsultsFilePath))
+                if (File.Exists(JumpKingRavensModSettingsContext.RavenInsultsFilePath))
                 {
-                    string[] fileContents = File.ReadAllLines(JumpKingModSettingsContext.RavenInsultsFilePath);
+                    string[] fileContents = File.ReadAllLines(JumpKingRavensModSettingsContext.RavenInsultsFilePath);
                     for (int i = 0; i < fileContents.Length; i++)
                     {
                         string line = fileContents[i].Trim();
-                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        if (line.Length <= 0 || line[0] == JumpKingRavensModSettingsContext.CommentCharacter)
                         {
                             continue;
                         }
@@ -47,7 +48,7 @@ namespace JumpKingRavensMod.Entities.Raven
                 }
                 else
                 {
-                    logger.Error($"Unable to find Raven Insult List at '{JumpKingModSettingsContext.RavenInsultsFilePath}'");
+                    logger.Error($"Unable to find Raven Insult List at '{JumpKingRavensModSettingsContext.RavenInsultsFilePath}'");
                 }
             }
             catch (Exception e)

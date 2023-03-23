@@ -100,7 +100,7 @@ namespace JumpKingRavensMod.Entities.Raven
             killStunTimer = 0;
             killFallTimer = 0;
 
-            maxMessageTimeInSeconds = settings.GetSettingOrDefault(JumpKingModSettingsContext.RavensDisplayTimeInSecondsKey, DefaultMessageTimeInSeconds);
+            maxMessageTimeInSeconds = settings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, DefaultMessageTimeInSeconds);
 
             if (!string.IsNullOrWhiteSpace(ravenName))
             {

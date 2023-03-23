@@ -41,7 +41,7 @@ namespace JumpKingRavensMod.Patching
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
             // Parse the key to use for toggling
-            toggleKey = userSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
+            toggleKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
         }
 
         /// <summary>

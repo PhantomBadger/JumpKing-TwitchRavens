@@ -1,4 +1,5 @@
 ﻿using JumpKingRavensMod.API;
+using JumpKingRavensMod.Settings;
 using Logging.API;
 using Settings;
 using System;
@@ -27,13 +28,13 @@ namespace JumpKingRavensMod.Twitch
             // Parsing Excluded Term List
             try
             {
-                if (File.Exists(JumpKingModSettingsContext.ExcludedTermFilePath))
+                if (File.Exists(JumpKingRavensModSettingsContext.ExcludedTermFilePath))
                 {
-                    string[] fileContents = File.ReadAllLines(JumpKingModSettingsContext.ExcludedTermFilePath);
+                    string[] fileContents = File.ReadAllLines(JumpKingRavensModSettingsContext.ExcludedTermFilePath);
                     for (int i = 0; i < fileContents.Length; i++)
                     {
                         string line = fileContents[i].Trim();
-                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        if (line.Length <= 0 || line[0] == JumpKingRavensModSettingsContext.CommentCharacter)
                         {
                             continue;
                         }
@@ -44,7 +45,7 @@ namespace JumpKingRavensMod.Twitch
                 }
                 else
                 {
-                    logger.Error($"Unable to find Excluded Term File List at '{JumpKingModSettingsContext.ExcludedTermFilePath}'");
+                    logger.Error($"Unable to find Excluded Term File List at '{JumpKingRavensModSettingsContext.ExcludedTermFilePath}'");
                 }
             }
             catch (Exception e)

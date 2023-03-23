@@ -4,6 +4,7 @@ using Logging.API;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.Xna.Framework.Input;
 using Settings;
+using JumpKingRavensMod.Settings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -515,7 +516,7 @@ namespace JumpKingRavensMod.Install.UI
         /// </summary>
         private bool CanUpdateModSettings()
         {
-            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingModSettingsContext.SettingsFileName);
+            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.SettingsFileName);
             bool fileExists = File.Exists(expectedSettingsFilePath);
             return fileExists;
         }
@@ -589,50 +590,50 @@ namespace JumpKingRavensMod.Install.UI
                 }
             }
 
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.SelectedStreamingPlatformKey, SelectedStreamingPlatform.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, SelectedStreamingPlatform.ToString());
 
             // YouTube
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeChannelNameKey, YouTubeSettings.YouTubeAccountName);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeApiKeyKey, YouTubeSettings.YouTubeAPIKey);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeConnectKeyKey, YouTubeSettings.ConnectKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, Ravens.YouTubeRavenTriggerType.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, YouTubeSettings.YouTubeAccountName);
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeApiKeyKey, YouTubeSettings.YouTubeAPIKey);
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeConnectKeyKey, YouTubeSettings.ConnectKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, Ravens.YouTubeRavenTriggerType.ToString());
 
             // Twitch
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchSettings.TwitchAccountName);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchSettings.TwitchOAuth);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, Ravens.RavenTriggerType.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, Ravens.RavensChannelPointID);
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchSettings.TwitchAccountName);
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.OAuthKey, TwitchSettings.TwitchOAuth);
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, Ravens.RavenTriggerType.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, Ravens.RavensChannelPointID);
 
             // Ravens
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, Ravens.RavenEnabled.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Ravens.RavenToggleDebugKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensClearDebugKeyKey, Ravens.RavenClearDebugKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Ravens.RavenSubModeToggleKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensMaxCountKey, Ravens.MaxRavensCount);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensDisplayTimeInSecondsKey, Ravens.MessageDurationInSeconds);
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensEnabledKey, Ravens.RavenEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, Ravens.RavenToggleDebugKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, Ravens.RavenClearDebugKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, Ravens.RavenSubModeToggleKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensMaxCountKey, Ravens.MaxRavensCount);
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, Ravens.MessageDurationInSeconds);
 
             // Chat Display
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
 
             // Free Fly
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
 
             // Exclusion List
-            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.ExcludedTermFilePath);
+            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.ExcludedTermFilePath);
             Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
             File.WriteAllLines(expectedExclusionPath, Ravens.ExcludedTerms);
 
             // Raven Insults
-            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.RavenInsultsFilePath);
+            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.RavenInsultsFilePath);
             Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
             File.WriteAllLines(expectedRavenInsultsPath, Ravens.RavenInsults);
 
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenInsultSpawnCountKey, Ravens.InsultRavenSpawnCount.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, Ravens.InsultRavenSpawnCount.ToString());
 
             // Gun Mode
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.GunEnabledKey, Ravens.GunEnabled.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.GunToggleKeyKey, Ravens.GunToggleKey.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.GunEnabledKey, Ravens.GunEnabled.ToString());
+            ModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.GunToggleKeyKey, Ravens.GunToggleKey.ToString());
 
             MessageBox.Show($"Settings updated successfully!");
         }
@@ -643,50 +644,50 @@ namespace JumpKingRavensMod.Install.UI
         private void LoadModSettings(bool createIfDoesntExist)
         {
             // Load in the settings
-            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingModSettingsContext.SettingsFileName);
+            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.SettingsFileName);
             if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
             {
-                ModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModSettingsContext.GetDefaultSettings(), logger);
+                ModSettings = new UserSettings(expectedSettingsFilePath, JumpKingRavensModSettingsContext.GetDefaultSettings(), logger);
 
                 // Load the initial data
-                SelectedStreamingPlatform = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
+                SelectedStreamingPlatform = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
 
                 // YouTube Info
-                YouTubeSettings.YouTubeAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
-                YouTubeSettings.YouTubeAPIKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeApiKeyKey, string.Empty);
-                YouTubeSettings.ConnectKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
-                Ravens.YouTubeRavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
+                YouTubeSettings.YouTubeAccountName = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, string.Empty);
+                YouTubeSettings.YouTubeAPIKey = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeApiKeyKey, string.Empty);
+                YouTubeSettings.ConnectKey = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
+                Ravens.YouTubeRavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
 
                 // Twitch Info
-                TwitchSettings.TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
-                TwitchSettings.TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
-                Ravens.RavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
-                Ravens.RavensChannelPointID = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
+                TwitchSettings.TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                TwitchSettings.TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.OAuthKey, string.Empty);
+                Ravens.RavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
+                Ravens.RavensChannelPointID = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
 
                 // Raven Info
-                Ravens.RavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true);
-                Ravens.RavenClearDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
-                Ravens.RavenToggleDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
-                Ravens.RavenSubModeToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
-                Ravens.MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5.ToString());
-                Ravens.MessageDurationInSeconds = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensDisplayTimeInSecondsKey, 3.0f.ToString());
-                Ravens.InsultRavenSpawnCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
+                Ravens.RavenEnabled = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensEnabledKey, true);
+                Ravens.RavenClearDebugKey = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
+                Ravens.RavenToggleDebugKey = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+                Ravens.RavenSubModeToggleKey = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
+                Ravens.MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensMaxCountKey, 5.ToString());
+                Ravens.MessageDurationInSeconds = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, 3.0f.ToString());
+                Ravens.InsultRavenSpawnCount = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
 
                 // Chat Display Info
-                ChatDisplayEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
+                ChatDisplayEnabled = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.TwitchRelayEnabledKey, false);
 
                 // Free Fly
-                FreeFlyingEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false);
-                FreeFlyToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
+                FreeFlyingEnabled = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, false);
+                FreeFlyToggleKey = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
 
                 // Gun
-                Ravens.GunEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunEnabledKey, false);
-                Ravens.GunToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunToggleKeyKey, Keys.F8);
+                Ravens.GunEnabled = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunEnabledKey, false);
+                Ravens.GunToggleKey = ModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunToggleKeyKey, Keys.F8);
             }
 
             // Load in Exclusion List
             List<string> excludedTerms = new List<string>();
-            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.ExcludedTermFilePath);
+            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.ExcludedTermFilePath);
             try
             {
                 if (File.Exists(expectedExclusionPath))
@@ -695,7 +696,7 @@ namespace JumpKingRavensMod.Install.UI
                     for (int i = 0; i < fileContent.Length; i++)
                     {
                         string line = fileContent[i].Trim();
-                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        if (line.Length <= 0 || line[0] == JumpKingRavensModSettingsContext.CommentCharacter)
                         {
                             continue;
                         }
@@ -717,7 +718,7 @@ namespace JumpKingRavensMod.Install.UI
 
             // Load in Raven Insults
             List<string> ravenInsultsFileContent = new List<string>();
-            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.RavenInsultsFilePath);
+            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.RavenInsultsFilePath);
             try
             {
                 if (File.Exists(expectedRavenInsultsPath))
@@ -726,7 +727,7 @@ namespace JumpKingRavensMod.Install.UI
                     for (int i = 0; i < fileContent.Length; i++)
                     {
                         string line = fileContent[i].Trim();
-                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        if (line.Length <= 0 || line[0] == JumpKingRavensModSettingsContext.CommentCharacter)
                         {
                             continue;
                         }
@@ -736,7 +737,7 @@ namespace JumpKingRavensMod.Install.UI
                 }
                 else
                 {
-                    ravenInsultsFileContent.AddRange(JumpKingModSettingsContext.GetDefaultInsults());
+                    ravenInsultsFileContent.AddRange(JumpKingRavensModSettingsContext.GetDefaultInsults());
                     Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
                     File.WriteAllLines(expectedRavenInsultsPath, ravenInsultsFileContent);
                 }
