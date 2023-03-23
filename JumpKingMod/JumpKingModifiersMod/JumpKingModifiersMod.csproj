@@ -57,12 +57,14 @@
     <Compile Include="API\IPlayerJumper.cs" />
     <Compile Include="API\IPlayerStateObserver.cs" />
     <Compile Include="API\IWalkSpeedModifier.cs" />
+    <Compile Include="API\IYouDiedSubtextGetter.cs" />
     <Compile Include="Entities\DamageTextEntity.cs" />
     <Compile Include="JumpKingModifiersModEntry.cs" />
     <Compile Include="Modifiers\BombCountdownModifier.cs" />
     <Compile Include="Modifiers\BouncyFloorModifier.cs" />
     <Compile Include="Modifiers\FallDamageModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
+    <Compile Include="Modifiers\YouDiedSubtextFileGetter.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />
     <Compile Include="Patching\States\InputState.cs" />
     <Compile Include="Patching\States\JumpState.cs" />
@@ -75,6 +77,10 @@
     <Compile Include="Triggers\DebugModifierTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj">
+      <Project>{9544190f-5c10-4c4b-8eb7-ffd8bc3de76c}</Project>
+      <Name>JumpKingModifiersMod.Settings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
       <Name>Logging</Name>
@@ -82,6 +88,10 @@
     <ProjectReference Include="..\PBJKModBase\PBJKModBase.csproj">
       <Project>{DE2B97BE-F646-4158-A63B-330DAFEF06E2}</Project>
       <Name>PBJKModBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Settings\Settings.csproj">
+      <Project>{d9c89840-a346-4334-99f2-cf323015c206}</Project>
+      <Name>Settings</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

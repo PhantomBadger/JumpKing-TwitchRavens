@@ -127,7 +127,6 @@ namespace JumpKingModifiersMod.Patching
             {
                 instance.OnPlayerJumped?.Invoke(prevJumpState);
             }
-            logger.Information($"Logging jump state of '{p_intensity}' and '{num}'");
         }
 
         /// <summary>

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.Settings
 {
+    /// <summary>
+    /// An aggregate of settings keys for use in <see cref="JumpKingModifiersMod"/>
+    /// </summary>
     public abstract class JumpKingModifiersModSettingsContext
     {
         public const string SettingsFileName = "JumpKingModifiersMod.settings";
@@ -19,16 +22,22 @@ namespace JumpKingModifiersMod.Settings
         public const string FallDamageSubtextsFilePath = "Content/Mods/FallDamageSubtexts.txt";
         public const string FallDamageModifierKey = "FallDamageModifier";
 
+        /// <summary>
+        /// Gets the default state of the settings
+        /// </summary>
         public static Dictionary<string, string> GetDefaultSettings()
         {
             return new Dictionary<string, string>()
             {
-                { FallDamageToggleKey, Keys.P.ToString() },
+                { DebugTriggerToggleKey, Keys.L.ToString() },
                 { FallDamageModifierKey, 0.1f.ToString() }
             };
         }
 
-        public static string[] GetDefaultFallDamageSubtextx()
+        /// <summary>
+        /// Gets the default values for the Fall Damage Subtexts
+        /// </summary>
+        public static string[] GetDefaultFallDamageSubtexts()
         {
             return new string[]
             {

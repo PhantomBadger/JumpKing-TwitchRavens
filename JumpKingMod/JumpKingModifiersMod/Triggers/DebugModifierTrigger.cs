@@ -1,9 +1,11 @@
 ﻿using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Modifiers;
 using JumpKingModifiersMod.Patching;
+using JumpKingModifiersMod.Settings;
 using Microsoft.Xna.Framework.Input;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
+using Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +22,10 @@ namespace JumpKingModifiersMod.Triggers
     /// </summary>
     public class DebugModifierTrigger : IModifierTrigger, IModEntity
     {
-        private IModifier modifier;
+        private readonly UserSettings userSettings;
+        private readonly IModifier modifier;
+        private readonly Keys toggleKey;
+
         private bool pressedCooldown;
         private bool isTriggerActive;
 
@@ -30,9 +35,12 @@ namespace JumpKingModifiersMod.Triggers
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register itself to</param>
         /// <param name="modifier">The <see cref="IModifier"/> to toggle</param>
         public DebugModifierTrigger(ModEntityManager modEntityManager, 
-            IModifier modifier)
+            IModifier modifier, UserSettings userSettings)
         {
             this.modifier = modifier ?? throw new ArgumentNullException(nameof(modifier));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
+
+            toggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerToggleKey, Keys.L);
 
             pressedCooldown = false;
             isTriggerActive = false;
@@ -71,7 +79,7 @@ namespace JumpKingModifiersMod.Triggers
 
             // Toggle the modifier
             var keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.L))
+            if (keyboardState.IsKeyDown(toggleKey))
             {
                 if (!pressedCooldown)
                 {

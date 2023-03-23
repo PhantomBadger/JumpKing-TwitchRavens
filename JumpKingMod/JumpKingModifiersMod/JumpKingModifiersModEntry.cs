@@ -9,6 +9,7 @@ using PBJKModBase;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
 using PBJKModBase.Patching;
+using Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,10 +60,13 @@ namespace JumpKingModifiersMod
                 // Set up modifiers and trigger
                 var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
                 var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
-                var fallDamageModifier = new FallDamageModifier(
-                    modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance, Logger);
 
-                var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, fallDamageModifier);
+                var subtextGetter = new YouDiedSubtextFileGetter(Logger);
+                var fallDamageModifier = new FallDamageModifier(
+                    modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance, 
+                    subtextGetter, userSettings, Logger);
+
+                var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, fallDamageModifier, userSettings);
                 debugTrigger.EnableTrigger();
             }
             catch (Exception e)

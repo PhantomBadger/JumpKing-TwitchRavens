@@ -5,11 +5,11 @@ using JumpKingModifiersMod.Entities;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Patching.States;
 using JumpKingModifiersMod.Settings;
-using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
+using Settings;
 using System;
 using System.Collections.Generic;
 
@@ -36,6 +36,7 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly ILogger logger;
         private readonly Random random;
         private readonly UserSettings userSettings;
+        private readonly IYouDiedSubtextGetter subtextGetter;
         private readonly float distanceDamageModifier;
         private readonly List<string> possibleSubtextValues;
 
@@ -70,17 +71,19 @@ namespace JumpKingModifiersMod.Modifiers
         /// <param name="playerStateObserver">An implementation of <see cref="IPlayerStateObserver"/> for getting the current player state</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to log to</param>
         public FallDamageModifier(ModifierUpdatingEntity modifierUpdatingEntity, ModEntityManager modEntityManager,
-            IPlayerStateObserver playerStateObserver, IGameStateObserver gameStateObserver, UserSettings userSettings, ILogger logger)
+            IPlayerStateObserver playerStateObserver, IGameStateObserver gameStateObserver, IYouDiedSubtextGetter subtextGetter,
+            UserSettings userSettings, ILogger logger)
         {
             this.modifierUpdatingEntity = modifierUpdatingEntity ?? throw new ArgumentNullException(nameof(modifierUpdatingEntity));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.playerStateObserver = playerStateObserver ?? throw new ArgumentNullException(nameof(playerStateObserver));
             this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
+            this.subtextGetter = subtextGetter ?? throw new ArgumentNullException(nameof(subtextGetter));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             random = new Random(DateTime.Now.Second + DateTime.Now.Millisecond);
 
-            distanceDamageModifier = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, 0.1f);
+            distanceDamageModifier = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, 0.1f);
             possibleSubtextValues = new List<string>();
             fallModifierState = FallDamageModifierState.Playing;
 
@@ -354,6 +357,7 @@ namespace JumpKingModifiersMod.Modifiers
                 youDiedAlphaLerpCounter = 0;
 
                 fallModifierState = FallDamageModifierState.DisplayingYouDied;
+                JKContentManager.Audio.RaymanSFX.Play();
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
             }
         }
@@ -373,9 +377,10 @@ namespace JumpKingModifiersMod.Modifiers
             {
                 youDiedEntity.ImageValue.SetAlpha(1);
 
+                string subtext = subtextGetter.GetYouDiedSubtext();
                 youDiedSubtextEntity = new UITextEntity(modEntityManager,
                     new Vector2(240, 245),
-                    "That's gotta be embarrassing...",
+                    subtext,
                     Color.White,
                     UIEntityAnchor.Center,
                     zOrder: 2);
@@ -455,6 +460,8 @@ namespace JumpKingModifiersMod.Modifiers
                 healthValue = MaxHealthValue;
                 fallModifierState = FallDamageModifierState.Playing;
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
+
+                JKContentManager.Audio.PressStart.Play();
             }
         }
 

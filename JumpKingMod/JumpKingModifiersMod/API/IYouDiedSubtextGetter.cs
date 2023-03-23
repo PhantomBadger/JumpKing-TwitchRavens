@@ -9,11 +9,11 @@ namespace JumpKingModifiersMod.API
     /// <summary>
     /// An interface representing an object which can get a subtext entry for the 'You Died' screen
     /// </summary>
-    internal interface IYouDiedSubtextGetter
+    public interface IYouDiedSubtextGetter
     {
         /// <summary>
         /// Gets a subtext value for the 'You Died' screen
         /// </summary>
-        string GetYourDiedSubtext();
+        string GetYouDiedSubtext();
     }
 }
