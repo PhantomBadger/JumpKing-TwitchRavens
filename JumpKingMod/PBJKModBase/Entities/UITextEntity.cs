@@ -62,15 +62,15 @@ namespace PBJKModBase.Entities
             }
         }
 
-        private readonly ModEntityManager modEntityManager;
+        protected readonly ModEntityManager modEntityManager;
 
-        private SpriteFont textFont;
-        private string textValue;
-        private string formattedText;
-        private Dictionary<char, Glyph> targetFontCharacterLookup;
-        private bool shouldUseFallbackFont;
+        protected SpriteFont textFont;
+        protected string textValue;
+        protected string formattedText;
+        protected Dictionary<char, Glyph> targetFontCharacterLookup;
+        protected bool shouldUseFallbackFont;
 
-        private const float MaxWidthOfLine = 300;
+        protected const float MaxWidthOfLine = 300;
 
         /// <summary>
         /// Ctor for creating a <see cref="UITextEntity"/> with a position and text value, and the default font
@@ -120,7 +120,7 @@ namespace PBJKModBase.Entities
         /// <summary>
         /// Gets the appropriate anchor position based on the set <see cref="AnchorPoint"/>
         /// </summary>
-        private Vector2 GetAnchorVector()
+        protected Vector2 GetAnchorVector()
         {
             switch (AnchorPoint)
             {
@@ -142,7 +142,7 @@ namespace PBJKModBase.Entities
         /// Called by the Entity Manager in the draw loop, uses <see cref="TextHelper.DrawString(SpriteFont, string, Vector2, Color, Vector2)"/> to render
         /// text to the screen
         /// </summary>
-        public void ForegroundDraw()
+        public virtual void ForegroundDraw()
         {
             Vector2 textSize = Size;
             Vector2 modifiedPosition = ScreenSpacePosition - new Vector2(0, textSize.Y);
@@ -156,7 +156,7 @@ namespace PBJKModBase.Entities
         /// <summary>
         /// Update method, do nothing
         /// </summary>
-        public void Update(float delta)
+        public virtual void Update(float delta)
         {
             // Do Nothing
         }
@@ -165,7 +165,7 @@ namespace PBJKModBase.Entities
         /// Given an input string, creates a new string with newlines added based on the 
         /// calculated size of the string with the <see cref="TextFont"/> currently set
         /// </summary>
-        private string WrapText(string input)
+        protected string WrapText(string input)
         {
             if (TextFont == null || input == null)
             {
@@ -230,7 +230,7 @@ namespace PBJKModBase.Entities
         /// Splits the given string based on the provided deliminators, but keeps
         /// the deliminators in the resulting split string array
         /// </summary>
-        private IEnumerable<string> TextSplit(string inputText, char[] deliminators)
+        protected IEnumerable<string> TextSplit(string inputText, char[] deliminators)
         {
             int startIndex = 0;
             int index = 0;
@@ -254,7 +254,7 @@ namespace PBJKModBase.Entities
         /// <summary>
         /// Determines whether we should use the fallback font for this string or not
         /// </summary>
-        private bool ShouldUseFallbackFont(string input)
+        protected bool ShouldUseFallbackFont(string input)
         {
             if (targetFontCharacterLookup == null)
             {

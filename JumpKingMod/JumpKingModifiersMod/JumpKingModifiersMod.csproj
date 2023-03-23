@@ -57,6 +57,7 @@
     <Compile Include="API\IPlayerJumper.cs" />
     <Compile Include="API\IPlayerStateObserver.cs" />
     <Compile Include="API\IWalkSpeedModifier.cs" />
+    <Compile Include="Entities\DamageTextEntity.cs" />
     <Compile Include="JumpKingModifiersModEntry.cs" />
     <Compile Include="Modifiers\BombCountdownModifier.cs" />
     <Compile Include="Modifiers\BouncyFloorModifier.cs" />

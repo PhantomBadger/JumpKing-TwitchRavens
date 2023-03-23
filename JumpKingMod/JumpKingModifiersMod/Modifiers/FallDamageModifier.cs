@@ -1,18 +1,14 @@
 ﻿using JumpKing;
 using JumpKing.Player;
 using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Entities;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Patching.States;
 using Logging.API;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.Modifiers
 {
@@ -35,6 +31,7 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly IPlayerStateObserver playerStateObserver;
         private readonly IGameStateObserver gameStateObserver;
         private readonly ILogger logger;
+        private readonly Random random;
 
         private UITextEntity healthTextEntity;
         private UIImageEntity healthBarFrontEntity;
@@ -75,6 +72,7 @@ namespace JumpKingModifiersMod.Modifiers
             this.playerStateObserver = playerStateObserver ?? throw new ArgumentNullException(nameof(playerStateObserver));
             this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            random = new Random(DateTime.Now.Second + DateTime.Now.Millisecond);
 
             fallModifierState = FallDamageModifierState.Playing;
 
@@ -225,9 +223,23 @@ namespace JumpKingModifiersMod.Modifiers
             return true;
         }
 
+        private bool keyReset = true;
         /// <inheritdoc/>
         public void Update(float p_delta)
         {
+            // Temporary Debug Spawner
+            //KeyboardState kbState = Keyboard.GetState();
+            //if (kbState.IsKeyDown(Keys.P) && keyReset)
+            //{
+            //    keyReset = false;
+            //    int randomNumber = random.Next(10) + 1;
+            //    SpawnDamageTextEntity(randomNumber, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
+            //}
+            //else if (!kbState.IsKeyDown(Keys.P))
+            //{
+            //    keyReset = true;
+            //}
+
             try
             {
                 switch (fallModifierState)
@@ -285,8 +297,11 @@ namespace JumpKingModifiersMod.Modifiers
                 int damage = Math.Max(1, (int)rawDamage);
 
                 // Apply the damage to the health
-                logger.Information($"Dealing Damage of '{damage}' (Raw damage '{rawDamage}')");
                 healthValue = Math.Max(0, healthValue - damage);
+                logger.Information($"Dealing Damage of '{damage}' (Raw damage '{rawDamage}') - Remaining Health: {healthValue}");
+
+                // Spawn the damage text
+                SpawnDamageTextEntity(damage, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
             }
             else if (playerState.IsOnGround)
             {
@@ -490,6 +505,14 @@ namespace JumpKingModifiersMod.Modifiers
 
             // Combine the offset and scale with the base position provided
             return new Rectangle(healthPosition.ToPoint() + new Point((int)xOffset, (int)yOffset), newSize);
+        }
+
+        /// <summary>
+        /// Spawns a <see cref="DamageTextEntity"/> with the provided values. The entity will handle its own lifetime and movement
+        /// </summary>
+        private DamageTextEntity SpawnDamageTextEntity(int damageValue, Vector2 startingScreenSpacePosition)
+        {
+            return new DamageTextEntity(modEntityManager, startingScreenSpacePosition, $"-{damageValue.ToString()}", Color.Red, JKContentManager.Font.MenuFontSmall, random);
         }
     }
 }

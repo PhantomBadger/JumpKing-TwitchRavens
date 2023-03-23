@@ -17,6 +17,7 @@ using PBJKModBase.API;
 using PBJKModBase.Entities;
 using PBJKModBase.Patching;
 using Settings;
+using TwitchLib.Client;
 
 namespace JumpKingRavensMod
 {
@@ -129,8 +130,16 @@ namespace JumpKingRavensMod
                                                 ravenTriggers.Add(easterEggTrigger);
                                             }
 
-                                            var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
-                                            ravenTriggers.Add(chatTrigger);
+                                            TwitchClient client = twitchClientFactory.GetTwitchClient();
+                                            if (client != null)
+                                            {
+                                                var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                                ravenTriggers.Add(chatTrigger);
+                                            }
+                                            else
+                                            {
+                                                Logger.Error($"Unable to create a Twitch Chat Raven Trigger as there is no valid Twitch Client created! Please check your settings!");
+                                            }
                                             break;
                                         }
                                     case TwitchRavenTriggerTypes.ChannelPointReward:
