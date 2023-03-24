@@ -328,6 +328,12 @@ namespace JumpKingModifiersMod.Modifiers
                 float rawDamage = (yDiff * distanceDamageModifier);
                 int damage = Math.Max(1, (int)rawDamage);
 
+                // If we landed on snow, deal no damage
+                if (playerState.IsOnSnow)
+                {
+                    damage = 0;
+                }
+
                 // Apply the damage to the health
                 healthValue = Math.Max(0, healthValue - damage);
                 logger.Information($"Dealing Damage of '{damage}' (Raw damage '{rawDamage}') - Remaining Health: {healthValue}");
@@ -335,8 +341,11 @@ namespace JumpKingModifiersMod.Modifiers
                 // Spawn the damage text
                 SpawnDamageTextEntity(damage, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
 
-                // Spawn a blood splat
-                SpawnBloodSplatEntity(playerState.Position);
+                if (damage > 0)
+                {
+                    // Spawn a blood splat
+                    SpawnBloodSplatEntity(playerState.Position);
+                }
             }
             else if (playerState.IsOnGround)
             {
@@ -557,7 +566,13 @@ namespace JumpKingModifiersMod.Modifiers
         /// </summary>
         private DamageTextEntity SpawnDamageTextEntity(int damageValue, Vector2 startingScreenSpacePosition)
         {
-            return new DamageTextEntity(modEntityManager, startingScreenSpacePosition, $"-{damageValue.ToString()}", Color.Red, JKContentManager.Font.MenuFontSmall, random);
+            return new DamageTextEntity(
+                modEntityManager, 
+                startingScreenSpacePosition, 
+                $"-{damageValue.ToString()}", 
+                damageValue > 0 ? Color.Red : Color.Aqua, 
+                JKContentManager.Font.MenuFontSmall, 
+                random);
         }
 
         /// <summary>

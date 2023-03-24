@@ -38,13 +38,32 @@ namespace JumpKingModifiersMod
                 logger.Information($"Loaded 'Health Bar Front' Texture");
 
                 BloodSplatterRawTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/bloodsplat");
-                BloodSplatterSprites = JKContentManager.Util.SpriteChopUtilGrid(BloodSplatterRawTexture, new Point(2, 4));
+                BloodSplatterSprites = SpriteChopUtilGrid(BloodSplatterRawTexture, new Point(2, 4), Vector2.Zero, BloodSplatterRawTexture.Bounds);
                 logger.Information($"Loaded 'Bloodsplat' Textures");
             }
             catch (Exception e)
             {
                 logger.Error($"Failed to initialise ModifiersModContentManager: {e.ToString()}");
             }
+        }
+
+        /// <summary>
+        /// Copied from JumpKing.JKContentManager.Util to save us needing to worry about accessing it
+        /// via reflection. This is internal in the base game but public in JK+
+        /// </summary>
+        internal static Sprite[] SpriteChopUtilGrid(Texture2D p_texture, Point p_cells, Vector2 p_center, Rectangle p_source)
+        {
+            int num = p_source.Width / p_cells.X;
+            int num2 = p_source.Height / p_cells.Y;
+            Sprite[] array = new Sprite[p_cells.X * p_cells.Y];
+            for (int i = 0; i < p_cells.X; i++)
+            {
+                for (int j = 0; j < p_cells.Y; j++)
+                {
+                    array[i + j * p_cells.X] = Sprite.CreateSpriteWithCenter(p_texture, new Rectangle(p_source.X + num * i, p_source.Y + num2 * j, num, num2), p_center);
+                }
+            }
+            return array;
         }
     }
 }

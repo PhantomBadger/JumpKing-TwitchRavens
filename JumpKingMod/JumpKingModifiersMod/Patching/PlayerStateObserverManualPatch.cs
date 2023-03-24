@@ -23,7 +23,9 @@ namespace JumpKingModifiersMod.Patching
     {
         private static ILogger logger;
 
-        private static FieldInfo isOnGroundField;
+        private static MethodInfo isOnGroundMethod;
+        private static MethodInfo isOnSnowMethod;
+        private static MethodInfo isInWaterMethod;
         private static FieldInfo velocityField;
         private static FieldInfo knockedField;
         private static FieldInfo positionField;
@@ -147,9 +149,17 @@ namespace JumpKingModifiersMod.Patching
         public static void PostfixBodyCompPatchMethod(object __instance, float p_delta)
         {
             bodyCompInstance = __instance;
-            if (isOnGroundField == null)
+            if (isOnGroundMethod == null)
             {
-                isOnGroundField = AccessTools.Field(bodyCompInstance.GetType(), "_is_on_ground");
+                isOnGroundMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsOnGround");
+            }
+            if (isOnSnowMethod == null)
+            {
+                isOnSnowMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsOnSnow");
+            }
+            if (isInWaterMethod == null)
+            {
+                isInWaterMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsInWater");
             }
             if (velocityField == null)
             {
@@ -194,17 +204,21 @@ namespace JumpKingModifiersMod.Patching
         /// </summary>
         public PlayerState GetPlayerState()
         {
-            if (isOnGroundField     != null &&
+            if (isOnGroundMethod     != null &&
+                isOnSnowMethod       != null &&
+                isInWaterMethod      != null &&
                 velocityField       != null &&
                 positionField       != null &&
                 knockedField        != null && 
                 bodyCompInstance    != null)
             {
-                bool isOnGroundValue = (bool)isOnGroundField.GetValue(bodyCompInstance);
+                bool isOnGround = (bool)isOnGroundMethod.Invoke(bodyCompInstance, null);
+                bool isOnSnow = (bool)isOnSnowMethod.Invoke(bodyCompInstance, null);
+                bool isInWater = (bool)isInWaterMethod.Invoke(bodyCompInstance, null);
                 Vector2 velocity = (Vector2)velocityField.GetValue(bodyCompInstance);
                 Vector2 position = (Vector2)positionField.GetValue(bodyCompInstance);
                 bool knocked = (bool)knockedField.GetValue(bodyCompInstance);
-                PlayerState state = new PlayerState(isOnGroundValue, velocity, position, knocked);
+                PlayerState state = new PlayerState(isOnGround, isOnSnow, isInWater, velocity, position, knocked);
                 return state;
             }
             else
@@ -233,7 +247,9 @@ namespace JumpKingModifiersMod.Patching
             if (playerEntityInstance != null)
             {
                 logger.Information($"Applying Default Save State!");
-                playerEntityInstance.ApplySaveState(SaveState.GetDefault());
+                SaveState defaultSaveState = SaveState.GetDefault();
+                defaultSaveState.position -= new Vector2(0, 10); // Move the player up a tiny bit, fixes odd issues where we clip into the ground a tad
+                playerEntityInstance.ApplySaveState(defaultSaveState);
             }
         }
 
