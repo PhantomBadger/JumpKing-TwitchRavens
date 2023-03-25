@@ -32,7 +32,8 @@ namespace PBJKModBase.Entities
 
         public void ForegroundDraw()
         {
-            ImageValue.Draw(Camera.TransformVector2(WorldSpacePosition));
+            // JK+ Changes some of the method signatures so we have to call a different one and pray
+            ImageValue.Draw(Camera.TransformVector2(WorldSpacePosition).ToPoint(), Microsoft.Xna.Framework.Graphics.SpriteEffects.None);
         }
 
         public void Update(float p_delta)
