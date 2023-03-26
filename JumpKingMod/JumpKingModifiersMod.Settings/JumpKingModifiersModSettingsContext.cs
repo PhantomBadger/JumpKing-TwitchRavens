@@ -23,6 +23,7 @@ namespace JumpKingModifiersMod.Settings
         public const string FallDamageSubtextsFilePath = "Content/Mods/FallDamageSubtexts.txt";
         public const string FallDamageModifierKey = "FallDamageModifier";
         public const string FallDamageClearBloodKey = "FallDamageClearBlood";
+        public const string FallDamagePreviousHealthKey = "FallDamagePreviousHealth";
 
         /// <summary>
         /// Gets the default state of the settings
@@ -34,6 +35,7 @@ namespace JumpKingModifiersMod.Settings
                 { DebugTriggerToggleKey, Keys.F11.ToString() },
                 { FallDamageClearBloodKey, Keys.F10.ToString() },
                 { FallDamageModifierKey, 0.1f.ToString() },
+                { FallDamagePreviousHealthKey, 100.ToString() }
             };
         }
 

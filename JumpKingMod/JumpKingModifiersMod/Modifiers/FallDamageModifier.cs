@@ -176,7 +176,9 @@ namespace JumpKingModifiersMod.Modifiers
             }
 
             fallModifierState = FallDamageModifierState.Playing;
-            healthValue = MaxHealthValue;
+
+            // Get the last used health value
+            healthValue = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamagePreviousHealthKey, MaxHealthValue);
 
             //Vector2? healthTextPosition = GetScreenSpacePositionForHealthTextEntity(playerState);
             //healthTextEntity = new UITextEntity(
