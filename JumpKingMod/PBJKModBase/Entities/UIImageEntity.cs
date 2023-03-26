@@ -44,7 +44,8 @@ namespace PBJKModBase.Entities
         {
             if (!DestinationRectangle.HasValue)
             {
-                ImageValue.Draw(ScreenSpacePosition);
+                // JK+ Changes some of the method signatures so we have to call a different one and pray
+                ImageValue.Draw(ScreenSpacePosition.ToPoint(), Microsoft.Xna.Framework.Graphics.SpriteEffects.None);
             }
             else
             {
