@@ -48,13 +48,13 @@ namespace JumpKingModifiersMod.Modifiers
                 }
                 else
                 {
-                    logger.Error($"Unable to find 'You Died' Subtexts List at '{JumpKingModifiersModSettingsContext.FallDamageSubtextsFilePath}'");
+                    logger.Warning($"Unable to find 'You Died' Subtexts List at '{JumpKingModifiersModSettingsContext.FallDamageSubtextsFilePath}', using default values instead!");
                     subtexts.AddRange(JumpKingModifiersModSettingsContext.GetDefaultFallDamageSubtexts());
                 }
             }
             catch (Exception e)
             {
-                logger.Error($"Encountered exception when loading 'You Died' Subtexts: {e.ToString()}");
+                logger.Error($"Encountered exception when loading 'You Died' Subtexts, using default values instead: {e.ToString()}");
                 subtexts.AddRange(JumpKingModifiersModSettingsContext.GetDefaultFallDamageSubtexts());
             }
         }

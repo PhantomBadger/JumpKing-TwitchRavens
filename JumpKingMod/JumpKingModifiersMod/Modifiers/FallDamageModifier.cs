@@ -301,6 +301,7 @@ namespace JumpKingModifiersMod.Modifiers
                 if (clearBloodKeyReset)
                 {
                     clearBloodKeyReset = false;
+                    logger.Information($"Clearing all Blood Splats!");
                     bloodSplatters.ClearAllBloodSplats();
                 }
             }
