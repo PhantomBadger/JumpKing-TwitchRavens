@@ -224,6 +224,9 @@ namespace JumpKingModifiersMod.Modifiers
 
             logger.Information($"Disable Fall Damage Modifier");
 
+            // Save out health value
+            userSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamagePreviousHealthKey, healthValue.ToString());
+
             playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
             healthTextEntity?.Dispose();
