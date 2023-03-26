@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\IGameRectFlipper.cs" />
     <Compile Include="API\IModifier.cs" />
     <Compile Include="API\IModifierTrigger.cs" />
     <Compile Include="API\IPlayerJumper.cs" />
@@ -64,9 +65,11 @@
     <Compile Include="Modifiers\BouncyFloorModifier.cs" />
     <Compile Include="Modifiers\FallDamageModifier.cs" />
     <Compile Include="Modifiers\FallDamage\BloodSplatterPersistence.cs" />
+    <Compile Include="Modifiers\FlipScreenModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
     <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />
+    <Compile Include="Patching\DrawRenderTargetManualPatch.cs" />
     <Compile Include="Patching\States\InputState.cs" />
     <Compile Include="Patching\States\JumpState.cs" />
     <Compile Include="Patching\JumpStateManualPatch.cs" />

@@ -54,19 +54,24 @@ namespace JumpKingModifiersMod
                 var jumpStatePatch = new JumpStateManualPatch(playerStatePatch, Logger);
                 jumpStatePatch.SetUpManualPatch(harmony);
 
+                // Set up the game rect patching
+                var drawRenderTargetPatch = new DrawRenderTargetManualPatch();
+                drawRenderTargetPatch.SetUpManualPatch(harmony);
+
                 // Make the Modifier Updating Entity
                 var modifierUpdatingEntity = new ModifierUpdatingEntity(ModEntityManager.Instance, Logger);
 
                 // Set up modifiers and trigger
                 var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
                 var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
+                var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
 
                 var subtextGetter = new YouDiedSubtextFileGetter(Logger);
                 var fallDamageModifier = new FallDamageModifier(
                     modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance, 
                     subtextGetter, userSettings, Logger);
 
-                var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, fallDamageModifier, userSettings);
+                var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, flipScreenModifier, userSettings);
                 debugTrigger.EnableTrigger();
             }
             catch (Exception e)
