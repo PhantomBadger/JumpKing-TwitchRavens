@@ -6,7 +6,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:Input="clr-namespace:Microsoft.Xna.Framework.Input;assembly=MonoGame.Framework"
         xmlns:local="clr-namespace:JumpKingRavensMod.Install.UI"
-        xmlns:settings="clr-namespace:Settings;assembly=Settings"
+        xmlns:settings="clr-namespace:JumpKingRavensMod.Settings;assembly=JumpKingRavensMod.Settings"
         mc:Ignorable="d"
         Title="Jump King Chat Ravens Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
    
