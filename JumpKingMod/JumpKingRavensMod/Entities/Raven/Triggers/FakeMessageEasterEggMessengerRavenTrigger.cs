@@ -133,8 +133,8 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
                 {
                     new EasterEggMessageInfo()
                     {
-                        RavenMessage = "You're 30, right?",
-                        RavenName = "TheBrutalic",
+                        RavenMessage = "I heard you been talkin' a big game",
+                        RavenName = "Queen of England",
                         RavenNameColor = Color.Aquamarine,
                         MessageOdds = 1,
                     }
@@ -172,6 +172,18 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
                         RavenMessage = "Hey! can I have your opinion about a game I made?",
                         RavenName = "duccW",
                         RavenNameColor = Color.Orange,
+                        MessageOdds = 1,
+                    }
+                }
+            },
+            {
+                "Rainhoe", new List<EasterEggMessageInfo>()
+                {
+                    new EasterEggMessageInfo()
+                    {
+                        RavenMessage = "Please stop making me fall",
+                        RavenName = "Jump King",
+                        RavenNameColor = Color.DarkGreen,
                         MessageOdds = 1,
                     }
                 }
