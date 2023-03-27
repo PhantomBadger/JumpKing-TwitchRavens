@@ -41,6 +41,7 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly IYouDiedSubtextGetter subtextGetter;
         private readonly float distanceDamageModifier;
         private readonly List<string> possibleSubtextValues;
+        private readonly bool isBloodEnabled;
         private readonly BloodSplatterPersistence bloodSplatters;
         private readonly Keys clearBloodKey;
 
@@ -89,6 +90,7 @@ namespace JumpKingModifiersMod.Modifiers
             random = new Random(DateTime.Now.Second + DateTime.Now.Millisecond);
 
             distanceDamageModifier = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, 0.1f);
+            isBloodEnabled = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
             clearBloodKey = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
             clearBloodKeyReset = true;
 
@@ -207,7 +209,10 @@ namespace JumpKingModifiersMod.Modifiers
                 Sprite.CreateSprite(ModifiersModContentManager.HealthBarFrontTexture),
                 zOrder: 1);
 
-            bloodSplatters.LoadBloodSplatters();
+            if (isBloodEnabled)
+            {
+                bloodSplatters.LoadBloodSplatters();
+            }
             logger.Information($"Enable Fall Damage Modifier");
             return true;
         }
@@ -247,8 +252,11 @@ namespace JumpKingModifiersMod.Modifiers
             lastOnGroundPosition = null;
             processSplat = false;
 
-            bloodSplatters.SaveBloodSplatters();
-            bloodSplatters.ClearAllBloodSplats();
+            if (isBloodEnabled)
+            {
+                bloodSplatters.SaveBloodSplatters();
+                bloodSplatters.ClearAllBloodSplats();
+            }
             return true;
         }
 
@@ -257,7 +265,10 @@ namespace JumpKingModifiersMod.Modifiers
         {
             try
             {
-                PollClearCommand();
+                if (isBloodEnabled)
+                {
+                    PollClearCommand();
+                }
 
                 switch (fallModifierState)
                 {
@@ -347,7 +358,7 @@ namespace JumpKingModifiersMod.Modifiers
                 // Spawn the damage text
                 SpawnDamageTextEntity(damage, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
 
-                if (damage > 0)
+                if (damage > 0 && isBloodEnabled)
                 {
                     // Spawn a blood splat
                     SpawnBloodSplatEntity(playerState.Position);
