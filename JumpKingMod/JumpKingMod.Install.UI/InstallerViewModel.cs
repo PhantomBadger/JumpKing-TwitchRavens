@@ -665,6 +665,11 @@ namespace JumpKingRavensMod.Install.UI
         /// </summary>
         private bool CanUpdateModSettings()
         {
+            if (string.IsNullOrWhiteSpace(GameDirectory))
+            {
+                return false;
+            }
+
             string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.SettingsFileName);
             bool fileExists = File.Exists(expectedSettingsFilePath);
             return fileExists;
@@ -722,7 +727,7 @@ namespace JumpKingRavensMod.Install.UI
         /// </summary>
         private void UpdateModSettings()
         {
-            if (RavenModSettings == null)
+            if (RavenModSettings == null || string.IsNullOrWhiteSpace(GameDirectory))
             {
                 return;
             }
@@ -799,6 +804,11 @@ namespace JumpKingRavensMod.Install.UI
         /// </summary>
         private void LoadRavenModSettings(bool createIfDoesntExist)
         {
+            if (string.IsNullOrWhiteSpace(GameDirectory))
+            {
+                return;
+            }
+
             // Load in the settings
             string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.SettingsFileName);
             if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
@@ -907,6 +917,11 @@ namespace JumpKingRavensMod.Install.UI
 
         private void LoadFallDamageModSettings(bool createIfDoesntExist)
         {
+            if (string.IsNullOrWhiteSpace(GameDirectory))
+            {
+                return;
+            }
+
             // Load in the settings
             string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingModifiersModSettingsContext.SettingsFileName);
             if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
