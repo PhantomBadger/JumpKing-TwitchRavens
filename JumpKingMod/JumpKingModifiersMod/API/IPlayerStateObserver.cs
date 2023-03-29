@@ -49,5 +49,17 @@ namespace JumpKingModifiersMod.API
         /// This is automatically set back to <c>false</c> internally if <paramref name="isWalkingDisabled"/> is <c>false</c>
         /// </param>
         void DisablePlayerWalking(bool isWalkingDisabled, bool isXVelocityDisabled = false);
+
+        /// <summary>
+        /// Allows the inverting of player left/right inputs
+        /// </summary>
+        /// <param name="invertPlayerInputs">if <c>true</c> then player inputs will be inverted, if <c>false</c> they wont</param>
+        void SetInvertPlayerInputs(bool invertPlayerInputs);
+
+        /// <summary>
+        /// Gets whether the player's inputs are currently inverted
+        /// </summary>
+        /// <returns><c>true</c> if the inputs are inverted, <c>false</c> if not</returns>
+        bool GetInvertPlayerInputs();
     }
 }

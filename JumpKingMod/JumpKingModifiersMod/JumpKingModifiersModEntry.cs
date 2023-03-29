@@ -66,23 +66,27 @@ namespace JumpKingModifiersMod
                 //var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
                 //var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
                 //var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
+                var invertControlsModifier = new InvertControlsModifier(playerStatePatch, Logger);
+                var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, invertControlsModifier, userSettings);
+                debugTrigger.EnableTrigger();
 
-                bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
-                if (isFallDamageEnabled)
-                {
-                    var subtextGetter = new YouDiedSubtextFileGetter(Logger);
-                    var fallDamageModifier = new FallDamageModifier(
-                        modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance,
-                        subtextGetter, userSettings, Logger);
 
-                    var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, fallDamageModifier, userSettings);
-                    debugTrigger.EnableTrigger();
-                    Logger.Information($"Fall Damage Mod is Enabled! Press the Toggle Key to activate once in game!");
-                }
-                else
-                {
-                    Logger.Error($"Fall Damage Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
-                }
+                //bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
+                //if (isFallDamageEnabled)
+                //{
+                //    var subtextGetter = new YouDiedSubtextFileGetter(Logger);
+                //    var fallDamageModifier = new FallDamageModifier(
+                //        modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance,
+                //        subtextGetter, userSettings, Logger);
+
+                //    var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, fallDamageModifier, userSettings);
+                //    debugTrigger.EnableTrigger();
+                //    Logger.Information($"Fall Damage Mod is Enabled! Press the Toggle Key to activate once in game!");
+                //}
+                //else
+                //{
+                //    Logger.Error($"Fall Damage Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
+                //}
             }
             catch (Exception e)
             {

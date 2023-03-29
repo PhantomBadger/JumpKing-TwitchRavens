@@ -66,6 +66,7 @@
     <Compile Include="Modifiers\FallDamageModifier.cs" />
     <Compile Include="Modifiers\FallDamage\BloodSplatterPersistence.cs" />
     <Compile Include="Modifiers\FlipScreenModifier.cs" />
+    <Compile Include="Modifiers\InvertControlsModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
     <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />

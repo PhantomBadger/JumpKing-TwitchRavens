@@ -40,6 +40,7 @@ namespace JumpKingModifiersMod.Patching
         private static int directionOverrideValue;
         private static bool isWalkingDisabled;
         private static bool isXVelocityDisabled;
+        private static bool isInputInverted;
 
         private static InputState prevInputState;
 
@@ -55,6 +56,7 @@ namespace JumpKingModifiersMod.Patching
             knockedOverrideValue = false;
             isWalkingDisabled = false;
             isXVelocityDisabled = false;
+            isInputInverted = false;
         }
 
         /// <inheritdoc/>
@@ -139,6 +141,16 @@ namespace JumpKingModifiersMod.Patching
             bool left = (bool)leftField.GetValue(__result);
             bool right = (bool)rightField.GetValue(__result);
             bool jump = (bool)jumpField.GetValue(__result);
+
+            // Invert the input in the result and also for our caching
+            if (isInputInverted)
+            {
+                rightField.SetValue(__result, left);
+                leftField.SetValue(__result, right);
+                bool tempRight = right;
+                right = left;
+                left = tempRight;
+            }
 
             prevInputState = new InputState(left, right, jump);
         }
@@ -271,6 +283,18 @@ namespace JumpKingModifiersMod.Patching
         public InputState GetInputState()
         {
             return prevInputState;
+        }
+
+        /// <inheritdoc/>
+        public void SetInvertPlayerInputs(bool invertPlayerInputs)
+        {
+            isInputInverted = invertPlayerInputs;
+        }
+
+        /// <inheritdoc/>
+        public bool GetInvertPlayerInputs()
+        {
+            return isInputInverted;
         }
     }
 }
