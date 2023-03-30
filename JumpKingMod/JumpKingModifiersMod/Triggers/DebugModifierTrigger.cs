@@ -36,11 +36,21 @@ namespace JumpKingModifiersMod.Triggers
         /// <param name="modifier">The <see cref="IModifier"/> to toggle</param>
         public DebugModifierTrigger(ModEntityManager modEntityManager, 
             IModifier modifier, UserSettings userSettings)
+            :this(modEntityManager, modifier, userSettings, userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerToggleKey, Keys.F11))
+        {
+ 
+        }
+
+        /// <summary>
+        /// Internal Ctor for creating a <see cref="DebugModifierTrigger"/> which lets us override the Key to trigger
+        /// </summary>
+        internal DebugModifierTrigger(ModEntityManager modEntityManager,
+            IModifier modifier, UserSettings userSettings, Keys toggleKey)
         {
             this.modifier = modifier ?? throw new ArgumentNullException(nameof(modifier));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
-            toggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerToggleKey, Keys.F11);
+            this.toggleKey = toggleKey;
 
             pressedCooldown = false;
             isTriggerActive = false;
