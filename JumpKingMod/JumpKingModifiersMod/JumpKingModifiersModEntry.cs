@@ -5,6 +5,7 @@ using JumpKingModifiersMod.Settings;
 using JumpKingModifiersMod.Triggers;
 using Logging;
 using Logging.API;
+using Microsoft.Xna.Framework.Input;
 using PBJKModBase;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
@@ -35,7 +36,7 @@ namespace JumpKingModifiersMod
                 harmony.PatchAll();
 
                 Logger.Information($"====================================");
-                Logger.Information($"Jump King Fall Damage Mod!");
+                Logger.Information($"Jump King Modifiers Mod!");
                 Logger.Information($"====================================");
 
                 // Load content & settings
@@ -63,30 +64,52 @@ namespace JumpKingModifiersMod
 
                 // Set up modifiers and trigger
                 // Not released yet ssshh....
-                //var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
-                //var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
-                //var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
+                var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
+                var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
+                var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
                 var invertControlsModifier = new InvertControlsModifier(playerStatePatch, Logger);
-                var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, invertControlsModifier, userSettings);
+
+                List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
+
+                // Fall Damage
+                bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
+                if (isFallDamageEnabled)
+                {
+                    var subtextGetter = new YouDiedSubtextFileGetter(Logger);
+                    var fallDamageModifier = new FallDamageModifier(
+                        modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance,
+                        subtextGetter, userSettings, Logger);
+                    Keys fallDamageToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, Keys.F11);
+
+                    var togglePair = new DebugTogglePair(fallDamageModifier, fallDamageToggleKey);
+                    debugToggles.Add(togglePair);
+
+                    Logger.Information($"Fall Damage Mod is Enabled! Press the Toggle Key ({fallDamageToggleKey.ToString()}) to activate once in game!");
+                }
+                else
+                {
+                    Logger.Error($"Fall Damage Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
+                }
+
+                // Manual Resizing
+                bool isShrinkingEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
+                if (isShrinkingEnabled)
+                {
+                    var manualResizeModifier = new ManualScreenResizeModifier(modifierUpdatingEntity, userSettings, Logger);
+                    Keys manualResizeToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
+
+                    var togglePair = new DebugTogglePair(manualResizeModifier, manualResizeToggleKey);
+                    debugToggles.Add(togglePair);
+                    Logger.Information($"Manual Resize Mod is Enabled! Press the Toggle Key ({manualResizeToggleKey.ToString()}) to activate once in game!");
+                }
+                else
+                {
+                    Logger.Error($"Manual Resize Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
+                }
+
+                // Make the toggle trigger
+                var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings);
                 debugTrigger.EnableTrigger();
-
-
-                //bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
-                //if (isFallDamageEnabled)
-                //{
-                //    var subtextGetter = new YouDiedSubtextFileGetter(Logger);
-                //    var fallDamageModifier = new FallDamageModifier(
-                //        modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance,
-                //        subtextGetter, userSettings, Logger);
-
-                //    var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, fallDamageModifier, userSettings);
-                //    debugTrigger.EnableTrigger();
-                //    Logger.Information($"Fall Damage Mod is Enabled! Press the Toggle Key to activate once in game!");
-                //}
-                //else
-                //{
-                //    Logger.Error($"Fall Damage Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
-                //}
             }
             catch (Exception e)
             {

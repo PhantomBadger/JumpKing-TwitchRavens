@@ -67,16 +67,24 @@ namespace JumpKingRavensMod.Twitch
                 twitchName = twitchName.Trim();
                 logger.Information($"Setting up Twitch Chat Client for '{twitchName}'");
 
-                var credentials = new ConnectionCredentials(twitchName, oAuthToken);
-                var clientOptions = new ClientOptions();
-                WebSocketClient webSocketClient = new WebSocketClient(clientOptions);
-                twitchClient = new TwitchClient(webSocketClient);
-                twitchClient.Initialize(credentials, twitchName);
+                try
+                {
+                    var credentials = new ConnectionCredentials(twitchName, oAuthToken);
+                    var clientOptions = new ClientOptions();
+                    WebSocketClient webSocketClient = new WebSocketClient(clientOptions);
+                    twitchClient = new TwitchClient(webSocketClient);
+                    twitchClient.Initialize(credentials, twitchName);
 
-                //twitchClient.OnLog += TwitchClient_OnLog;
+                    //twitchClient.OnLog += TwitchClient_OnLog;
 
-                twitchClient.Connect();
-                return twitchClient;
+                    twitchClient.Connect();
+                    return twitchClient;
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Encountered error when trying to create Twitch Client. Check your Oauth token is correct!");
+                    return null;
+                }
             }
         }
 

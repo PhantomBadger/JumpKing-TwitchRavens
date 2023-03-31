@@ -311,6 +311,86 @@ namespace JumpKingRavensMod.Install.UI
         private Keys fallDamageClearBloodKey;
 
         /// <summary>
+        /// Whether the Resizing mod will be enabled or not
+        /// </summary>
+        public bool ManualResizingEnabled
+        {
+            get
+            {
+                return resizingEnabled;
+            }
+            set
+            {
+                if (resizingEnabled != value)
+                {
+                    resizingEnabled = value;
+                    RaisePropertyChanged(nameof(ManualResizingEnabled));
+                }
+            }
+        }
+        private bool resizingEnabled;
+
+        /// <summary>
+        /// The key to press to toggle the Resize Mod
+        /// </summary>
+        public Keys ManualResizingToggleKey
+        {
+            get
+            {
+                return manualResizingToggleKey;
+            }
+            set
+            {
+                if (manualResizingToggleKey != value)
+                {
+                    manualResizingToggleKey = value;
+                    RaisePropertyChanged(nameof(ManualResizingToggleKey));
+                }
+            }
+        }
+        private Keys manualResizingToggleKey;
+
+        /// <summary>
+        /// The key to press to grow the screen in the Resize Mod
+        /// </summary>
+        public Keys ManualResizingGrowKey
+        {
+            get
+            {
+                return manualResizingGrowKey;
+            }
+            set
+            {
+                if (manualResizingGrowKey != value)
+                {
+                    manualResizingGrowKey = value;
+                    RaisePropertyChanged(nameof(ManualResizingGrowKey));
+                }
+            }
+        }
+        private Keys manualResizingGrowKey;
+
+        /// <summary>
+        /// The key to press to shrink the screen in the Resize Mod
+        /// </summary>
+        public Keys ManualResizingShrinkKey
+        {
+            get
+            {
+                return manualResizingShrinkKey;
+            }
+            set
+            {
+                if (manualResizingShrinkKey != value)
+                {
+                    manualResizingShrinkKey = value;
+                    RaisePropertyChanged(nameof(ManualResizingShrinkKey));
+                }
+            }
+        }
+        private Keys manualResizingShrinkKey;
+
+        /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
         /// </summary>
         public string ExpectedRemoteModDirectory
@@ -791,10 +871,15 @@ namespace JumpKingRavensMod.Install.UI
 
             // Fall Damage
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, FallDamageEnabled.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerToggleKey, FallDamageToggleKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, FallDamageToggleKey.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, FallDamageModifier.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, FallDamageBloodSplatEnabled.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, FallDamageClearBloodKey.ToString());
+
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, ManualResizingEnabled.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, ManualResizingToggleKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, ManualResizingGrowKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, ManualResizingShrinkKey.ToString());
 
             MessageBox.Show($"Settings updated successfully!");
         }
@@ -930,10 +1015,15 @@ namespace JumpKingRavensMod.Install.UI
 
                 // Load the initial data
                 FallDamageEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
-                FallDamageToggleKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerToggleKey, Keys.F11);
+                FallDamageToggleKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, Keys.F11);
                 FallDamageModifier = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, JumpKingModifiersModSettingsContext.DefaultFallDamageModifier).ToString();
                 FallDamageBloodSplatEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
                 FallDamageClearBloodKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
+
+                ManualResizingEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
+                ManualResizingToggleKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
+                ManualResizingGrowKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, Keys.Up);
+                ManualResizingShrinkKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, Keys.Down);
             }
         }
 

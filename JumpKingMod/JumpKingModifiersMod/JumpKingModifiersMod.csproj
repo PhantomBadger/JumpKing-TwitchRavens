@@ -67,6 +67,7 @@
     <Compile Include="Modifiers\FallDamage\BloodSplatterPersistence.cs" />
     <Compile Include="Modifiers\FlipScreenModifier.cs" />
     <Compile Include="Modifiers\InvertControlsModifier.cs" />
+    <Compile Include="Modifiers\ManualScreenResizeModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
     <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModifiersModContentManager.cs" />
     <Compile Include="Triggers\DebugModifierTrigger.cs" />
+    <Compile Include="Triggers\DebugTogglePair.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj">

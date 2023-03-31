@@ -632,11 +632,58 @@
                                 <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageModifierTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Fall Damage Modifier:" />
                                 <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource fallDamageModifierTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding FallDamageModifier, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <!-- Blood Enabled -->
-                                <TextBlock Grid.Row="7" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageBloodTooltip}" Text="Blood Splat Enabled: " />
-                                <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource fallDamageBloodTooltip}" IsChecked="{Binding FallDamageBloodSplatEnabled, Mode=TwoWay}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}"/>
+                                <TextBlock Grid.Row="7" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Blood Splat Enabled: " />
+                                <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource fallDamageBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding FallDamageBloodSplatEnabled, Mode=TwoWay}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}"/>
                                 <!-- Clear Blood Button -->
                                 <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageClearBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Clear Blood Key:" />
                                 <ComboBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource fallDamageClearBloodTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding FallDamageClearBloodKey, Mode=TwoWay}"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem x:Name="tabItemResizing" Header="Resizing">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <ToolTip x:Key="resizingTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            Will allow you to resize the window with the specified Grow and Shrink Keys!
+                                        </TextBlock>
+                                    </ToolTip>
+                                </Grid.Resources>
+                                <!-- Resizing Enabled  -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource resizingTooltip}" Text="Enabled: "/>
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource resizingTooltip}" IsChecked="{Binding ManualResizingEnabled, Mode=TwoWay}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" FontSize="9" TextWrapping="Wrap">
+                                    <Italic>
+                                        This works best in Borderless or Windowed mode!
+                                        <LineBreak/>
+                                        Use the below Toggle Key to activate it once you start playing!
+                                    </Italic>
+                                </TextBlock>
+                                <!-- Seperator -->
+                                <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
+                                <!-- Toggle Button -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource resizingTooltip}" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Key:" />
+                                <ComboBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource resizingTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding ManualResizingToggleKey, Mode=TwoWay}"/>
+                                <!-- Grow Button -->
+                                <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource resizingTooltip}" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Grow Key:" />
+                                <ComboBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource resizingTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding ManualResizingGrowKey, Mode=TwoWay}"/>
+                                <!-- Shrink Button -->
+                                <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource resizingTooltip}" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Shrink Key:" />
+                                <ComboBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource resizingTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding ManualResizingShrinkKey, Mode=TwoWay}"/>
                             </Grid>
                         </TabItem>
                         <!--

@@ -20,41 +20,35 @@ namespace JumpKingModifiersMod.Triggers
     /// listens for keyboard input within the Monogame application as an entity to toggle a provided 
     /// modifier
     /// </summary>
-    public class DebugModifierTrigger : IModifierTrigger, IModEntity
+    public class DebugModifierTrigger : IModifierTrigger, IModEntity, IDisposable
     {
+        private readonly ModEntityManager modEntityManager;
+        private readonly List<DebugTogglePair> modifierToggles;
         private readonly UserSettings userSettings;
-        private readonly IModifier modifier;
-        private readonly Keys toggleKey;
 
-        private bool pressedCooldown;
         private bool isTriggerActive;
 
         /// <summary>
         /// Ctor for creating a <see cref="DebugModifierTrigger"/>
         /// </summary>
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register itself to</param>
-        /// <param name="modifier">The <see cref="IModifier"/> to toggle</param>
-        public DebugModifierTrigger(ModEntityManager modEntityManager, 
-            IModifier modifier, UserSettings userSettings)
-            :this(modEntityManager, modifier, userSettings, userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerToggleKey, Keys.F11))
+        /// <param name="modifierToggles">A collection of <see cref="DebugTogglePair"/> to link a <see cref="IModifier"/> to a toggle key</param>
+        internal DebugModifierTrigger(ModEntityManager modEntityManager,
+            List<DebugTogglePair> modifierToggles, UserSettings userSettings)
         {
- 
+            this.modifierToggles = modifierToggles ?? throw new ArgumentNullException(nameof(modifierToggles));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
+
+            isTriggerActive = false;
+            modEntityManager.AddEntity(this, 0);
         }
 
         /// <summary>
-        /// Internal Ctor for creating a <see cref="DebugModifierTrigger"/> which lets us override the Key to trigger
+        /// Implementation of <see cref="IDisposable.Dispose"/> to clean up
         /// </summary>
-        internal DebugModifierTrigger(ModEntityManager modEntityManager,
-            IModifier modifier, UserSettings userSettings, Keys toggleKey)
+        public void Dispose()
         {
-            this.modifier = modifier ?? throw new ArgumentNullException(nameof(modifier));
-            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
-
-            this.toggleKey = toggleKey;
-
-            pressedCooldown = false;
-            isTriggerActive = false;
-            modEntityManager.AddEntity(this, 0);
+            modEntityManager.RemoveEntity(this);
         }
 
         /// <inheritdoc/>
@@ -87,26 +81,31 @@ namespace JumpKingModifiersMod.Triggers
                 return;
             }
 
-            // Toggle the modifier
-            var keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(toggleKey))
+            // Toggle the modifiers
+            var kbState = Keyboard.GetState();
+            for (int i = 0; i < modifierToggles.Count; i++)
             {
-                if (!pressedCooldown)
+                DebugTogglePair togglePair = modifierToggles[i];
+
+                if (kbState.IsKeyDown(togglePair.ToggleKey))
                 {
-                    pressedCooldown = true;
-                    if (modifier.IsModifierEnabled())
+                    if (togglePair.ToggleKeyReset)
                     {
-                        modifier.DisableModifier();
-                    }
-                    else
-                    {
-                        modifier.EnableModifier();
+                        togglePair.ToggleKeyReset = false;
+                        if (togglePair.Modifier.IsModifierEnabled())
+                        {
+                            togglePair.Modifier.DisableModifier();
+                        }
+                        else
+                        {
+                            togglePair.Modifier.EnableModifier();
+                        }
                     }
                 }
-            }
-            else
-            {
-                pressedCooldown = false;
+                else
+                {
+                    togglePair.ToggleKeyReset = true;
+                }
             }
         }
 

@@ -15,19 +15,22 @@ namespace JumpKingModifiersMod.Settings
         public const string SettingsFileName = "JumpKingModifiersMod.settings";
         public const char CommentCharacter = '#';
 
-        // Debug Trigger
-        public const string DebugTriggerToggleKey = "DebugTriggerToggleKey";
-
         // Fall Damage
         public const string FallDamageBloodSplatterFilePath = "Content/Mods/BloodSplatters.txt";
         public const string FallDamageSubtextsFilePath = "Content/Mods/FallDamageSubtexts.txt";
+        public const string DebugTriggerFallDamageToggleKeyKey = "DebugTriggerFallDamageToggleKey";
         public const string FallDamageEnabledKey = "FallDamageEnabled";
         public const string FallDamageModifierKey = "FallDamageModifier";
         public const string FallDamageBloodEnabledKey = "FallDamageBloodEnabled";
         public const string FallDamageClearBloodKey = "FallDamageClearBlood";
         public const string FallDamagePreviousHealthKey = "FallDamagePreviousHealth";
-
         public const float DefaultFallDamageModifier = 0.05f;
+
+        // Shrinking
+        public const string DebugTriggerManualResizeToggleKey = "DebugTriggerManualResizeToggleKey";
+        public const string ManualResizeEnabledKey = "ManualResizeEnabled";
+        public const string ManualResizeGrowKeyKey = "ManualResizeGrowKey";
+        public const string ManualResizeShrinkKeyKey = "ManualResizeShrinkKey";
 
         /// <summary>
         /// Gets the default state of the settings
@@ -36,12 +39,16 @@ namespace JumpKingModifiersMod.Settings
         {
             return new Dictionary<string, string>()
             {
-                { DebugTriggerToggleKey, Keys.F11.ToString() },
+                { DebugTriggerFallDamageToggleKeyKey, Keys.F11.ToString() },
                 { FallDamageEnabledKey, false.ToString() },
                 { FallDamageBloodEnabledKey, true.ToString() },
                 { FallDamageClearBloodKey, Keys.F10.ToString() },
                 { FallDamageModifierKey, DefaultFallDamageModifier.ToString() },
-                { FallDamagePreviousHealthKey, 100.ToString() }
+                { FallDamagePreviousHealthKey, 100.ToString() },
+                { DebugTriggerManualResizeToggleKey, Keys.F9.ToString() },
+                { ManualResizeEnabledKey, false.ToString() },
+                { ManualResizeGrowKeyKey, Keys.Up.ToString() },
+                { ManualResizeShrinkKeyKey, Keys.Down.ToString() }
             };
         }
 
