@@ -68,8 +68,10 @@ namespace JumpKingModifiersMod
                 var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
                 var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
                 var invertControlsModifier = new InvertControlsModifier(playerStatePatch, Logger);
+                var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
+                debugToggles.Add(new DebugTogglePair(bombCountdownModifier, Keys.OemPeriod));
 
                 // Fall Damage
                 bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
