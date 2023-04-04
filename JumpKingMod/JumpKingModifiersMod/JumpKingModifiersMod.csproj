@@ -58,6 +58,7 @@
     <Compile Include="API\IPlayerJumper.cs" />
     <Compile Include="API\IPlayerStateObserver.cs" />
     <Compile Include="API\IWalkSpeedModifier.cs" />
+    <Compile Include="API\IWindObserver.cs" />
     <Compile Include="API\IYouDiedSubtextGetter.cs" />
     <Compile Include="Entities\DamageTextEntity.cs" />
     <Compile Include="JumpKingModifiersModEntry.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Modifiers\ManualScreenResizeModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
     <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
+    <Compile Include="Modifiers\WindToggleModifier.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />
     <Compile Include="Patching\DrawRenderTargetManualPatch.cs" />
     <Compile Include="Patching\States\InputState.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Patching\States\PlayerState.cs" />
     <Compile Include="Patching\PlayerStateObserverManualPatch.cs" />
     <Compile Include="Patching\PlayerValuesManualPatch.cs" />
+    <Compile Include="Patching\WindObserverManualPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModifiersModContentManager.cs" />
     <Compile Include="Triggers\DebugModifierTrigger.cs" />

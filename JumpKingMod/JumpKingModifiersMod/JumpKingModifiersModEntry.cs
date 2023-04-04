@@ -59,6 +59,10 @@ namespace JumpKingModifiersMod
                 var drawRenderTargetPatch = new DrawRenderTargetManualPatch();
                 drawRenderTargetPatch.SetUpManualPatch(harmony);
 
+                // Set up the wind patching
+                var windPatch = new WindObserverManualPatch(Logger);
+                windPatch.SetUpManualPatch(harmony);
+
                 // Make the Modifier Updating Entity
                 var modifierUpdatingEntity = new ModifierUpdatingEntity(ModEntityManager.Instance, Logger);
 
@@ -69,9 +73,10 @@ namespace JumpKingModifiersMod
                 var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
                 var invertControlsModifier = new InvertControlsModifier(playerStatePatch, Logger);
                 var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
+                var windModifier = new WindToggleModifier(windPatch, Logger);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
-                debugToggles.Add(new DebugTogglePair(bombCountdownModifier, Keys.OemPeriod));
+                debugToggles.Add(new DebugTogglePair(windModifier, Keys.OemPeriod));
 
                 // Fall Damage
                 bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
