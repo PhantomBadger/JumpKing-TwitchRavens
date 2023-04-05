@@ -13,13 +13,32 @@ using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.Visuals
 {
+    /// <summary>
+    /// An implementation of <see cref="IModEntity"/> and <see cref="IDisposable"/> which handles spawning and positioning
+    /// text notifications for modifiers being enabled and disabled
+    /// </summary>
     public class ModifierNotifications : IModEntity, IDisposable
     {
+        /// <summary>
+        /// A private aggregate class for the Modifier and whether its being enabled or disabled
+        /// </summary>
         private class ModifierState
         {
+            /// <summary>
+            /// An implementation of <see cref="IModifier"/> that has changed state
+            /// </summary>
             public IModifier Modifier { get; private set; }
+
+            /// <summary>
+            /// Whether the provided modifier is being enabled or disabled
+            /// </summary>
             public bool IsEnabled { get; private set; }
 
+            /// <summary>
+            /// Ctor for creating a <see cref="ModifierState"/>
+            /// </summary>
+            /// <param name="modifier">An implementation of <see cref="IModifier"/> that has changed state</param>
+            /// <param name="isEnabled">Whether the provided modifier is being enabled or disabled. <c>true</c> will mean the modifier is being enabled</param>
             public ModifierState(IModifier modifier, bool isEnabled)
             {
                 Modifier = modifier ?? throw new ArgumentNullException(nameof(modifier));
@@ -43,6 +62,12 @@ namespace JumpKingModifiersMod.Visuals
         private const float FadeOutDurationInSeconds = 0.5f;
         private const float MaxAlpha = 102f;
 
+        /// <summary>
+        /// Ctor for creating a <see cref="ModifierNotifications"/>
+        /// </summary>
+        /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register with</param>
+        /// <param name="triggers">A list of <see cref="IModifierTrigger"/> implementations to listed to for modifier state changes</param>
+        /// <param name="logger">An implementation of <see cref="ILogger"/> to use for logging</param>
         public ModifierNotifications(ModEntityManager modEntityManager, List<IModifierTrigger> triggers, ILogger logger)
         {
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
@@ -62,6 +87,9 @@ namespace JumpKingModifiersMod.Visuals
             modEntityManager.AddEntity(this, zOrder: 0);
         }
 
+        /// <summary>
+        /// Implementation of <see cref="IDisposable.Dispose"/> to clean up events
+        /// </summary>
         public void Dispose()
         {
             for (int i = 0; i < triggers.Count; i++)
@@ -74,6 +102,9 @@ namespace JumpKingModifiersMod.Visuals
             modEntityManager.RemoveEntity(this);
         }
 
+        /// <summary>
+        /// Called by <see cref="IModifierTrigger.OnModifierDisabled"/>
+        /// </summary>
         private void OnModifierDisabled(IModifier modifier)
         {
             modifierStatesToDisplay.Enqueue(new ModifierState(modifier, isEnabled: false));
@@ -81,6 +112,9 @@ namespace JumpKingModifiersMod.Visuals
             fadeOutCounter = 0;
         }
 
+        /// <summary>
+        /// Called by <see cref="IModifierTrigger.OnModifierEnabled"/>
+        /// </summary>
         private void OnModifierEnabled(IModifier modifier)
         {
             modifierStatesToDisplay.Enqueue(new ModifierState(modifier, isEnabled: true));
@@ -88,6 +122,7 @@ namespace JumpKingModifiersMod.Visuals
             fadeOutCounter = 0;
         }
 
+        /// <inheritdoc/>
         public void Update(float p_delta)
         {
             // Do we have any modifier states to display?
@@ -144,6 +179,7 @@ namespace JumpKingModifiersMod.Visuals
             }
         }
 
+        /// <inheritdoc/>
         public void Draw()
         {
             // Do nothing
