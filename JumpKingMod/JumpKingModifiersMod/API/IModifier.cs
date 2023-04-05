@@ -12,6 +12,11 @@ namespace JumpKingModifiersMod.API
     public interface IModifier
     {
         /// <summary>
+        /// A name to refer to this modifier in a user-oriented way
+        /// </summary>
+        string DisplayName { get; }
+
+        /// <summary>
         /// Applies the current modifier
         /// </summary>
         /// <returns><c>true</c> if successfully applied, <c>false</c> if not</returns>

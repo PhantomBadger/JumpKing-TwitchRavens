@@ -17,6 +17,8 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class ManualScreenResizeModifier : IModifier, IDisposable
     {
+        public string DisplayName { get; } = "Screen Resize (Manual)";
+
         private readonly ModifierUpdatingEntity modifierUpdatingEntity;
         private readonly UserSettings userSettings;
         private readonly ILogger logger;

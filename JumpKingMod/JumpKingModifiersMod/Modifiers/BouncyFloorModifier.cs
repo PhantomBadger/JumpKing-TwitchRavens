@@ -17,6 +17,8 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class BouncyFloorModifier : IModifier, IDisposable
     {
+        public string DisplayName { get; } = "Bouncy";
+
         private readonly ModifierUpdatingEntity modifierUpdatingEntity;
         private readonly IPlayerStateObserver playerStateAccessor;
         private readonly IPlayerJumper playerJumper;

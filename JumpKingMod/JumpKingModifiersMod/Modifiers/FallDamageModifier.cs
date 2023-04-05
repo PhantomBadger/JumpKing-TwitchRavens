@@ -23,6 +23,8 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class FallDamageModifier : IModifier, IDisposable
     {
+        public string DisplayName { get; } = "Fall Damage";
+
         private enum FallDamageModifierState
         {
             Playing,

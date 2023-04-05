@@ -6,11 +6,17 @@ using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.API
 {
+    public delegate void ModifierEnabledDelegate(IModifier modifier);
+    public delegate void ModifierDisabledDelegate(IModifier modifier);
+
     /// <summary>
     /// An interface representing a possible trigger for a modifier
     /// </summary>
     public interface IModifierTrigger
     {
+        event ModifierEnabledDelegate OnModifierEnabled;
+        event ModifierDisabledDelegate OnModifierDisabled;
+
         /// <summary>
         /// Enabled the trigger to start being able to activate a modifier
         /// </summary>

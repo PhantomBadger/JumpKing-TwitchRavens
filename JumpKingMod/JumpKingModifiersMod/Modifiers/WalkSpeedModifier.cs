@@ -14,6 +14,8 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class WalkSpeedModifier : IModifier
     {
+        public string DisplayName { get; } = "Increase Walk Speed";
+
         private readonly float speedModifier;
         private readonly ILogger logger;
         private readonly IWalkSpeedModifier walkSpeedModifierAccessor;

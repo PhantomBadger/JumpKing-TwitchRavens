@@ -3,6 +3,7 @@ using JumpKingModifiersMod.Modifiers;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Settings;
 using JumpKingModifiersMod.Triggers;
+using JumpKingModifiersMod.Visuals;
 using Logging;
 using Logging.API;
 using Microsoft.Xna.Framework.Input;
@@ -117,6 +118,9 @@ namespace JumpKingModifiersMod
                 // Make the toggle trigger
                 var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings);
                 debugTrigger.EnableTrigger();
+
+                // Make the modifier notification
+                var modifierNotification = new ModifierNotifications(ModEntityManager.Instance, new List<API.IModifierTrigger>() { debugTrigger }, Logger);
             }
             catch (Exception e)
             {

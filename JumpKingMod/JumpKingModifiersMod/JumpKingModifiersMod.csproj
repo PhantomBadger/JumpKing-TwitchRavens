@@ -85,6 +85,7 @@
     <Compile Include="ModifiersModContentManager.cs" />
     <Compile Include="Triggers\DebugModifierTrigger.cs" />
     <Compile Include="Triggers\DebugTogglePair.cs" />
+    <Compile Include="Visuals\ModifierNotifications.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj">

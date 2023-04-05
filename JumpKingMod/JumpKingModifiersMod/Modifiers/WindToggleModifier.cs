@@ -13,6 +13,8 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class WindToggleModifier : IModifier
     {
+        public string DisplayName { get; } = "Wind";
+
         private readonly IWindObserver windObserver;
         private readonly ILogger logger;
 
@@ -51,6 +53,7 @@ namespace JumpKingModifiersMod.Modifiers
             }
 
             windObserver.SetWindOverrideState(shouldOverrideWind: true);
+            logger.Information("Enabled 'Wind Toggle' Modifier");
             return true;
         }
 

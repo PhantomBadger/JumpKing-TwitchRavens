@@ -13,6 +13,8 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class InvertControlsModifier : IModifier, IDisposable
     {
+        public string DisplayName { get; } = "Invert Controls";
+
         private readonly IPlayerStateObserver playerStateObserver;
         private readonly ILogger logger;
 

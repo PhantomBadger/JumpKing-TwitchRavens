@@ -18,6 +18,8 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class BombCountdownModifier : IModifier, IDisposable
     {
+        public string DisplayName { get; } = "Bomb Countdown";
+
         private readonly ModifierUpdatingEntity modifierUpdatingEntity;
         private readonly ModEntityManager modEntityManager;
         private readonly IPlayerStateObserver playerStateObserver;

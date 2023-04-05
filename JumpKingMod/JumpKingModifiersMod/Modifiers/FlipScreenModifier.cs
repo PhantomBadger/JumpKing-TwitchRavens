@@ -15,6 +15,8 @@ namespace JumpKingModifiersMod.Modifiers
     /// </summary>
     public class FlipScreenModifier : IModifier, IDisposable
     {
+        public string DisplayName { get; } = "Flip Screen";
+
         private readonly IGameRectFlipper gameRectFlipper;
         private readonly ILogger logger;
 

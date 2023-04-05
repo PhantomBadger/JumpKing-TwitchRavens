@@ -22,6 +22,9 @@ namespace JumpKingModifiersMod.Triggers
     /// </summary>
     public class DebugModifierTrigger : IModifierTrigger, IModEntity, IDisposable
     {
+        public event ModifierEnabledDelegate OnModifierEnabled;
+        public event ModifierDisabledDelegate OnModifierDisabled;
+
         private readonly ModEntityManager modEntityManager;
         private readonly List<DebugTogglePair> modifierToggles;
         private readonly UserSettings userSettings;
@@ -94,11 +97,17 @@ namespace JumpKingModifiersMod.Triggers
                         togglePair.ToggleKeyReset = false;
                         if (togglePair.Modifier.IsModifierEnabled())
                         {
-                            togglePair.Modifier.DisableModifier();
+                            if (togglePair.Modifier.DisableModifier())
+                            {
+                                OnModifierDisabled?.Invoke(togglePair.Modifier);
+                            }
                         }
                         else
                         {
-                            togglePair.Modifier.EnableModifier();
+                            if (togglePair.Modifier.EnableModifier())
+                            {
+                                OnModifierEnabled?.Invoke(togglePair.Modifier);
+                            }
                         }
                     }
                 }
