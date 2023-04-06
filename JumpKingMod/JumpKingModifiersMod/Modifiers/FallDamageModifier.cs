@@ -42,7 +42,6 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly UserSettings userSettings;
         private readonly IYouDiedSubtextGetter subtextGetter;
         private readonly float distanceDamageModifier;
-        private readonly List<string> possibleSubtextValues;
         private readonly bool isBloodEnabled;
         private readonly BloodSplatterPersistence bloodSplatters;
         private readonly Keys clearBloodKey;
@@ -96,7 +95,6 @@ namespace JumpKingModifiersMod.Modifiers
             clearBloodKey = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
             clearBloodKeyReset = true;
 
-            possibleSubtextValues = new List<string>();
             bloodSplatters = new BloodSplatterPersistence(modEntityManager, userSettings, random, logger);
             fallModifierState = FallDamageModifierState.Playing;
 

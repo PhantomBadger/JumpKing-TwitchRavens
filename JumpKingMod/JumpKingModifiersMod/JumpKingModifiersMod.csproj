@@ -69,6 +69,7 @@
     <Compile Include="Modifiers\FlipScreenModifier.cs" />
     <Compile Include="Modifiers\InvertControlsModifier.cs" />
     <Compile Include="Modifiers\ManualScreenResizeModifier.cs" />
+    <Compile Include="Modifiers\RisingLavaModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
     <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
     <Compile Include="Modifiers\WindToggleModifier.cs" />

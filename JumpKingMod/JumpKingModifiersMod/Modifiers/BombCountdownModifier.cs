@@ -16,6 +16,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// An implementation of <see cref="IModifier"/>  and <see cref="IDisposable"/> which maintains a countdown on the player
     /// once it hits zero a punishment is incurred, the countdown is staved by jumping
     /// </summary>
+    [Obsolete("Not yet complete!")]
     public class BombCountdownModifier : IModifier, IDisposable
     {
         public string DisplayName { get; } = "Bomb Countdown";
