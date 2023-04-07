@@ -20,6 +20,7 @@ namespace JumpKingModifiersMod
         public static Texture2D HealthBarFrontTexture;
         public static Texture2D BloodSplatterRawTexture;
         public static Sprite[] BloodSplatterSprites;
+        public static Texture2D LowVisibilityOverlayTexture;
 
         /// <summary>
         /// Load all the Mod-specific content
@@ -40,6 +41,9 @@ namespace JumpKingModifiersMod
                 BloodSplatterRawTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/bloodsplat");
                 BloodSplatterSprites = SpriteChopUtilGrid(BloodSplatterRawTexture, new Point(2, 4), Vector2.Zero, BloodSplatterRawTexture.Bounds);
                 logger.Information($"Loaded 'Bloodsplat' Textures");
+
+                LowVisibilityOverlayTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/lowVisibilityOverlay");
+                logger.Information($"Loaded 'Low Visibility Overlay' Texture");
             }
             catch (Exception e)
             {

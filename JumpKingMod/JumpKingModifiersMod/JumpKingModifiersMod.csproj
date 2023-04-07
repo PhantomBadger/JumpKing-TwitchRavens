@@ -68,6 +68,7 @@
     <Compile Include="Modifiers\FallDamage\BloodSplatterPersistence.cs" />
     <Compile Include="Modifiers\FlipScreenModifier.cs" />
     <Compile Include="Modifiers\InvertControlsModifier.cs" />
+    <Compile Include="Modifiers\LowVisibilityModifier.cs" />
     <Compile Include="Modifiers\ManualScreenResizeModifier.cs" />
     <Compile Include="Modifiers\RisingLavaModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
@@ -114,6 +115,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\healthbar_front.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\lowVisibilityOverlay.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\youdied.xnb">
