@@ -117,6 +117,9 @@
     <None Include="Resources\healthbar_front.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\lava.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\lowVisibilityOverlay.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

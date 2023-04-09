@@ -21,6 +21,7 @@ namespace JumpKingModifiersMod
         public static Texture2D BloodSplatterRawTexture;
         public static Sprite[] BloodSplatterSprites;
         public static Texture2D LowVisibilityOverlayTexture;
+        public static Texture2D LavaTexture;
 
         /// <summary>
         /// Load all the Mod-specific content
@@ -44,6 +45,9 @@ namespace JumpKingModifiersMod
 
                 LowVisibilityOverlayTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/lowVisibilityOverlay");
                 logger.Information($"Loaded 'Low Visibility Overlay' Texture");
+
+                LavaTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/lava");
+                logger.Information($"Loaded 'Lava' Texture");
             }
             catch (Exception e)
             {

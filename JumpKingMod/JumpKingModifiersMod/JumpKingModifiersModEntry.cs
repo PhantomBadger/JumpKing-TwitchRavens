@@ -76,9 +76,10 @@ namespace JumpKingModifiersMod
                 var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
                 var windModifier = new WindToggleModifier(windPatch, Logger);
                 var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
+                var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
-                debugToggles.Add(new DebugTogglePair(lowVisibilityModifier, Keys.OemPeriod));
+                debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));
 
                 // Fall Damage
                 bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
