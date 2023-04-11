@@ -1,5 +1,6 @@
 ﻿using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Patching.States;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,5 +62,20 @@ namespace JumpKingModifiersMod.API
         /// </summary>
         /// <returns><c>true</c> if the inputs are inverted, <c>false</c> if not</returns>
         bool GetInvertPlayerInputs();
+
+        /// <summary>
+        /// Gets the player's hitbox
+        /// </summary>
+        Rectangle GetPlayerHitbox();
+
+        /// <summary>
+        /// Sets the player's position
+        /// </summary>
+        void SetPosition(Vector2 position);
+
+        /// <summary>
+        /// If set, the player will not be drawn
+        /// </summary>
+        void DisablePlayerDrawing(bool isDrawDisabled);
     }
 }

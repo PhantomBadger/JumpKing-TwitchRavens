@@ -23,17 +23,11 @@ namespace JumpKingModifiersMod.Patching
     {
         private static ILogger logger;
 
-        private static MethodInfo isOnGroundMethod;
-        private static MethodInfo isOnSnowMethod;
-        private static MethodInfo isInWaterMethod;
-        private static FieldInfo velocityField;
         private static FieldInfo knockedField;
-        private static FieldInfo positionField;
         private static FieldInfo leftField;
         private static FieldInfo rightField;
         private static FieldInfo jumpField;
         private static object bodyCompInstance;
-        private static PlayerEntity playerEntityInstance;
         private static bool knockedOverrideIsActive;
         private static bool knockedOverrideValue;
         private static bool directionOverrideIsActive;
@@ -41,6 +35,7 @@ namespace JumpKingModifiersMod.Patching
         private static bool isWalkingDisabled;
         private static bool isXVelocityDisabled;
         private static bool isInputInverted;
+        private static bool isDrawDisabled;
 
         private static InputState prevInputState;
 
@@ -70,10 +65,6 @@ namespace JumpKingModifiersMod.Patching
             var prefixPlayerSetDirectionEntityMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixPlayerEntityPatchMethod");
             harmony.Patch(playerEntitySetDirectionMethod, prefix: new HarmonyMethod(prefixPlayerSetDirectionEntityMethod));
 
-            var playerEntityUpdateMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:Update");
-            var postfixPlayerEntityUpdateMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixPlayerEntityUpdatePatchMethod");
-            harmony.Patch(playerEntityUpdateMethod, postfix: new HarmonyMethod(postfixPlayerEntityUpdateMethod));
-
             var walkComponentMyRunMethod = AccessTools.Method("JumpKing.Player.Walk:MyRun");
             var prefixWalkComponentMyRunMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixWalkComponentMyRunMethod");
             harmony.Patch(walkComponentMyRunMethod, prefix: new HarmonyMethod(prefixWalkComponentMyRunMethod));
@@ -85,6 +76,10 @@ namespace JumpKingModifiersMod.Patching
             var inputComponentGetStateMethod = AccessTools.Method("JumpKing.Player.InputComponent:GetState");
             var postfixInputComponentGetStateMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixInputComponentGetStateMethod");
             harmony.Patch(inputComponentGetStateMethod, postfix: new HarmonyMethod(postfixInputComponentGetStateMethod));
+
+            var playerEntityDrawMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:Draw");
+            var prefixPlayerEntityDrawMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixPlayerEntityDrawMethod");
+            harmony.Patch(playerEntityDrawMethod, prefix: new HarmonyMethod(prefixPlayerEntityDrawMethod));
         }
 
         /// <summary>
@@ -95,10 +90,10 @@ namespace JumpKingModifiersMod.Patching
             // If we want to disable walking then exit early
             if (isWalkingDisabled)
             {
-                if (velocityField != null && bodyCompInstance != null && isXVelocityDisabled)
+                if (JumpKing.GameManager.GameLoop.m_player?.m_body != null && isXVelocityDisabled)
                 {
-                    Vector2 curVelocity = (Vector2)velocityField.GetValue(bodyCompInstance);
-                    velocityField.SetValue(bodyCompInstance, new Vector2(0, curVelocity.Y));
+                    Vector2 curVelocity = JumpKing.GameManager.GameLoop.m_player.m_body.velocity;
+                    JumpKing.GameManager.GameLoop.m_player.m_body.velocity = new Vector2(0, curVelocity.Y);
                 }
 
                 __result = BTresult.Success;
@@ -161,29 +156,9 @@ namespace JumpKingModifiersMod.Patching
         public static void PostfixBodyCompPatchMethod(object __instance, float p_delta)
         {
             bodyCompInstance = __instance;
-            if (isOnGroundMethod == null)
-            {
-                isOnGroundMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsOnGround");
-            }
-            if (isOnSnowMethod == null)
-            {
-                isOnSnowMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsOnSnow");
-            }
-            if (isInWaterMethod == null)
-            {
-                isInWaterMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsInWater");
-            }
-            if (velocityField == null)
-            {
-                velocityField = AccessTools.Field(bodyCompInstance.GetType(), "velocity");
-            }
             if (knockedField == null)
             {
                 knockedField = AccessTools.Field(bodyCompInstance.GetType(), "_knocked");
-            }
-            if (positionField == null)
-            {
-                positionField = AccessTools.Field(bodyCompInstance.GetType(), "position");
             }
 
             if (knockedOverrideIsActive)
@@ -204,11 +179,15 @@ namespace JumpKingModifiersMod.Patching
         }
 
         /// <summary>
-        /// Runs after 'JumpKing.Player.PlayerEntity:Update' and records the instance
+        /// Runs before 'JumpKing.Player.PlayerEntity:Draw
         /// </summary>
-        public static void PostfixPlayerEntityUpdatePatchMethod(object __instance)
+        public static bool PrefixPlayerEntityDrawMethod(object __instance)
         {
-            playerEntityInstance = (PlayerEntity)__instance;
+            if (isDrawDisabled)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -216,20 +195,14 @@ namespace JumpKingModifiersMod.Patching
         /// </summary>
         public PlayerState GetPlayerState()
         {
-            if (isOnGroundMethod     != null &&
-                isOnSnowMethod       != null &&
-                isInWaterMethod      != null &&
-                velocityField       != null &&
-                positionField       != null &&
-                knockedField        != null && 
-                bodyCompInstance    != null)
+            if (JumpKing.GameManager.GameLoop.m_player?.m_body != null)
             {
-                bool isOnGround = (bool)isOnGroundMethod.Invoke(bodyCompInstance, null);
-                bool isOnSnow = (bool)isOnSnowMethod.Invoke(bodyCompInstance, null);
-                bool isInWater = (bool)isInWaterMethod.Invoke(bodyCompInstance, null);
-                Vector2 velocity = (Vector2)velocityField.GetValue(bodyCompInstance);
-                Vector2 position = (Vector2)positionField.GetValue(bodyCompInstance);
-                bool knocked = (bool)knockedField.GetValue(bodyCompInstance);
+                bool isOnGround = JumpKing.GameManager.GameLoop.m_player.m_body.IsOnGround;
+                bool isOnSnow = JumpKing.GameManager.GameLoop.m_player.m_body.IsOnSnow;
+                bool isInWater = JumpKing.GameManager.GameLoop.m_player.m_body.IsInWater;
+                Vector2 velocity = JumpKing.GameManager.GameLoop.m_player.m_body.velocity;
+                Vector2 position = JumpKing.GameManager.GameLoop.m_player.m_body.position;
+                bool knocked = JumpKing.GameManager.GameLoop.m_player.m_body.IsKnocked;
                 PlayerState state = new PlayerState(isOnGround, isOnSnow, isInWater, velocity, position, knocked);
                 return state;
             }
@@ -256,12 +229,12 @@ namespace JumpKingModifiersMod.Patching
         /// <inheritdoc/>
         public void RestartPlayerPosition()
         {
-            if (playerEntityInstance != null)
+            if (JumpKing.GameManager.GameLoop.m_player != null)
             {
                 logger.Information($"Applying Default Save State!");
                 SaveState defaultSaveState = SaveState.GetDefault();
                 defaultSaveState.position -= new Vector2(0, 10); // Move the player up a tiny bit, fixes odd issues where we clip into the ground a tad
-                playerEntityInstance.ApplySaveState(defaultSaveState);
+                JumpKing.GameManager.GameLoop.m_player.ApplySaveState(defaultSaveState);
             }
         }
 
@@ -295,6 +268,24 @@ namespace JumpKingModifiersMod.Patching
         public bool GetInvertPlayerInputs()
         {
             return isInputInverted;
+        }
+
+        /// <inheritdoc/>
+        public Rectangle GetPlayerHitbox()
+        {
+            return JumpKing.GameManager.GameLoop.m_player.m_body.GetHitbox();
+        }
+
+        /// <inheritdoc/>
+        public void SetPosition(Vector2 position)
+        {
+            JumpKing.GameManager.GameLoop.m_player.m_body.position = position;
+        }
+
+        /// <inheritdoc/>
+        public void DisablePlayerDrawing(bool isDrawDisabled)
+        {
+            PlayerStateObserverManualPatch.isDrawDisabled = isDrawDisabled;
         }
     }
 }
