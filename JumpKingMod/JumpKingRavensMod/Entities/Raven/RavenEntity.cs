@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using JumpKing;
 using JumpKingRavensMod.API;
-using JumpKingRavensMod.Components;
+using PBJKModBase.Components;
 using JumpKingRavensMod.Entities.Raven;
 using JumpKingRavensMod.Entities.Raven.States;
 using Logging.API;

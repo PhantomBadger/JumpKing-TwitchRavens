@@ -1,5 +1,4 @@
 ﻿using JumpKing;
-using JumpKingRavensMod.API;
 using PBJKModBase.API;
 using System;
 using System.Collections.Generic;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.Components
+namespace PBJKModBase.Components
 {
     /// <summary>
     /// An implementation of <see cref="IModComponent"/> which animates through a list of sprites

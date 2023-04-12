@@ -43,6 +43,7 @@ namespace JumpKingModifiersMod.Patching
         private static bool isXVelocityDisabled;
         private static bool isInputInverted;
         private static bool isDrawDisabled;
+        private static bool isBodyCompDisabled;
 
         private static InputState prevInputState;
 
@@ -65,8 +66,9 @@ namespace JumpKingModifiersMod.Patching
         public void SetUpManualPatch(Harmony harmony)
         {
             var bodyCompMethod = AccessTools.Method("JumpKing.Player.BodyComp:Update");
+            var prefixBodyCompMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixBodyCompPatchMethod");
             var postfixBodyCompMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixBodyCompPatchMethod");
-            harmony.Patch(bodyCompMethod, new HarmonyMethod(postfixBodyCompMethod));
+            harmony.Patch(bodyCompMethod, prefix: new HarmonyMethod(prefixBodyCompMethod), postfix: new HarmonyMethod(postfixBodyCompMethod));
 
             var playerEntitySetDirectionMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:SetDirection");
             var prefixPlayerSetDirectionEntityMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixPlayerEntityPatchMethod");
@@ -159,6 +161,18 @@ namespace JumpKingModifiersMod.Patching
             }
 
             prevInputState = new InputState(left, right, jump);
+        }
+
+        /// <summary>
+        /// Runs before <see cref="JumpKing.Player.BodyComp.Update(float)"/> and optionally prevents it from running
+        /// </summary>
+        public static bool PrefixBodyCompPatchMethod(object __instance)
+        {
+            if (isBodyCompDisabled)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -342,6 +356,11 @@ namespace JumpKingModifiersMod.Patching
         public void DisablePlayerDrawing(bool isDrawDisabled)
         {
             PlayerStateObserverManualPatch.isDrawDisabled = isDrawDisabled;
+        }
+
+        public void DisablePlayerBodyComp(bool isBodyCompDisabled)
+        {
+            PlayerStateObserverManualPatch.isBodyCompDisabled = isBodyCompDisabled;
         }
     }
 }

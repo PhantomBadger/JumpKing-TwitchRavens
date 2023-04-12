@@ -1,5 +1,5 @@
 ﻿using JumpKingRavensMod.API;
-using JumpKingRavensMod.Components;
+using PBJKModBase.Components;
 using PBJKModBase.API;
 using System;
 using System.Collections.Generic;

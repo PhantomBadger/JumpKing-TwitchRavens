@@ -26,10 +26,8 @@ namespace JumpKingModifiersMod.Modifiers
         {
             Rising,                         // The Lava is rising as normal, we check for player contact
             PlayerDeathAnim,                // The player is forced into a Mario-esque death bounce
-            FadingCutout,                   // A cutout fades across the screen like a Bowser cutout would in Mario
-            DisplayingYouDied,              // Displaying the primary "You Died" text
-            DisplayingYouDiedSubtext,       // Displaying the secondary "You Died" subtext
-            WaitingForInput                 // Waiting for user input to reset
+            ShrinkCutout,                   // A cutout fades across the screen like a Bowser cutout would in Mario
+            ExpandCutout,                   // A cutout fades back revealing the player in the restarted position 
         }
 
         private readonly ModifierUpdatingEntity modifierUpdatingEntity;
@@ -38,23 +36,33 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly ILogger logger;
 
         private WorldspaceImageEntity lavaEntity;
-        private WorldspaceImageEntity deathPlayerEntity;
+        private UIImageEntity deathPlayerEntity;
         private RisingLavaModifierState lavaModifierState;
         private Vector2 deathAnimVelocity;
-        private float deathScreenBottom;
+        private float shrinkCutoutCounter;
+        private float expandCutoutCounter;
 
         private const float SpawnYBuffer = 0;
         private const float ScreenHeight = 360;
         private const float LavaRisingSpeed = 2f;
-        private const float DeathAnimUpVelocity = 25f;
+        private const float DeathAnimUpVelocity = 3.5f;
         private const float Gravity = 9.8f;
+        private const float ShrinkCutoutTimeInSeconds = 0.35f;
+        private const float ExpandCutoutTimeInSeconds = 0.35f;
 
+        /// <summary>
+        /// Ctor for creating a <see cref="RisingLavaModifier"/>
+        /// </summary>
+        /// <param name="modifierUpdatingEntity">A <see cref="ModifierUpdatingEntity"/> to register to for updates</param>
+        /// <param name="modEntityManager">A <see cref="ModEntityManager"/> to register created entities with</param>
+        /// <param name="playerStateObserver">An implementation of <see cref="IPlayerStateObserver"/> for interacting with the player</param>
+        /// <param name="logger">An implementation of <see cref="ILogger"/> to log to</param>
         public RisingLavaModifier(ModifierUpdatingEntity modifierUpdatingEntity, ModEntityManager modEntityManager,
             IPlayerStateObserver playerStateObserver, ILogger logger)
         {
             this.modifierUpdatingEntity = modifierUpdatingEntity ?? throw new ArgumentNullException(nameof(modifierUpdatingEntity));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
-            this.playerStateObserver = playerStateObserver ?? throw new ArgumentException(nameof(playerStateObserver));
+            this.playerStateObserver = playerStateObserver ?? throw new ArgumentNullException(nameof(playerStateObserver));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             lavaModifierState = RisingLavaModifierState.Rising;
@@ -63,16 +71,21 @@ namespace JumpKingModifiersMod.Modifiers
             modifierUpdatingEntity.RegisterModifier(this);
         }
 
+        /// <summary>
+        /// An implementation of <see cref="IDisposable.Dispose"/> to clean up
+        /// </summary>
         public void Dispose()
         {
             modifierUpdatingEntity.UnregisterModifier(this);
         }
 
+        /// <inheritdoc/>
         public bool IsModifierEnabled()
         {
             return lavaEntity != null;
         }
 
+        /// <inheritdoc/>
         public bool DisableModifier()
         {
             if (lavaEntity == null)
@@ -82,15 +95,18 @@ namespace JumpKingModifiersMod.Modifiers
             }
 
             playerStateObserver.DisablePlayerWalking(isWalkingDisabled: false, isXVelocityDisabled: false);
-            playerStateObserver.SetKnockedStateOverride(isActive: false, newState: false);
             playerStateObserver.DisablePlayerDrawing(isDrawDisabled: false);
+            playerStateObserver.DisablePlayerBodyComp(isBodyCompDisabled: false);
 
-            lavaEntity.Dispose();
+            lavaEntity?.Dispose();
             lavaEntity = null;
+            deathPlayerEntity?.Dispose();
+            deathPlayerEntity = null;
             logger.Information($"Disabled 'Rising Lava' Modifier successfully!");
             return true;
         }
 
+        /// <inheritdoc/>
         public bool EnableModifier()
         {
             if (lavaEntity != null)
@@ -111,6 +127,7 @@ namespace JumpKingModifiersMod.Modifiers
             return true;
         }
 
+        /// <inheritdoc/>
         public void Update(float p_delta)
         {
             PlayerState playerState = playerStateObserver.GetPlayerState();
@@ -126,19 +143,23 @@ namespace JumpKingModifiersMod.Modifiers
                         Rectangle playerHitbox = playerStateObserver.GetPlayerHitbox();
                         Vector2 playerBottomPosition = playerState.Position + new Vector2(0, playerHitbox.Height);
                         Vector2 lavaTopPos = lavaEntity.WorldSpacePosition - new Vector2(0, ModifiersModContentManager.LavaTexture.Height / 2);
-                        logger.Information($"Current lava top pos: {lavaTopPos}");
+
                         if (lavaTopPos.Y < playerBottomPosition.Y)
                         {
                             // Disable the player
                             playerStateObserver.DisablePlayerWalking(isWalkingDisabled: true, isXVelocityDisabled: true);
                             playerStateObserver.DisablePlayerDrawing(isDrawDisabled: true);
+                            playerStateObserver.DisablePlayerBodyComp(isBodyCompDisabled: true);
 
                             // Record the current information
                             deathAnimVelocity = new Vector2(0, -DeathAnimUpVelocity);
-                            deathScreenBottom = GetCurrentScreenBottomY();
 
-                            // Spawn a fake 'Death Player' sprite - TODO
-                            //deathPlayerEntity = new WorldspaceImageEntity(modEntityManager, playerState.Position, )
+                            // Spawn a fake 'Death Player' sprite - TODO Replace Sprite lol
+                            deathPlayerEntity = new UIImageEntity(
+                                modEntityManager, 
+                                Camera.TransformVector2(playerState.Position), 
+                                Sprite.CreateSprite(ModifiersModContentManager.BloodSplatterRawTexture), 
+                                zOrder: 3);
 
                             lavaModifierState = RisingLavaModifierState.PlayerDeathAnim;
                             logger.Information($"Setting Modifier State to {lavaModifierState.ToString()}");
@@ -148,13 +169,47 @@ namespace JumpKingModifiersMod.Modifiers
                 case RisingLavaModifierState.PlayerDeathAnim:
                     {
                         // Move the player up then down 'Mario Style'
+                        deathPlayerEntity.ScreenSpacePosition += deathAnimVelocity;
+                        deathAnimVelocity.Y += (Gravity * p_delta);
                         
-                        //playerStateObserver.SetPosition(playerState.Position + deathAnimVelocity);
-                        //deathAnimVelocity.Y += (Gravity * p_delta);
-                        //if (playerState.Position.Y > deathScreenBottom)
-                        //{
-                        //    logger.Information($"FELL OFF BOTTOM");
-                        //}
+                        // If we're off the bottom of the screen then go to the next stage
+                        if (deathPlayerEntity.ScreenSpacePosition.Y > ScreenHeight)
+                        {
+                            deathPlayerEntity?.Dispose();
+                            deathPlayerEntity = null;
+
+                            shrinkCutoutCounter = 0;
+
+                            // TODO: Spawn Fade
+
+                            lavaModifierState = RisingLavaModifierState.ShrinkCutout;
+                            logger.Information($"Setting Modifier State to {lavaModifierState.ToString()}");
+                        }
+                        break;
+                    }
+                case RisingLavaModifierState.ShrinkCutout:
+                    {
+                        if ((shrinkCutoutCounter += p_delta) > ShrinkCutoutTimeInSeconds)
+                        {
+                            expandCutoutCounter = 0;
+
+                            lavaModifierState = RisingLavaModifierState.ExpandCutout;
+                            logger.Information($"Setting Modifier State to {lavaModifierState.ToString()}");
+                        }
+                        break;
+                    }
+                case RisingLavaModifierState.ExpandCutout:
+                    {
+                        if ((expandCutoutCounter += p_delta) > ExpandCutoutTimeInSeconds)
+                        {
+                            playerStateObserver.DisablePlayerWalking(isWalkingDisabled: false, isXVelocityDisabled: false);
+                            playerStateObserver.DisablePlayerDrawing(isDrawDisabled: false);
+                            playerStateObserver.DisablePlayerBodyComp(isBodyCompDisabled: false);
+                            playerStateObserver.RestartPlayerPosition();
+
+                            lavaModifierState = RisingLavaModifierState.Rising;
+                            logger.Information($"Setting Modifier State to {lavaModifierState.ToString()}");
+                        }
                         break;
                     }
             }

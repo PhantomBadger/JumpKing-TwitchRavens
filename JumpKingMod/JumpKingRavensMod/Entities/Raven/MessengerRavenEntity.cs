@@ -1,6 +1,6 @@
 ﻿using JumpKing;
 using JumpKingRavensMod.API;
-using JumpKingRavensMod.Components;
+using PBJKModBase.Components;
 using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;

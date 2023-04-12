@@ -98,7 +98,6 @@
     <Compile Include="API\IMessengerRavenTrigger.cs" />
     <Compile Include="API\IRavenLandingPositionsCache.cs" />
     <Compile Include="API\IYouTubeClientConnector.cs" />
-    <Compile Include="Components\LoopingAnimationComponent.cs" />
     <Compile Include="Entities\GunEntity.cs" />
     <Compile Include="Entities\MessengerRavenSpawningEntity.cs" />
     <Compile Include="Entities\RavenDebugSpawningEntity.cs" />

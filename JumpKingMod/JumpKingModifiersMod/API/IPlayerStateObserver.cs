@@ -77,5 +77,10 @@ namespace JumpKingModifiersMod.API
         /// If set, the player will not be drawn
         /// </summary>
         void DisablePlayerDrawing(bool isDrawDisabled);
+
+        /// <summary>
+        /// If set, prevents the BodyComp component from updating
+        /// </summary>
+        void DisablePlayerBodyComp(bool isBodyCompDisabled);
     }
 }

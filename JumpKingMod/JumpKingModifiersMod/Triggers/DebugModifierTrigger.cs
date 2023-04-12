@@ -39,6 +39,7 @@ namespace JumpKingModifiersMod.Triggers
         internal DebugModifierTrigger(ModEntityManager modEntityManager,
             List<DebugTogglePair> modifierToggles, UserSettings userSettings)
         {
+            this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.modifierToggles = modifierToggles ?? throw new ArgumentNullException(nameof(modifierToggles));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
