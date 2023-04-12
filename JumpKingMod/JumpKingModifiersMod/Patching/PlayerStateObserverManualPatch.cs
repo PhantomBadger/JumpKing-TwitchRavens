@@ -23,11 +23,18 @@ namespace JumpKingModifiersMod.Patching
     {
         private static ILogger logger;
 
+        private static MethodInfo isOnGroundMethod;
+        private static MethodInfo isOnSnowMethod;
+        private static MethodInfo isInWaterMethod;
+        private static MethodInfo getHitboxMethod;
+        private static FieldInfo velocityField;
         private static FieldInfo knockedField;
+        private static FieldInfo positionField;
         private static FieldInfo leftField;
         private static FieldInfo rightField;
         private static FieldInfo jumpField;
         private static object bodyCompInstance;
+        private static PlayerEntity playerEntityInstance;
         private static bool knockedOverrideIsActive;
         private static bool knockedOverrideValue;
         private static bool directionOverrideIsActive;
@@ -65,6 +72,10 @@ namespace JumpKingModifiersMod.Patching
             var prefixPlayerSetDirectionEntityMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixPlayerEntityPatchMethod");
             harmony.Patch(playerEntitySetDirectionMethod, prefix: new HarmonyMethod(prefixPlayerSetDirectionEntityMethod));
 
+            var playerEntityUpdateMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:Update");
+            var postfixPlayerEntityUpdateMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixPlayerEntityUpdatePatchMethod");
+            harmony.Patch(playerEntityUpdateMethod, postfix: new HarmonyMethod(postfixPlayerEntityUpdateMethod));
+
             var walkComponentMyRunMethod = AccessTools.Method("JumpKing.Player.Walk:MyRun");
             var prefixWalkComponentMyRunMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixWalkComponentMyRunMethod");
             harmony.Patch(walkComponentMyRunMethod, prefix: new HarmonyMethod(prefixWalkComponentMyRunMethod));
@@ -90,10 +101,10 @@ namespace JumpKingModifiersMod.Patching
             // If we want to disable walking then exit early
             if (isWalkingDisabled)
             {
-                if (JumpKing.GameManager.GameLoop.m_player?.m_body != null && isXVelocityDisabled)
+                if (velocityField != null && bodyCompInstance != null && isXVelocityDisabled)
                 {
-                    Vector2 curVelocity = JumpKing.GameManager.GameLoop.m_player.m_body.velocity;
-                    JumpKing.GameManager.GameLoop.m_player.m_body.velocity = new Vector2(0, curVelocity.Y);
+                    Vector2 curVelocity = (Vector2)velocityField.GetValue(bodyCompInstance);
+                    velocityField.SetValue(bodyCompInstance, new Vector2(0, curVelocity.Y));
                 }
 
                 __result = BTresult.Success;
@@ -156,9 +167,33 @@ namespace JumpKingModifiersMod.Patching
         public static void PostfixBodyCompPatchMethod(object __instance, float p_delta)
         {
             bodyCompInstance = __instance;
+            if (isOnGroundMethod == null)
+            {
+                isOnGroundMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsOnGround");
+            }
+            if (isOnSnowMethod == null)
+            {
+                isOnSnowMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsOnSnow");
+            }
+            if (isInWaterMethod == null)
+            {
+                isInWaterMethod = AccessTools.Method(bodyCompInstance.GetType(), "get_IsInWater");
+            }
+            if (velocityField == null)
+            {
+                velocityField = AccessTools.Field(bodyCompInstance.GetType(), "velocity");
+            }
             if (knockedField == null)
             {
                 knockedField = AccessTools.Field(bodyCompInstance.GetType(), "_knocked");
+            }
+            if (positionField == null)
+            {
+                positionField = AccessTools.Field(bodyCompInstance.GetType(), "position");
+            }
+            if (getHitboxMethod == null)
+            {
+                getHitboxMethod = AccessTools.Method(bodyCompInstance.GetType(), "GetHitbox");
             }
 
             if (knockedOverrideIsActive)
@@ -179,7 +214,15 @@ namespace JumpKingModifiersMod.Patching
         }
 
         /// <summary>
-        /// Runs before 'JumpKing.Player.PlayerEntity:Draw
+        /// Runs after 'JumpKing.Player.PlayerEntity:Update' and records the instance
+        /// </summary>
+        public static void PostfixPlayerEntityUpdatePatchMethod(object __instance)
+        {
+            playerEntityInstance = (PlayerEntity)__instance;
+        }
+
+        /// <summary>
+        /// Runs before 'JumpKing.Player.PlayerEntity:Draw' and optionally prevents it running
         /// </summary>
         public static bool PrefixPlayerEntityDrawMethod(object __instance)
         {
@@ -195,14 +238,20 @@ namespace JumpKingModifiersMod.Patching
         /// </summary>
         public PlayerState GetPlayerState()
         {
-            if (JumpKing.GameManager.GameLoop.m_player?.m_body != null)
+            if (isOnGroundMethod     != null &&
+                isOnSnowMethod       != null &&
+                isInWaterMethod      != null &&
+                velocityField       != null &&
+                positionField       != null &&
+                knockedField        != null && 
+                bodyCompInstance    != null)
             {
-                bool isOnGround = JumpKing.GameManager.GameLoop.m_player.m_body.IsOnGround;
-                bool isOnSnow = JumpKing.GameManager.GameLoop.m_player.m_body.IsOnSnow;
-                bool isInWater = JumpKing.GameManager.GameLoop.m_player.m_body.IsInWater;
-                Vector2 velocity = JumpKing.GameManager.GameLoop.m_player.m_body.velocity;
-                Vector2 position = JumpKing.GameManager.GameLoop.m_player.m_body.position;
-                bool knocked = JumpKing.GameManager.GameLoop.m_player.m_body.IsKnocked;
+                bool isOnGround = (bool)isOnGroundMethod.Invoke(bodyCompInstance, null);
+                bool isOnSnow = (bool)isOnSnowMethod.Invoke(bodyCompInstance, null);
+                bool isInWater = (bool)isInWaterMethod.Invoke(bodyCompInstance, null);
+                Vector2 velocity = (Vector2)velocityField.GetValue(bodyCompInstance);
+                Vector2 position = (Vector2)positionField.GetValue(bodyCompInstance);
+                bool knocked = (bool)knockedField.GetValue(bodyCompInstance);
                 PlayerState state = new PlayerState(isOnGround, isOnSnow, isInWater, velocity, position, knocked);
                 return state;
             }
@@ -229,12 +278,12 @@ namespace JumpKingModifiersMod.Patching
         /// <inheritdoc/>
         public void RestartPlayerPosition()
         {
-            if (JumpKing.GameManager.GameLoop.m_player != null)
+            if (playerEntityInstance != null)
             {
                 logger.Information($"Applying Default Save State!");
                 SaveState defaultSaveState = SaveState.GetDefault();
                 defaultSaveState.position -= new Vector2(0, 10); // Move the player up a tiny bit, fixes odd issues where we clip into the ground a tad
-                JumpKing.GameManager.GameLoop.m_player.ApplySaveState(defaultSaveState);
+                playerEntityInstance.ApplySaveState(defaultSaveState);
             }
         }
 
@@ -273,13 +322,20 @@ namespace JumpKingModifiersMod.Patching
         /// <inheritdoc/>
         public Rectangle GetPlayerHitbox()
         {
-            return JumpKing.GameManager.GameLoop.m_player.m_body.GetHitbox();
+            if (getHitboxMethod != null && bodyCompInstance != null)
+            {
+                return (Rectangle)getHitboxMethod.Invoke(bodyCompInstance, null);
+            }
+            return Rectangle.Empty;
         }
 
         /// <inheritdoc/>
         public void SetPosition(Vector2 position)
         {
-            JumpKing.GameManager.GameLoop.m_player.m_body.position = position;
+            if (bodyCompInstance != null && positionField != null)
+            {
+                positionField.SetValue(bodyCompInstance, position);
+            }
         }
 
         /// <inheritdoc/>
