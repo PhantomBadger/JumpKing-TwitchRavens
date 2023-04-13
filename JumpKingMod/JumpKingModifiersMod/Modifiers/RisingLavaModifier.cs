@@ -124,6 +124,7 @@ namespace JumpKingModifiersMod.Modifiers
 
             cutoutShrinkAnimationComponent.ResetAnimation();
             cutoutExpandAnimationComponent.ResetAnimation();
+            oscillationCounter = 0;
 
             cutoutEntity?.Dispose();
             cutoutEntity = null;
@@ -153,6 +154,7 @@ namespace JumpKingModifiersMod.Modifiers
             }
 
             lavaModifierState = RisingLavaModifierState.Rising;
+            oscillationCounter = 0;
 
             // Spawn the lava at the bottom of the current screen
             lavaEntity = new WorldspaceImageEntity(modEntityManager,
@@ -177,7 +179,7 @@ namespace JumpKingModifiersMod.Modifiers
                 case RisingLavaModifierState.Rising:
                     {
                         // Make the Lava move up & wiggle
-                        float xOscillation = 20 + ((float)Math.Sin(oscillationCounter += p_delta) / 20f);
+                        float xOscillation = ((float)Math.Sin(oscillationCounter += p_delta) / 30f);
                         oscillationCounter %= (float)(2 * Math.PI);
                         lavaEntity.WorldSpacePosition -= new Vector2(xOscillation, p_delta * LavaRisingSpeed);
 
@@ -256,6 +258,7 @@ namespace JumpKingModifiersMod.Modifiers
                             cutoutEntity.ImageValue = cutoutExpandAnimationComponent.GetActiveSprite();
 
                             lavaEntity.WorldSpacePosition = GetLavaSpawnPos();
+                            oscillationCounter = 0;
 
                             lavaModifierState = RisingLavaModifierState.ExpandCutout;
                             logger.Information($"Setting Modifier State to {lavaModifierState.ToString()}");
