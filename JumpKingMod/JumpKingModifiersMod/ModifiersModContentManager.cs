@@ -22,6 +22,9 @@ namespace JumpKingModifiersMod
         public static Sprite[] BloodSplatterSprites;
         public static Texture2D LowVisibilityOverlayTexture;
         public static Texture2D LavaTexture;
+        public static Texture2D KingDeathTexture;
+        public static Texture2D CutoutRawTexture;
+        public static Sprite[] CutoutSprites;
 
         /// <summary>
         /// Load all the Mod-specific content
@@ -48,6 +51,13 @@ namespace JumpKingModifiersMod
 
                 LavaTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/lava");
                 logger.Information($"Loaded 'Lava' Texture");
+
+                KingDeathTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/king_death");
+                logger.Information($"Loaded 'King Death' Texture");
+
+                CutoutRawTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/cutout");
+                CutoutSprites = SpriteChopUtilGrid(CutoutRawTexture, new Point(4, 6), Vector2.Zero, CutoutRawTexture.Bounds);
+                logger.Information($"Loaded 'Cutout' Textures");
             }
             catch (Exception e)
             {

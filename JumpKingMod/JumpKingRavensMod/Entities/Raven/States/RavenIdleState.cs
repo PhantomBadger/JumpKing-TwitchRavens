@@ -16,13 +16,13 @@ namespace JumpKingRavensMod.Entities.Raven.States
     public class RavenIdleState : IModEntityState
     {
         private readonly RavenEntity raven;
-        private readonly LoopingAnimationComponent idleAnimation;
+        private readonly AnimationComponent idleAnimation;
         public IModEntityState TransitionToState;
 
         /// <summary>
         /// Constructor for creating a <see cref="RavenIdleState"/>
         /// </summary>
-        public RavenIdleState(RavenEntity raven, LoopingAnimationComponent idleAnimation)
+        public RavenIdleState(RavenEntity raven, AnimationComponent idleAnimation)
         {
             this.raven = raven ?? throw new ArgumentNullException(nameof(raven));
             this.idleAnimation = idleAnimation ?? throw new ArgumentNullException(nameof(idleAnimation));

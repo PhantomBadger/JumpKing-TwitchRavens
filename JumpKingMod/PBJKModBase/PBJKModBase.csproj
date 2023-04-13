@@ -58,7 +58,7 @@
     <Compile Include="API\IModComponent.cs" />
     <Compile Include="API\IModEntity.cs" />
     <Compile Include="API\IModEntityState.cs" />
-    <Compile Include="Components\LoopingAnimationComponent.cs" />
+    <Compile Include="Components\AnimationComponent.cs" />
     <Compile Include="Entities\WorldspaceImageEntity.cs" />
     <Compile Include="Entities\ModEntityManager.cs" />
     <Compile Include="Entities\UIImageEntity.cs" />

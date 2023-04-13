@@ -34,8 +34,8 @@ namespace JumpKingRavensMod.Entities
         protected readonly Random random;
 
         protected IModEntityState activeAnimationState;
-        protected LoopingAnimationComponent overrideAnimation;
-        protected LoopingAnimationComponent activeAnimation;
+        protected AnimationComponent overrideAnimation;
+        protected AnimationComponent activeAnimation;
         protected float width;
         protected float height;
         protected SpriteEffects spriteEffects;
@@ -136,7 +136,7 @@ namespace JumpKingRavensMod.Entities
         /// <summary>
         /// Sets the currently active looping animation
         /// </summary>
-        public void SetLoopingAnimation(LoopingAnimationComponent loopingAnimation)
+        public void SetLoopingAnimation(AnimationComponent loopingAnimation)
         {
             activeAnimation = loopingAnimation;
         }
@@ -147,10 +147,10 @@ namespace JumpKingRavensMod.Entities
         private void InitialiseRavenAnimationStates()
         {
             // Set up states
-            var idleAnimation = new LoopingAnimationComponent(ravenContent.IdleSprites, 0.1f);
+            var idleAnimation = new AnimationComponent(ravenContent.IdleSprites, 0.1f);
             RavenIdleState idleState = new RavenIdleState(this, idleAnimation);
 
-            var flyingAnimation = new LoopingAnimationComponent(ravenContent.Fly, 0.05f);
+            var flyingAnimation = new AnimationComponent(ravenContent.Fly, 0.05f);
             RavenFlyingState flyingState = new RavenFlyingState(this, flyingAnimation);
 
             idleState.TransitionToState = flyingState;
@@ -178,7 +178,7 @@ namespace JumpKingRavensMod.Entities
         /// Sets the override animation, if not null it will be used instead of the state machine's animation
         /// </summary>
         /// <param name="overrideAnimation"></param>
-        protected void SetOverrideAnimation(LoopingAnimationComponent overrideAnimation)
+        protected void SetOverrideAnimation(AnimationComponent overrideAnimation)
         {
             this.overrideAnimation = overrideAnimation;
         }

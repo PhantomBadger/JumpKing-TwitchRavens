@@ -212,7 +212,7 @@ namespace JumpKingRavensMod.Entities.Raven
                     // After a pre-set time, start falling
                     if ((killStunTimer += delta) > MaxKillStunTimeInSeconds)
                     {
-                        SetOverrideAnimation(new LoopingAnimationComponent(new Sprite[] { killFallSprite }, 1f));
+                        SetOverrideAnimation(new AnimationComponent(new Sprite[] { killFallSprite }, 1f));
                         ravenLogicState = RavenLogicState.KilledFalling;
 
                         // Dispose of the name early
@@ -255,7 +255,7 @@ namespace JumpKingRavensMod.Entities.Raven
         /// </summary>
         public void SetKillState()
         {
-            SetOverrideAnimation(new LoopingAnimationComponent(new Sprite[] { killStunSprite }, 1f));
+            SetOverrideAnimation(new AnimationComponent(new Sprite[] { killStunSprite }, 1f));
             ravenLogicState = RavenLogicState.Killed;
         }
 
