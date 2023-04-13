@@ -2,6 +2,7 @@
 using JumpKing.SaveThread;
 using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Patching;
+using JumpKingModifiersMod.Patching.Teleporting;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.Components;
@@ -89,6 +90,7 @@ namespace JumpKingModifiersMod.Modifiers
             cutoutPauseCounter = 0;
             oscillationCounter = 0;
 
+            playerStateObserver.OnPlayerTeleported += OnPlayerTeleported;
             modifierUpdatingEntity.RegisterModifier(this);
         }
 
@@ -97,6 +99,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// </summary>
         public void Dispose()
         {
+            playerStateObserver.OnPlayerTeleported -= OnPlayerTeleported;
             modifierUpdatingEntity.UnregisterModifier(this);
         }
 
@@ -174,7 +177,7 @@ namespace JumpKingModifiersMod.Modifiers
                 case RisingLavaModifierState.Rising:
                     {
                         // Make the Lava move up & wiggle
-                        float xOscillation = ((float)Math.Sin(oscillationCounter += p_delta) / 20f);
+                        float xOscillation = 20 + ((float)Math.Sin(oscillationCounter += p_delta) / 20f);
                         oscillationCounter %= (float)(2 * Math.PI);
                         lavaEntity.WorldSpacePosition -= new Vector2(xOscillation, p_delta * LavaRisingSpeed);
 
@@ -280,11 +283,34 @@ namespace JumpKingModifiersMod.Modifiers
         }
 
         /// <summary>
+        /// Called when the player is teleported
+        /// </summary>
+        /// <param name="e"></param>
+        private void OnPlayerTeleported(OnTeleportedEventArgs e)
+        {
+            if (lavaModifierState == RisingLavaModifierState.Rising && lavaEntity != null)
+            {
+                logger.Information($"Player Teleporting from {e.PreviousScreenIndex} to {e.NewScreenIndex}");
+                float prevScreenBottom = GetScreenBottomY(e.PreviousScreenIndex);
+                float newScreenBottom = GetScreenBottomY(e.NewScreenIndex);
+                lavaEntity.WorldSpacePosition += new Vector2(0, (newScreenBottom - prevScreenBottom));
+            }
+        }
+
+        /// <summary>
         /// Get the bottom Y position of the current screen
         /// </summary>
         private float GetCurrentScreenBottomY()
         {
-            return (-Camera.Offset.Y) - ((Camera.CurrentScreen - 1) * ScreenHeight);
+            return GetScreenBottomY(Camera.CurrentScreen);
+        }
+
+        /// <summary>
+        /// Get the bottom Y position of the provided screen
+        /// </summary>
+        private float GetScreenBottomY(int screenIndex)
+        {
+            return (-Camera.Offset.Y) - ((screenIndex - 1) * ScreenHeight);
         }
 
         /// <summary>

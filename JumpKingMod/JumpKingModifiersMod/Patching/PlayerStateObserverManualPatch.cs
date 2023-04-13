@@ -1,5 +1,6 @@
 ﻿using BehaviorTree;
 using HarmonyLib;
+using JumpKing;
 using JumpKing.Player;
 using JumpKing.SaveThread;
 using JumpKingModifiersMod.API;
@@ -8,6 +9,7 @@ using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.API;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -22,11 +24,12 @@ namespace JumpKingModifiersMod.Patching
     public class PlayerStateObserverManualPatch : IManualPatch, IPlayerStateObserver
     {
         private static ILogger logger;
-
         private static MethodInfo isOnGroundMethod;
         private static MethodInfo isOnSnowMethod;
         private static MethodInfo isInWaterMethod;
         private static MethodInfo getHitboxMethod;
+        private static MethodInfo getCurrentScreenMethod;
+        private static MethodInfo getCanTeleportMethod;
         private static FieldInfo velocityField;
         private static FieldInfo knockedField;
         private static FieldInfo positionField;
@@ -44,8 +47,11 @@ namespace JumpKingModifiersMod.Patching
         private static bool isInputInverted;
         private static bool isDrawDisabled;
         private static bool isBodyCompDisabled;
-
         private static InputState prevInputState;
+        private static ConcurrentQueue<int> preTeleportIndexQueue;
+        private static PlayerStateObserverManualPatch instance;
+
+        public event OnPlayerTeleportedDelegate OnPlayerTeleported;
 
         /// <summary>
         /// Ctor for creating a <see cref="PlayerStateObserverManualPatch"/>
@@ -60,6 +66,8 @@ namespace JumpKingModifiersMod.Patching
             isWalkingDisabled = false;
             isXVelocityDisabled = false;
             isInputInverted = false;
+            preTeleportIndexQueue = new ConcurrentQueue<int>();
+            instance = this;
         }
 
         /// <inheritdoc/>
@@ -93,6 +101,57 @@ namespace JumpKingModifiersMod.Patching
             var playerEntityDrawMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:Draw");
             var prefixPlayerEntityDrawMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixPlayerEntityDrawMethod");
             harmony.Patch(playerEntityDrawMethod, prefix: new HarmonyMethod(prefixPlayerEntityDrawMethod));
+
+            getCurrentScreenMethod = AccessTools.Method($"JumpKing.Level.LevelManager:get_CurrentScreen");
+            getCanTeleportMethod = AccessTools.Method($"JumpKing.Level.LevelScreen:get_CanTeleport");
+            var bodyCompCapPositionMethod = AccessTools.Method("JumpKing.Player.BodyComp:CapPosition");
+            var prefixCapPositionMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PrefixCapPositionMethod");
+            var postfixCapPositionMethod = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixCapPositionMethod");
+            harmony.Patch(bodyCompCapPositionMethod, prefix: new HarmonyMethod(prefixCapPositionMethod), postfix: new HarmonyMethod(postfixCapPositionMethod));
+        }
+
+        /// <summary>
+        /// Tries to get whether the current screen can teleport
+        /// </summary>
+        private static bool CurrentScreenCanTeleport()
+        {
+            if (getCanTeleportMethod == null || getCanTeleportMethod == null)
+            {
+                return false;
+            }
+            object currentScreen = getCurrentScreenMethod.Invoke(null, null);
+            bool result = (bool)getCanTeleportMethod.Invoke(currentScreen, null);
+            return result;
+        }
+
+        /// <summary>
+        /// Called before <see cref="JumpKing.Player.BodyComp.CapPosition"/> and checks to see if we expect it to teleport
+        /// recording info if we are
+        /// </summary>
+        public static void PrefixCapPositionMethod(object __instance)
+        {
+            if (CurrentScreenCanTeleport())
+            {
+                if (getHitboxMethod != null && bodyCompInstance != null)
+                {
+                    Rectangle hitbox = (Rectangle)getHitboxMethod.Invoke(bodyCompInstance, null);
+                    if (hitbox.Center.X < 0 || hitbox.Center.X > 480)
+                    {
+                        preTeleportIndexQueue.Enqueue(Camera.CurrentScreen);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called after <see cref="JumpKing.Player.BodyComp.CapPosition"/> and records new info if we did teleport
+        /// </summary>
+        public static void PostfixCapPositionMethod(object __instance)
+        {
+            if (instance != null && preTeleportIndexQueue != null && preTeleportIndexQueue.TryDequeue(out int preTeleportIndex))
+            {
+                instance.OnPlayerTeleported?.Invoke(new Teleporting.OnTeleportedEventArgs(preTeleportIndex, Camera.CurrentScreen));
+            }
         }
 
         /// <summary>

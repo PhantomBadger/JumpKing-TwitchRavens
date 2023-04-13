@@ -1,5 +1,6 @@
 ﻿using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Patching.States;
+using JumpKingModifiersMod.Patching.Teleporting;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,15 @@ using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.API
 {
+    public delegate void OnPlayerTeleportedDelegate(OnTeleportedEventArgs e);
+
     /// <summary>
     /// An interface representing an object capable of getting the current player state
     /// </summary>
     public interface IPlayerStateObserver
     {
+        event OnPlayerTeleportedDelegate OnPlayerTeleported;
+
         /// <summary>
         /// Returns the current <see cref="PlayerState"/>
         /// </summary>
