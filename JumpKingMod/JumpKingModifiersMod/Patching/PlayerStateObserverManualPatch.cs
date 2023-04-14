@@ -349,14 +349,29 @@ namespace JumpKingModifiersMod.Patching
         }
 
         /// <inheritdoc/>
-        public void RestartPlayerPosition()
+        public void RestartPlayerPosition(bool niceSpawns)
         {
             if (playerEntityInstance != null)
             {
-                logger.Information($"Applying Default Save State!");
                 SaveState defaultSaveState = SaveState.GetDefault();
-                defaultSaveState.position -= new Vector2(0, 10); // Move the player up a tiny bit, fixes odd issues where we clip into the ground a tad
+                // If we're in NB+ then we will want to start them at the Imp room
+                if (EventFlagsSave.ContainsFlag(StoryEventFlags.StartedNBP) && niceSpawns)
+                {
+                    logger.Information($"NBP Detected - Resetting to Imp Room");
+                    defaultSaveState.position = new Vector2(177f, -15585f);
+                }
+                else if (EventFlagsSave.ContainsFlag(StoryEventFlags.StartedGhost) && niceSpawns)
+                {
+                    logger.Information($"GotB Detected - Resetting to bottom of Drop");
+                    defaultSaveState.position = new Vector2(227.5f, -57300f);
+                }
+                else
+                { 
+                    defaultSaveState.position -= new Vector2(0, 10); // Move the player up a tiny bit, fixes odd issues where we clip into the ground a tad
+                    logger.Information($"Applying Default Save State!");
+                }
                 playerEntityInstance.ApplySaveState(defaultSaveState);
+                Camera.UpdateCamera(defaultSaveState.position.ToPoint());
             }
         }
 

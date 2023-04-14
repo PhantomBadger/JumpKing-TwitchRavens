@@ -1,4 +1,5 @@
-﻿using JumpKing;
+﻿using HarmonyLib;
+using JumpKing;
 using JumpKing.Player;
 using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Entities;
@@ -45,6 +46,7 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly bool isBloodEnabled;
         private readonly BloodSplatterPersistence bloodSplatters;
         private readonly Keys clearBloodKey;
+        private readonly bool niceSpawns;
 
         private UITextEntity healthTextEntity;
         private UIImageEntity healthBarFrontEntity;
@@ -94,6 +96,7 @@ namespace JumpKingModifiersMod.Modifiers
             isBloodEnabled = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
             clearBloodKey = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
             clearBloodKeyReset = true;
+            niceSpawns = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, true);
 
             bloodSplatters = new BloodSplatterPersistence(modEntityManager, userSettings, random, logger);
             fallModifierState = FallDamageModifierState.Playing;
@@ -351,6 +354,13 @@ namespace JumpKingModifiersMod.Modifiers
                     damage = 0;
                 }
 
+                // If we're on that one drop screen in GotB, deal no damage
+                if (Camera.CurrentScreen == 160 && 
+                    JumpKing.SaveThread.EventFlagsSave.ContainsFlag(JumpKing.SaveThread.StoryEventFlags.StartedGhost))
+                {
+                    damage = 0;
+                }
+
                 // Apply the damage to the health
                 healthValue = Math.Max(0, healthValue - damage);
                 logger.Information($"Dealing Damage of '{damage}' (Raw damage '{rawDamage}') - Remaining Health: {healthValue}");
@@ -506,7 +516,7 @@ namespace JumpKingModifiersMod.Modifiers
                 playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
                 // Restart the player position and reset the health
-                playerStateObserver.RestartPlayerPosition();
+                playerStateObserver.RestartPlayerPosition(niceSpawns);
                 healthValue = MaxHealthValue;
                 fallModifierState = FallDamageModifierState.Playing;
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");

@@ -42,7 +42,8 @@ namespace JumpKingModifiersMod.API
         /// <summary>
         /// Restarts the player's position to the start of the map
         /// </summary>
-        void RestartPlayerPosition();
+        /// <param name="niceSpawns">If <c>true</c> then we will restart to a nice part of each DLC map instead of the base map</param>
+        void RestartPlayerPosition(bool niceSpawns);
 
         /// <summary>
         /// Disables (or re-enables) player walking

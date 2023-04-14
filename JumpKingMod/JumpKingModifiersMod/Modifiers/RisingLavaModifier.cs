@@ -3,10 +3,12 @@ using JumpKing.SaveThread;
 using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Patching.Teleporting;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.Components;
 using PBJKModBase.Entities;
+using Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +20,6 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> and <see cref="IDisposable"/> which has lava slowly rise from the bottom of the map. Touching the lava will mean death and a reset!
     /// </summary>
-    /// TODO: Figure out how to handle teleports/horizontal screen transitions
-    [Obsolete("Not yet complete!")]
     public class RisingLavaModifier : IModifier, IDisposable
     {
         public string DisplayName => "Rising Lava";
@@ -37,6 +37,8 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly ModEntityManager modEntityManager;
         private readonly IPlayerStateObserver playerStateObserver;
         private readonly ILogger logger;
+        private readonly float lavaRisingSpeed;
+        private readonly bool niceSpawns;
 
         private WorldspaceImageEntity lavaEntity;
         private UIImageEntity deathPlayerEntity;
@@ -50,7 +52,6 @@ namespace JumpKingModifiersMod.Modifiers
 
         private const float SpawnYBuffer = 0;
         private const float ScreenHeight = 360;
-        private const float LavaRisingSpeed = 2f;
         private const float DeathAnimUpVelocity = 3.5f;
         private const float Gravity = 9.8f;
         private const float ShrinkCutoutTimeInSeconds = 0.35f;
@@ -65,7 +66,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// <param name="playerStateObserver">An implementation of <see cref="IPlayerStateObserver"/> for interacting with the player</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to log to</param>
         public RisingLavaModifier(ModifierUpdatingEntity modifierUpdatingEntity, ModEntityManager modEntityManager,
-            IPlayerStateObserver playerStateObserver, ILogger logger)
+            IPlayerStateObserver playerStateObserver, UserSettings userSettings, ILogger logger)
         {
             this.modifierUpdatingEntity = modifierUpdatingEntity ?? throw new ArgumentNullException(nameof(modifierUpdatingEntity));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
@@ -74,6 +75,9 @@ namespace JumpKingModifiersMod.Modifiers
 
             lavaModifierState = RisingLavaModifierState.Rising;
             lavaEntity = null;
+
+            lavaRisingSpeed = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed);
+            niceSpawns = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, true);
 
             // Set up the animation components
             cutoutShrinkAnimationComponent = new AnimationComponent(
@@ -181,7 +185,7 @@ namespace JumpKingModifiersMod.Modifiers
                         // Make the Lava move up & wiggle
                         float xOscillation = ((float)Math.Sin(oscillationCounter += p_delta) / 30f);
                         oscillationCounter %= (float)(2 * Math.PI);
-                        lavaEntity.WorldSpacePosition -= new Vector2(xOscillation, p_delta * LavaRisingSpeed);
+                        lavaEntity.WorldSpacePosition -= new Vector2(xOscillation, p_delta * lavaRisingSpeed);
 
                         // Check to see if the player is intersecting with it
                         Rectangle playerHitbox = playerStateObserver.GetPlayerHitbox();
@@ -240,7 +244,7 @@ namespace JumpKingModifiersMod.Modifiers
                             playerStateObserver.DisablePlayerWalking(isWalkingDisabled: false, isXVelocityDisabled: false);
                             playerStateObserver.DisablePlayerDrawing(isDrawDisabled: false);
                             playerStateObserver.DisablePlayerBodyComp(isBodyCompDisabled: false);
-                            playerStateObserver.RestartPlayerPosition();
+                            playerStateObserver.RestartPlayerPosition(niceSpawns);
                             
                             cutoutPauseCounter = 0;
 

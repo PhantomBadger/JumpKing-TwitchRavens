@@ -24,6 +24,7 @@ namespace JumpKingModifiersMod.Settings
         public const string FallDamageBloodEnabledKey = "FallDamageBloodEnabled";
         public const string FallDamageClearBloodKey = "FallDamageClearBlood";
         public const string FallDamagePreviousHealthKey = "FallDamagePreviousHealth";
+        public const string FallDamageNiceSpawnsKey = "FallDamageNiceSpawns";
         public const float DefaultFallDamageModifier = 0.05f;
 
         // Shrinking
@@ -31,6 +32,13 @@ namespace JumpKingModifiersMod.Settings
         public const string ManualResizeEnabledKey = "ManualResizeEnabled";
         public const string ManualResizeGrowKeyKey = "ManualResizeGrowKey";
         public const string ManualResizeShrinkKeyKey = "ManualResizeShrinkKey";
+
+        // Lava
+        public const string DebugTriggerLavaRisingToggleKeyKey = "DebugTriggerLavaRisingToggleKey";
+        public const string RisingLavaEnabledKey = "RisingLavaEnabled";
+        public const string RisingLavaSpeedKey = "RisingLavaSpeed";
+        public const string RisingLavaNiceSpawnsKey = "RisingLavaNiceSpawns";
+        public const float DefaultRisingLavaSpeed = 5f;
 
         /// <summary>
         /// Gets the default state of the settings
@@ -45,10 +53,15 @@ namespace JumpKingModifiersMod.Settings
                 { FallDamageClearBloodKey, Keys.F10.ToString() },
                 { FallDamageModifierKey, DefaultFallDamageModifier.ToString() },
                 { FallDamagePreviousHealthKey, 100.ToString() },
+                { FallDamageNiceSpawnsKey, true.ToString() },
                 { DebugTriggerManualResizeToggleKey, Keys.F9.ToString() },
                 { ManualResizeEnabledKey, false.ToString() },
                 { ManualResizeGrowKeyKey, Keys.Up.ToString() },
-                { ManualResizeShrinkKeyKey, Keys.Down.ToString() }
+                { ManualResizeShrinkKeyKey, Keys.Down.ToString() },
+                { DebugTriggerLavaRisingToggleKeyKey, Keys.F11.ToString() },
+                { RisingLavaEnabledKey, false.ToString() },
+                { RisingLavaSpeedKey, DefaultRisingLavaSpeed.ToString() },
+                { RisingLavaNiceSpawnsKey, true.ToString() },
             };
         }
 
