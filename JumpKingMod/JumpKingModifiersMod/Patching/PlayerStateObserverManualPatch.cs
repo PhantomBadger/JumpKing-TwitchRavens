@@ -52,6 +52,7 @@ namespace JumpKingModifiersMod.Patching
         private static PlayerStateObserverManualPatch instance;
 
         public event OnPlayerTeleportedDelegate OnPlayerTeleported;
+        public event OnPlayerPositionRestartedDelegate OnPlayerPositionRestarted;
 
         /// <summary>
         /// Ctor for creating a <see cref="PlayerStateObserverManualPatch"/>
@@ -362,8 +363,8 @@ namespace JumpKingModifiersMod.Patching
                 }
                 else if (EventFlagsSave.ContainsFlag(StoryEventFlags.StartedGhost) && niceSpawns)
                 {
-                    logger.Information($"GotB Detected - Resetting to bottom of Drop");
-                    defaultSaveState.position = new Vector2(227.5f, -57300f);
+                    logger.Information($"GotB Detected - Resetting to bottom of Bog");
+                    defaultSaveState.position = new Vector2(209.5f, -36110f);
                 }
                 else
                 { 
@@ -372,6 +373,7 @@ namespace JumpKingModifiersMod.Patching
                 }
                 playerEntityInstance.ApplySaveState(defaultSaveState);
                 Camera.UpdateCamera(defaultSaveState.position.ToPoint());
+                OnPlayerPositionRestarted?.Invoke(defaultSaveState.position);
             }
         }
 

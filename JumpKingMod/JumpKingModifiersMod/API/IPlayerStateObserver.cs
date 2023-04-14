@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace JumpKingModifiersMod.API
 {
     public delegate void OnPlayerTeleportedDelegate(OnTeleportedEventArgs e);
+    public delegate void OnPlayerPositionRestartedDelegate(Vector2 newPosition);
 
     /// <summary>
     /// An interface representing an object capable of getting the current player state
@@ -18,6 +19,7 @@ namespace JumpKingModifiersMod.API
     public interface IPlayerStateObserver
     {
         event OnPlayerTeleportedDelegate OnPlayerTeleported;
+        event OnPlayerPositionRestartedDelegate OnPlayerPositionRestarted;
 
         /// <summary>
         /// Returns the current <see cref="PlayerState"/>

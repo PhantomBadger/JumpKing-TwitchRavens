@@ -58,7 +58,7 @@ namespace JumpKingModifiersMod.Settings
                 { ManualResizeEnabledKey, false.ToString() },
                 { ManualResizeGrowKeyKey, Keys.Up.ToString() },
                 { ManualResizeShrinkKeyKey, Keys.Down.ToString() },
-                { DebugTriggerLavaRisingToggleKeyKey, Keys.F11.ToString() },
+                { DebugTriggerLavaRisingToggleKeyKey, Keys.F7.ToString() },
                 { RisingLavaEnabledKey, false.ToString() },
                 { RisingLavaSpeedKey, DefaultRisingLavaSpeed.ToString() },
                 { RisingLavaNiceSpawnsKey, true.ToString() },

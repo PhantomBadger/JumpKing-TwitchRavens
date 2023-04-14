@@ -95,6 +95,7 @@ namespace JumpKingModifiersMod.Modifiers
             oscillationCounter = 0;
 
             playerStateObserver.OnPlayerTeleported += OnPlayerTeleported;
+            playerStateObserver.OnPlayerPositionRestarted += OnPlayerPositionRestarted;
             modifierUpdatingEntity.RegisterModifier(this);
         }
 
@@ -104,6 +105,7 @@ namespace JumpKingModifiersMod.Modifiers
         public void Dispose()
         {
             playerStateObserver.OnPlayerTeleported -= OnPlayerTeleported;
+            playerStateObserver.OnPlayerPositionRestarted -= OnPlayerPositionRestarted;
             modifierUpdatingEntity.UnregisterModifier(this);
         }
 
@@ -122,6 +124,14 @@ namespace JumpKingModifiersMod.Modifiers
                 return false;
             }
 
+            DisableInternal();
+
+            logger.Information($"Disabled 'Rising Lava' Modifier successfully!");
+            return true;
+        }
+
+        private void DisableInternal()
+        {
             playerStateObserver.DisablePlayerWalking(isWalkingDisabled: false, isXVelocityDisabled: false);
             playerStateObserver.DisablePlayerDrawing(isDrawDisabled: false);
             playerStateObserver.DisablePlayerBodyComp(isBodyCompDisabled: false);
@@ -136,9 +146,6 @@ namespace JumpKingModifiersMod.Modifiers
             lavaEntity = null;
             deathPlayerEntity?.Dispose();
             deathPlayerEntity = null;
-
-            logger.Information($"Disabled 'Rising Lava' Modifier successfully!");
-            return true;
         }
 
         /// <inheritdoc/>
@@ -157,6 +164,14 @@ namespace JumpKingModifiersMod.Modifiers
                 return false;
             }
 
+            EnableInternal();
+
+            logger.Information($"Enabled 'Rising Lava' Modifier successfully!");
+            return true;
+        }
+
+        private void EnableInternal()
+        {
             lavaModifierState = RisingLavaModifierState.Rising;
             oscillationCounter = 0;
 
@@ -165,8 +180,6 @@ namespace JumpKingModifiersMod.Modifiers
                 GetLavaSpawnPos(),
                 Sprite.CreateCenteredSprite(ModifiersModContentManager.LavaTexture, ModifiersModContentManager.LavaTexture.Bounds),
                 zOrder: 2);
-            logger.Information($"Enabled 'Rising Lava' Modifier successfully!");
-            return true;
         }
 
         /// <inheritdoc/>
@@ -301,6 +314,18 @@ namespace JumpKingModifiersMod.Modifiers
                 float prevScreenBottom = GetScreenBottomY(e.PreviousScreenIndex);
                 float newScreenBottom = GetScreenBottomY(e.NewScreenIndex);
                 lavaEntity.WorldSpacePosition += new Vector2(0, (newScreenBottom - prevScreenBottom));
+            }
+        }
+
+        /// <summary>
+        /// Called when the player's position is restarted
+        /// </summary>
+        /// <param name="newPosition"></param>
+        private void OnPlayerPositionRestarted(Vector2 newPosition)
+        {
+            if (lavaEntity != null)
+            {
+                lavaEntity.WorldSpacePosition = GetLavaSpawnPos();
             }
         }
 
