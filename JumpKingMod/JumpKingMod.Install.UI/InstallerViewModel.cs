@@ -210,6 +210,7 @@ namespace JumpKingRavensMod.Install.UI
                 {
                     fallDamageEnabled = value;
                     RaisePropertyChanged(nameof(FallDamageEnabled));
+                    RaisePropertyChanged(nameof(FallDamageBloodSplatVisibility));
                 }
             }
         }
@@ -285,10 +286,22 @@ namespace JumpKingRavensMod.Install.UI
                 {
                     fallDamageBloodSplatEnabled = value;
                     RaisePropertyChanged(nameof(FallDamageBloodSplatEnabled));
+                    RaisePropertyChanged(nameof(FallDamageBloodSplatVisibility));
                 }
             }
         }
         private bool fallDamageBloodSplatEnabled;
+
+        /// <summary>
+        /// Aggregate field for visibility control
+        /// </summary>
+        public bool FallDamageBloodSplatVisibility
+        {
+            get
+            {
+                return FallDamageBloodSplatEnabled && FallDamageEnabled;
+            }
+        }
 
         /// <summary>
         /// The key to press to clear Blood Splats
@@ -309,6 +322,26 @@ namespace JumpKingRavensMod.Install.UI
             }
         }
         private Keys fallDamageClearBloodKey;
+
+        /// <summary>
+        /// Whether we will use nice spawns for DLC maps for Fall Damage
+        /// </summary>
+        public bool FallDamageNiceSpawns
+        {
+            get
+            {
+                return fallDamageNiceSpawns;
+            }
+            set
+            {
+                if (fallDamageNiceSpawns != value)
+                {
+                    fallDamageNiceSpawns = value;
+                    RaisePropertyChanged(nameof(FallDamageNiceSpawns));
+                }
+            }
+        }
+        private bool fallDamageNiceSpawns;
 
         /// <summary>
         /// Whether the Resizing mod will be enabled or not
@@ -389,6 +422,101 @@ namespace JumpKingRavensMod.Install.UI
             }
         }
         private Keys manualResizingShrinkKey;
+
+        /// <summary>
+        /// Whether the Rising Lava mod is enabled
+        /// </summary>
+        public bool RisingLavaEnabled
+        {
+            get
+            {
+                return risingLavaEnabled;
+            }
+            set
+            {
+                if (risingLavaEnabled != value)
+                {
+                    risingLavaEnabled = value;
+                    RaisePropertyChanged(nameof(RisingLavaEnabled));
+                }
+            }
+        }
+        private bool risingLavaEnabled;
+
+        /// <summary>
+        /// The button to press to toggle rising lava in game
+        /// </summary>
+        public Keys RisingLavaToggleKey
+        {
+            get
+            {
+                return risingLavaToggleKey;
+            }
+            set
+            {
+                if (risingLavaToggleKey != value)
+                {
+                    risingLavaToggleKey = value;
+                    RaisePropertyChanged(nameof(RisingLavaToggleKey));
+                }
+            }
+        }
+        private Keys risingLavaToggleKey;
+
+        /// <summary>
+        /// The speed the lava will raise
+        /// </summary>
+        public string RisingLavaSpeed
+        {
+            get
+            {
+                return risingLavaSpeed.ToString();
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    risingLavaSpeed = JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed;
+                }
+                else
+                {
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        if (newVal > 1000)
+                        {
+                            newVal = 1000;
+                        }
+                        risingLavaSpeed = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(RisingLavaSpeed));
+            }
+        }
+        private float risingLavaSpeed;
+
+        /// <summary>
+        /// Whether or not we use nice spawns for DLC maps for Rising Lava
+        /// </summary>
+        public bool RisingLavaNiceSpawns
+        {
+            get
+            {
+                return risingLavaNiceSpawns;
+            }
+            set
+            {
+                if (risingLavaNiceSpawns != value)
+                {
+                    risingLavaNiceSpawns = value;
+                    RaisePropertyChanged(nameof(RisingLavaNiceSpawns));
+                }
+            }
+        }
+        private bool risingLavaNiceSpawns;
 
         /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
@@ -875,11 +1003,18 @@ namespace JumpKingRavensMod.Install.UI
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, FallDamageModifier.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, FallDamageBloodSplatEnabled.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, FallDamageClearBloodKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, FallDamageNiceSpawns.ToString());
 
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, ManualResizingEnabled.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, ManualResizingToggleKey.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, ManualResizingGrowKey.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, ManualResizingShrinkKey.ToString());
+
+            // Rising Lava
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, RisingLavaEnabled.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, RisingLavaToggleKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, RisingLavaSpeed);
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, RisingLavaNiceSpawns.ToString());
 
             MessageBox.Show($"Settings updated successfully!");
         }
@@ -1019,11 +1154,17 @@ namespace JumpKingRavensMod.Install.UI
                 FallDamageModifier = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, JumpKingModifiersModSettingsContext.DefaultFallDamageModifier).ToString();
                 FallDamageBloodSplatEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
                 FallDamageClearBloodKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
+                FallDamageNiceSpawns = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, true);
 
                 ManualResizingEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
                 ManualResizingToggleKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
                 ManualResizingGrowKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, Keys.Up);
                 ManualResizingShrinkKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, Keys.Down);
+
+                RisingLavaEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
+                RisingLavaToggleKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F11);
+                RisingLavaSpeed = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed.ToString());
+                RisingLavaNiceSpawns = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, true);
             }
         }
 

@@ -590,6 +590,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
                                     <ToolTip x:Key="fallDamageTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
@@ -612,6 +613,13 @@
                                             When pressed all blood splatters will be cleared
                                         </TextBlock>
                                     </ToolTip>
+                                    <ToolTip x:Key="fallDamageNiceSpawnsTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            If enabled then dying from fall damage on a DLC map will reset you to the start of
+                                            <LineBreak/>
+                                            the DLC map instead of the bottom of the base map.
+                                        </TextBlock>
+                                    </ToolTip>
                                 </Grid.Resources>
                                 <!-- Fall Damage Enabled -->
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageTooltip}" Text="Enabled: " />
@@ -631,12 +639,15 @@
                                 <!-- Damage Modifier -->
                                 <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageModifierTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Fall Damage Modifier:" />
                                 <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource fallDamageModifierTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding FallDamageModifier, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <!-- Nice Spawns -->
+                                <TextBlock Grid.Row="7" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageNiceSpawnsTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Nice Spawns: " />
+                                <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource fallDamageNiceSpawnsTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding FallDamageNiceSpawns, Mode=TwoWay}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}"/>
                                 <!-- Blood Enabled -->
-                                <TextBlock Grid.Row="7" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Blood Splat Enabled: " />
-                                <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource fallDamageBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding FallDamageBloodSplatEnabled, Mode=TwoWay}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}"/>
+                                <TextBlock Grid.Row="8" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Blood Splat Enabled: " />
+                                <CheckBox Grid.Row="8" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource fallDamageBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding FallDamageBloodSplatEnabled, Mode=TwoWay}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}"/>
                                 <!-- Clear Blood Button -->
-                                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageClearBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Clear Blood Key:" />
-                                <ComboBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource fallDamageClearBloodTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding FallDamageClearBloodKey, Mode=TwoWay}"/>
+                                <TextBlock Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageClearBloodTooltip}" Visibility="{Binding FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Clear Blood Key:" />
+                                <ComboBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource fallDamageClearBloodTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding FallDamageBloodSplatVisibility, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding FallDamageClearBloodKey, Mode=TwoWay}"/>
                             </Grid>
                         </TabItem>
                         <TabItem x:Name="tabItemResizing" Header="Resizing">
@@ -684,6 +695,60 @@
                                 <!-- Shrink Button -->
                                 <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource resizingTooltip}" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Shrink Key:" />
                                 <ComboBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource resizingTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding ManualResizingEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding ManualResizingShrinkKey, Mode=TwoWay}"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem x:Name="tabRisingLava" Header="Rising Lava">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <ToolTip x:Key="risingLavaTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            Lava will raise up the map slowly, if you make contact with it you must restart!
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="risingLavaNiceSpawnsTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                            If enabled then touching the lava on a DLC map will reset you to the start of
+                                            <LineBreak/>
+                                            the DLC map instead of the bottom of the base map.
+                                        </TextBlock>
+                                    </ToolTip>
+                                </Grid.Resources>
+                                <!-- Rising Lava Enabled  -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource risingLavaTooltip}" Text="Enabled: "/>
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource risingLavaTooltip}" IsChecked="{Binding RisingLavaEnabled, Mode=TwoWay}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" FontSize="9" TextWrapping="Wrap">
+                                    <Italic>
+                                        This mode will be inactive by default in game. 
+                                        <LineBreak/>
+                                        Use the below Toggle Key to activate it once you start playing!
+                                    </Italic>
+                                </TextBlock>
+                                <!-- Seperator -->
+                                <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
+                                <!-- Toggle Button -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource risingLavaTooltip}" Visibility="{Binding RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Key:" />
+                                <ComboBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource risingLavaTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RisingLavaToggleKey, Mode=TwoWay}"/>
+                                <!-- Damage Modifier -->
+                                <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource risingLavaTooltip}" Visibility="{Binding RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Rising Lava Speed:" />
+                                <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource risingLavaTooltip}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}" Visibility="{Binding RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding RisingLavaSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <!-- Nice Spawns -->
+                                <TextBlock Grid.Row="7" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource risingLavaNiceSpawnsTooltip}" Visibility="{Binding RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Nice Spawns: " />
+                                <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource risingLavaNiceSpawnsTooltip}" Visibility="{Binding RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding RisingLavaNiceSpawns, Mode=TwoWay}" IsEnabled="{Binding AreFallDamageModSettingsLoaded}"/>
                             </Grid>
                         </TabItem>
                         <!--

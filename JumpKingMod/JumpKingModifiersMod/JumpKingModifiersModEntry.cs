@@ -76,10 +76,9 @@ namespace JumpKingModifiersMod
                 var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
                 var windModifier = new WindToggleModifier(windPatch, Logger);
                 var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
-                var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
-                debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));
+                //debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));
 
                 // Fall Damage
                 bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
@@ -115,6 +114,22 @@ namespace JumpKingModifiersMod
                 else
                 {
                     Logger.Error($"Manual Resize Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
+                }
+
+                // Rising Lava
+                bool isRisingLavaEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
+                if (isRisingLavaEnabled)
+                {
+                    var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, userSettings, Logger);
+                    Keys risingLavaToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F11);
+
+                    var togglePair = new DebugTogglePair(risingLavaModifier, risingLavaToggleKey);
+                    debugToggles.Add(togglePair);
+                    Logger.Information($"Rising Lava Mod is Enabled! Press the Toggle Key ({risingLavaToggleKey.ToString()}) to activate once in game!");
+                }
+                else
+                {
+                    Logger.Error($"Rising Lava Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
                 }
 
                 // Make the toggle trigger
