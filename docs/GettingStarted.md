@@ -88,4 +88,14 @@ For custom maps using JK+, all deaths will spawn you at the start of the map
 
 Any fall that lands in Deep Snow or the Bog won't harm you. Additionally the required fall in 'Ghost of the Babe' won't harm you either.
 
+### Custom Death Text
+
+You can add a 'FallDamageSubtexts.txt' file to the 'Content/Mods' folder of your Jump King install directory. If present the game will pick a random line from the file to display when the player has died
+
+![image](https://user-images.githubusercontent.com/9095972/233860969-bfd4fb2f-2f9e-4c92-bfa0-3cf95b3a849e.png)
+
+<img src="https://user-images.githubusercontent.com/9095972/233861040-6716c32c-c59a-459c-900a-98a084b100a2.png" width="50%"/>
+
+
+
 
