@@ -1,9 +1,15 @@
-# To download the Ravens mod please use [Release v3.0](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v3.0)
+# Please read our [Getting Started Guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md) to install the Ravens or Fall Damage Mods
 
 # Jump King Chat Raven Mod
-This Mod allows your Twitch or YouTube Chat to lend words of encouragement whilst you climb to the babe! 
+This Mod allows your Twitch or YouTube Chat to lend words of encouragement whilst you climb to the babe! It will also include the 'Fall Damage' mod until we can get around to splitting it out properly.
 
 ## Features
+### Fall Damage
+The King is no longer the resilient hero he once was, each fall takes a bit more of his health away - until you're forced to try again from the start!
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/9095972/233857633-34c0744b-53ca-4b97-b772-2971690007e8.gif" width="75%" height="75%" alt="Every Fall deals damage to the King!"/>
+</p>
+
 ### Twitch & YouTube Ravens
 Both Twitch and YouTube Chat can now communicate with you within the world of Jump King! Messages from chat will be parroted by small ravens that land on the stage as you traverse it. You have the option of gating this behind a Channel Point reward for busier chats!
 <p align="center">
@@ -28,21 +34,9 @@ _**Note:** Enabling this aspect of the mod will disable achievements in the game
 
 ## Installation
 
-[Check out the Instructions here!](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/Installation.md)
+[Check out the Instructions here!](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md)
 
 For YouTube Support, check out [this guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/ConnectingToYouTube.md)
-
-### Common Issues
-<details>
-  <summary>Operation is not supported. HRESULT: 0x80131515</summary>
-  
-  <p align="center">
-    <img src="https://user-images.githubusercontent.com/9095972/137400957-8d5399be-3e28-46de-b589-d8fea48cbe2b.png" width="75%" height="75%"/>
-  </p>
-
-  Occurs when running the game after installing.
-  This is because your computer is blocking the .dlls from being dynamically loaded by Jump King. You can either right click each .dll in the mods folder, go to 'properties' and then click 'Unblock'. Or alternatively, you can run a powershell command in the mod's directory such as `dir -Recurse | Unblock-File` to unblock the files all at once. 
-</details>
   
 ## Updating the Settings
 
