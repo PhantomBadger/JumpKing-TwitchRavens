@@ -24,13 +24,19 @@ Open 'Installer' and run the 'JumpKingMod.Install.UI.exe' file
 
 This app is your one-stop-shop for Installing my mods and editing their settings in the future!
 
-Click the '...' next to the **'Install Directory'** text box and navigate to your Jump King Install Directory (where your JumpKing.exe is located) and click 'Select Folder'. If you're not sure where this is, right click Jump King in Steam and click on 'Browse Local Files'
+---
+
+First, click the '...' next to the **'Install Directory'** text box and navigate to your Jump King Install Directory (where your JumpKing.exe is located) and click 'Select Folder'. If you're not sure where this is, right click Jump King in Steam and click on 'Browse Local Files'
+
+<img src="https://user-images.githubusercontent.com/9095972/233862333-002b4e4c-6c2e-4462-8e53-376ffb90bcf7.png" width="50%"/>
 
 ![image](https://user-images.githubusercontent.com/9095972/233857972-d969c9bc-7e19-4ed7-b03f-646d5ab16372.png)
 
 <img src="https://user-images.githubusercontent.com/9095972/233857993-71f02eb3-cf9e-4bf7-8a17-f3c52e08076d.png" width="50%"/>
 
-Click the '...' next to the **'Mod Directory'** text box and navigate to the 'Mod Files' folder in the .zip you downloaded and unpackaged
+Next, click the '...' next to the **'Mod Directory'** text box and navigate to the 'Mod Files' folder in the .zip you downloaded and unpackaged
+
+<img src="https://user-images.githubusercontent.com/9095972/233862358-89a92bcd-fcd4-4848-81ca-0f7f0396ff4a.png" width="50%"/>
 
 ![image](https://user-images.githubusercontent.com/9095972/233858063-d6870cbe-84df-4296-af4e-668c90852d52.png)
 
