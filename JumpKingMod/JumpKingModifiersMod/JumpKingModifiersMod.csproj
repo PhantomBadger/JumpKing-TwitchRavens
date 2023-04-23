@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0B06258C-47D2-4E48-9C15-2A003AA5B678}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JumpKingModifiersMod</RootNamespace>
+    <AssemblyName>JumpKingModifiersMod</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\Harmony\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="JumpKing">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Jump King\JumpKing.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Jump King\MonoGame.Framework.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="API\IGameRectFlipper.cs" />
+    <Compile Include="API\IModifier.cs" />
+    <Compile Include="API\IModifierTrigger.cs" />
+    <Compile Include="API\IPlayerJumper.cs" />
+    <Compile Include="API\IPlayerStateObserver.cs" />
+    <Compile Include="API\IWalkSpeedModifier.cs" />
+    <Compile Include="API\IWindObserver.cs" />
+    <Compile Include="API\IYouDiedSubtextGetter.cs" />
+    <Compile Include="Entities\DamageTextEntity.cs" />
+    <Compile Include="JumpKingModifiersModEntry.cs" />
+    <Compile Include="Modifiers\BombCountdownModifier.cs" />
+    <Compile Include="Modifiers\BouncyFloorModifier.cs" />
+    <Compile Include="Modifiers\FallDamageModifier.cs" />
+    <Compile Include="Modifiers\FallDamage\BloodSplatterPersistence.cs" />
+    <Compile Include="Modifiers\FlipScreenModifier.cs" />
+    <Compile Include="Modifiers\InvertControlsModifier.cs" />
+    <Compile Include="Modifiers\LowVisibilityModifier.cs" />
+    <Compile Include="Modifiers\ManualScreenResizeModifier.cs" />
+    <Compile Include="Modifiers\RisingLavaModifier.cs" />
+    <Compile Include="Modifiers\WalkSpeedModifier.cs" />
+    <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
+    <Compile Include="Modifiers\WindToggleModifier.cs" />
+    <Compile Include="ModifierUpdatingEntity.cs" />
+    <Compile Include="Patching\DrawRenderTargetManualPatch.cs" />
+    <Compile Include="Patching\States\InputState.cs" />
+    <Compile Include="Patching\States\JumpState.cs" />
+    <Compile Include="Patching\JumpStateManualPatch.cs" />
+    <Compile Include="Patching\States\PlayerState.cs" />
+    <Compile Include="Patching\PlayerStateObserverManualPatch.cs" />
+    <Compile Include="Patching\PlayerValuesManualPatch.cs" />
+    <Compile Include="Patching\Teleporting\OnTeleportedEventArgs.cs" />
+    <Compile Include="Patching\WindObserverManualPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ModifiersModContentManager.cs" />
+    <Compile Include="Triggers\DebugModifierTrigger.cs" />
+    <Compile Include="Triggers\DebugTogglePair.cs" />
+    <Compile Include="Visuals\ModifierNotifications.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj">
+      <Project>{9544190f-5c10-4c4b-8eb7-ffd8bc3de76c}</Project>
+      <Name>JumpKingModifiersMod.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Logging\Logging.csproj">
+      <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase\PBJKModBase.csproj">
+      <Project>{DE2B97BE-F646-4158-A63B-330DAFEF06E2}</Project>
+      <Name>PBJKModBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Settings\Settings.csproj">
+      <Project>{d9c89840-a346-4334-99f2-cf323015c206}</Project>
+      <Name>Settings</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bloodsplat.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\cutout.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\healthbar_back.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\healthbar_front.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\king_death.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\lava.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\lowVisibilityOverlay.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\youdied.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /E /C /S "$(SolutionDir)JumpKingModifiersMod\bin\$(ConfigurationName)\*" "D:\SteamLibrary\steamapps\common\Jump King\Content\Mods"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

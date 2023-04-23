@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingMod.Install
+namespace JumpKingRavensMod.Install
 {
     /// <summary>
     /// An aggregate class containing info about our Mod's entry point

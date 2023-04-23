@@ -1,0 +1,16 @@
+﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace JumpKingRavensMod.API
+{
+    public delegate void MessengerRavenTriggerArgs(string ravenName, Color ravenNameColour, string ravenMessage, bool isFromSubscriber, bool isPriority);
+
+    public interface IMessengerRavenTrigger
+    {
+        event MessengerRavenTriggerArgs OnMessengerRavenTrigger;
+    }
+}

@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingMod.Install
+namespace JumpKingRavensMod.Install
 {
     /// <summary>
     /// A class which wraps all the required logic for installing a hook to our Mod .dll in a given MonoGame.Framework.dll

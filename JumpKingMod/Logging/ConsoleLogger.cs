@@ -41,6 +41,22 @@ namespace Logging
         private const uint OPEN_EXISTING = 0x3;
 
         /// <summary>
+        /// Singleton of the Console Logger
+        /// </summary>
+        public static ConsoleLogger Instance 
+        { 
+            get 
+            { 
+                if (instance == null)
+                {
+                    instance = new ConsoleLogger();
+                }
+                return instance;
+            } 
+        }
+        private static ConsoleLogger instance;
+
+        /// <summary>
         /// Default ctor for creating a <see cref="ConsoleLogger"/>
         /// </summary>
         public ConsoleLogger()

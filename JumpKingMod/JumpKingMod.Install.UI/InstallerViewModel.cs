@@ -1,4 +1,5 @@
-﻿using JumpKingMod.Settings;
+﻿using JumpKingRavensMod.Settings;
+using JumpKingModifiersMod.Settings;
 using Logging;
 using Logging.API;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -15,8 +16,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
+using System.Globalization;
 
-namespace JumpKingMod.Install.UI
+namespace JumpKingRavensMod.Install.UI
 {
     public class InstallerViewModel : INotifyPropertyChanged
     {
@@ -194,6 +196,329 @@ namespace JumpKingMod.Install.UI
         private Keys freeFlyToggleKey;
 
         /// <summary>
+        /// Returns whether the Fall Damage Mod should be enabled
+        /// </summary>
+        public bool FallDamageEnabled
+        {
+            get
+            {
+                return fallDamageEnabled;
+            }
+            set
+            {
+                if (fallDamageEnabled != value)
+                {
+                    fallDamageEnabled = value;
+                    RaisePropertyChanged(nameof(FallDamageEnabled));
+                    RaisePropertyChanged(nameof(FallDamageBloodSplatVisibility));
+                }
+            }
+        }
+        private bool fallDamageEnabled;
+
+        /// <summary>
+        /// Returns the key which toggles the fall damage modifier
+        /// </summary>
+        public Keys FallDamageToggleKey
+        {
+            get
+            {
+                return fallDamageToggleKey;
+            }
+            set
+            {
+                if (fallDamageToggleKey != value)
+                {
+                    fallDamageToggleKey = value;
+                    RaisePropertyChanged(nameof(FallDamageToggleKey));
+                }
+            }
+        }
+        private Keys fallDamageToggleKey;
+
+        /// <summary>
+        /// The modifier to apply to the fall distance to produce damage
+        /// </summary>
+        public string FallDamageModifier
+        {
+            get
+            {
+                return fallDamageModifier.ToString();
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    fallDamageModifier = JumpKingModifiersModSettingsContext.DefaultFallDamageModifier;
+                }
+                else
+                {
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        if (newVal > 1000)
+                        {
+                            newVal = 1000;
+                        }
+                        fallDamageModifier = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(FallDamageModifier));
+            }
+        }
+        private float fallDamageModifier;
+
+        /// <summary>
+        /// Returns whether the Blood Splat on Fall should be enabled
+        /// </summary>
+        public bool FallDamageBloodSplatEnabled
+        {
+            get
+            {
+                return fallDamageBloodSplatEnabled;
+            }
+            set
+            {
+                if (fallDamageBloodSplatEnabled != value)
+                {
+                    fallDamageBloodSplatEnabled = value;
+                    RaisePropertyChanged(nameof(FallDamageBloodSplatEnabled));
+                    RaisePropertyChanged(nameof(FallDamageBloodSplatVisibility));
+                }
+            }
+        }
+        private bool fallDamageBloodSplatEnabled;
+
+        /// <summary>
+        /// Aggregate field for visibility control
+        /// </summary>
+        public bool FallDamageBloodSplatVisibility
+        {
+            get
+            {
+                return FallDamageBloodSplatEnabled && FallDamageEnabled;
+            }
+        }
+
+        /// <summary>
+        /// The key to press to clear Blood Splats
+        /// </summary>
+        public Keys FallDamageClearBloodKey
+        {
+            get
+            {
+                return fallDamageClearBloodKey;
+            }
+            set
+            {
+                if (fallDamageClearBloodKey != value)
+                {
+                    fallDamageClearBloodKey = value;
+                    RaisePropertyChanged(nameof(FallDamageClearBloodKey));
+                }
+            }
+        }
+        private Keys fallDamageClearBloodKey;
+
+        /// <summary>
+        /// Whether we will use nice spawns for DLC maps for Fall Damage
+        /// </summary>
+        public bool FallDamageNiceSpawns
+        {
+            get
+            {
+                return fallDamageNiceSpawns;
+            }
+            set
+            {
+                if (fallDamageNiceSpawns != value)
+                {
+                    fallDamageNiceSpawns = value;
+                    RaisePropertyChanged(nameof(FallDamageNiceSpawns));
+                }
+            }
+        }
+        private bool fallDamageNiceSpawns;
+
+        /// <summary>
+        /// Whether the Resizing mod will be enabled or not
+        /// </summary>
+        public bool ManualResizingEnabled
+        {
+            get
+            {
+                return resizingEnabled;
+            }
+            set
+            {
+                if (resizingEnabled != value)
+                {
+                    resizingEnabled = value;
+                    RaisePropertyChanged(nameof(ManualResizingEnabled));
+                }
+            }
+        }
+        private bool resizingEnabled;
+
+        /// <summary>
+        /// The key to press to toggle the Resize Mod
+        /// </summary>
+        public Keys ManualResizingToggleKey
+        {
+            get
+            {
+                return manualResizingToggleKey;
+            }
+            set
+            {
+                if (manualResizingToggleKey != value)
+                {
+                    manualResizingToggleKey = value;
+                    RaisePropertyChanged(nameof(ManualResizingToggleKey));
+                }
+            }
+        }
+        private Keys manualResizingToggleKey;
+
+        /// <summary>
+        /// The key to press to grow the screen in the Resize Mod
+        /// </summary>
+        public Keys ManualResizingGrowKey
+        {
+            get
+            {
+                return manualResizingGrowKey;
+            }
+            set
+            {
+                if (manualResizingGrowKey != value)
+                {
+                    manualResizingGrowKey = value;
+                    RaisePropertyChanged(nameof(ManualResizingGrowKey));
+                }
+            }
+        }
+        private Keys manualResizingGrowKey;
+
+        /// <summary>
+        /// The key to press to shrink the screen in the Resize Mod
+        /// </summary>
+        public Keys ManualResizingShrinkKey
+        {
+            get
+            {
+                return manualResizingShrinkKey;
+            }
+            set
+            {
+                if (manualResizingShrinkKey != value)
+                {
+                    manualResizingShrinkKey = value;
+                    RaisePropertyChanged(nameof(ManualResizingShrinkKey));
+                }
+            }
+        }
+        private Keys manualResizingShrinkKey;
+
+        /// <summary>
+        /// Whether the Rising Lava mod is enabled
+        /// </summary>
+        public bool RisingLavaEnabled
+        {
+            get
+            {
+                return risingLavaEnabled;
+            }
+            set
+            {
+                if (risingLavaEnabled != value)
+                {
+                    risingLavaEnabled = value;
+                    RaisePropertyChanged(nameof(RisingLavaEnabled));
+                }
+            }
+        }
+        private bool risingLavaEnabled;
+
+        /// <summary>
+        /// The button to press to toggle rising lava in game
+        /// </summary>
+        public Keys RisingLavaToggleKey
+        {
+            get
+            {
+                return risingLavaToggleKey;
+            }
+            set
+            {
+                if (risingLavaToggleKey != value)
+                {
+                    risingLavaToggleKey = value;
+                    RaisePropertyChanged(nameof(RisingLavaToggleKey));
+                }
+            }
+        }
+        private Keys risingLavaToggleKey;
+
+        /// <summary>
+        /// The speed the lava will raise
+        /// </summary>
+        public string RisingLavaSpeed
+        {
+            get
+            {
+                return risingLavaSpeed.ToString();
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    risingLavaSpeed = JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed;
+                }
+                else
+                {
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        if (newVal > 1000)
+                        {
+                            newVal = 1000;
+                        }
+                        risingLavaSpeed = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(RisingLavaSpeed));
+            }
+        }
+        private float risingLavaSpeed;
+
+        /// <summary>
+        /// Whether or not we use nice spawns for DLC maps for Rising Lava
+        /// </summary>
+        public bool RisingLavaNiceSpawns
+        {
+            get
+            {
+                return risingLavaNiceSpawns;
+            }
+            set
+            {
+                if (risingLavaNiceSpawns != value)
+                {
+                    risingLavaNiceSpawns = value;
+                    RaisePropertyChanged(nameof(RisingLavaNiceSpawns));
+                }
+            }
+        }
+        private bool risingLavaNiceSpawns;
+
+        /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
         /// </summary>
         public string ExpectedRemoteModDirectory
@@ -205,32 +530,60 @@ namespace JumpKingMod.Install.UI
         }
 
         /// <summary>
-        /// Returns whether the mod settings are currently populated
+        /// Returns whether the ravenmod settings are currently populated
         /// </summary>
-        public bool AreModSettingsLoaded
+        public bool AreRavenModSettingsLoaded
         {
             get
             {
-                return ModSettings != null;
+                return RavenModSettings != null;
             }
         }
 
-        public UserSettings ModSettings
+        /// <summary>
+        /// Returns whether the fall damage mod settings are currently populated
+        /// </summary>
+        public bool AreFallDamageModSettingsLoaded
         {
             get
             {
-                return modSettings;
+                return FallDamageModSettings != null;
+            }
+        }
+
+        public UserSettings RavenModSettings
+        {
+            get
+            {
+                return ravenModSettings;
             }
             private set
             {
-                modSettings = value;
-                RaisePropertyChanged(nameof(ModSettings));
-                RaisePropertyChanged(nameof(AreModSettingsLoaded));
+                ravenModSettings = value;
+                RaisePropertyChanged(nameof(RavenModSettings));
+                RaisePropertyChanged(nameof(AreRavenModSettingsLoaded));
                 UpdateSettingsCommand.RaiseCanExecuteChanged();
                 LoadSettingsCommand.RaiseCanExecuteChanged();
             }
         }
-        private UserSettings modSettings;
+        private UserSettings ravenModSettings;
+
+        public UserSettings FallDamageModSettings
+        {
+            get
+            {
+                return fallDamageModSettings;
+            }
+            private set
+            {
+                fallDamageModSettings = value;
+                RaisePropertyChanged(nameof(FallDamageModSettings));
+                RaisePropertyChanged(nameof(AreFallDamageModSettingsLoaded));
+                UpdateSettingsCommand.RaiseCanExecuteChanged();
+                LoadSettingsCommand.RaiseCanExecuteChanged();
+            }
+        }
+        private UserSettings fallDamageModSettings;
 
         public string InstallErrorMessage
         {
@@ -328,8 +681,12 @@ namespace JumpKingMod.Install.UI
             BrowseGameDirectoryCommand = new DelegateCommand(_ => { BrowseForGameDirectory(); });
             BrowseModDirectoryCommand = new DelegateCommand(_ => { BrowseForModDirectory(); });
             InstallCommand = new DelegateCommand(_ => { InstallMod(); }, _ => { return CanInstallMod(); });
-            UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return AreModSettingsLoaded && CanUpdateModSettings(); });
-            LoadSettingsCommand = new DelegateCommand(_ => { LoadModSettings(createIfDoesntExist: true); }, _ => { return CanUpdateModSettings(); });
+            UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return AreRavenModSettingsLoaded && CanUpdateModSettings(); });
+            LoadSettingsCommand = new DelegateCommand(_ => 
+            { 
+                LoadRavenModSettings(createIfDoesntExist: true);
+                LoadFallDamageModSettings(createIfDoesntExist: true);
+            }, _ => { return CanUpdateModSettings(); });
             AddExcludedTermCommand = new DelegateCommand(_ => { AddToCollection(Ravens.ExcludedTerms, Ravens.CandidateExcludedItem); });
             RemoveExcludedTermCommand = new DelegateCommand(_ => 
             { 
@@ -458,7 +815,8 @@ namespace JumpKingMod.Install.UI
             // Load in any settings at the mod location
             if (success)
             {
-                LoadModSettings(createIfDoesntExist: true);
+                LoadRavenModSettings(createIfDoesntExist: true);
+                LoadFallDamageModSettings(createIfDoesntExist: true);
             }
 
             // Report the result
@@ -515,7 +873,12 @@ namespace JumpKingMod.Install.UI
         /// </summary>
         private bool CanUpdateModSettings()
         {
-            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingModSettingsContext.SettingsFileName);
+            if (string.IsNullOrWhiteSpace(GameDirectory))
+            {
+                return false;
+            }
+
+            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.SettingsFileName);
             bool fileExists = File.Exists(expectedSettingsFilePath);
             return fileExists;
         }
@@ -572,7 +935,7 @@ namespace JumpKingMod.Install.UI
         /// </summary>
         private void UpdateModSettings()
         {
-            if (ModSettings == null)
+            if (RavenModSettings == null || string.IsNullOrWhiteSpace(GameDirectory))
             {
                 return;
             }
@@ -589,50 +952,69 @@ namespace JumpKingMod.Install.UI
                 }
             }
 
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.SelectedStreamingPlatformKey, SelectedStreamingPlatform.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, SelectedStreamingPlatform.ToString());
 
             // YouTube
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeChannelNameKey, YouTubeSettings.YouTubeAccountName);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeApiKeyKey, YouTubeSettings.YouTubeAPIKey);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeConnectKeyKey, YouTubeSettings.ConnectKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, Ravens.YouTubeRavenTriggerType.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, YouTubeSettings.YouTubeAccountName);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeApiKeyKey, YouTubeSettings.YouTubeAPIKey);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeConnectKeyKey, YouTubeSettings.ConnectKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, Ravens.YouTubeRavenTriggerType.ToString());
 
             // Twitch
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchSettings.TwitchAccountName);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.OAuthKey, TwitchSettings.TwitchOAuth);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenTriggerTypeKey, Ravens.RavenTriggerType.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, Ravens.RavensChannelPointID);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchSettings.TwitchAccountName);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.OAuthKey, TwitchSettings.TwitchOAuth);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, Ravens.RavenTriggerType.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, Ravens.RavensChannelPointID);
 
             // Ravens
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensEnabledKey, Ravens.RavenEnabled.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Ravens.RavenToggleDebugKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensClearDebugKeyKey, Ravens.RavenClearDebugKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Ravens.RavenSubModeToggleKey.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensMaxCountKey, Ravens.MaxRavensCount);
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavensDisplayTimeInSecondsKey, Ravens.MessageDurationInSeconds);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensEnabledKey, Ravens.RavenEnabled.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, Ravens.RavenToggleDebugKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, Ravens.RavenClearDebugKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, Ravens.RavenSubModeToggleKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensMaxCountKey, Ravens.MaxRavensCount);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, Ravens.MessageDurationInSeconds);
 
             // Chat Display
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
 
             // Free Fly
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
 
             // Exclusion List
-            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.ExcludedTermFilePath);
+            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.ExcludedTermFilePath);
             Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
             File.WriteAllLines(expectedExclusionPath, Ravens.ExcludedTerms);
 
             // Raven Insults
-            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.RavenInsultsFilePath);
+            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.RavenInsultsFilePath);
             Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
             File.WriteAllLines(expectedRavenInsultsPath, Ravens.RavenInsults);
 
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.RavenInsultSpawnCountKey, Ravens.InsultRavenSpawnCount.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, Ravens.InsultRavenSpawnCount.ToString());
 
             // Gun Mode
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.GunEnabledKey, Ravens.GunEnabled.ToString());
-            ModSettings.SetOrCreateSetting(JumpKingModSettingsContext.GunToggleKeyKey, Ravens.GunToggleKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.GunEnabledKey, Ravens.GunEnabled.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.GunToggleKeyKey, Ravens.GunToggleKey.ToString());
+
+            // Fall Damage
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, FallDamageEnabled.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, FallDamageToggleKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, FallDamageModifier.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, FallDamageBloodSplatEnabled.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, FallDamageClearBloodKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, FallDamageNiceSpawns.ToString());
+
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, ManualResizingEnabled.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, ManualResizingToggleKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, ManualResizingGrowKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, ManualResizingShrinkKey.ToString());
+
+            // Rising Lava
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, RisingLavaEnabled.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, RisingLavaToggleKey.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, RisingLavaSpeed);
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, RisingLavaNiceSpawns.ToString());
 
             MessageBox.Show($"Settings updated successfully!");
         }
@@ -640,53 +1022,58 @@ namespace JumpKingMod.Install.UI
         /// <summary>
         /// Creates or loads the mod settings from the given install directory
         /// </summary>
-        private void LoadModSettings(bool createIfDoesntExist)
+        private void LoadRavenModSettings(bool createIfDoesntExist)
         {
+            if (string.IsNullOrWhiteSpace(GameDirectory))
+            {
+                return;
+            }
+
             // Load in the settings
-            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingModSettingsContext.SettingsFileName);
+            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.SettingsFileName);
             if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
             {
-                ModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModSettingsContext.GetDefaultSettings(), logger);
+                RavenModSettings = new UserSettings(expectedSettingsFilePath, JumpKingRavensModSettingsContext.GetDefaultSettings(), logger);
 
                 // Load the initial data
-                SelectedStreamingPlatform = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
+                SelectedStreamingPlatform = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
 
                 // YouTube Info
-                YouTubeSettings.YouTubeAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeChannelNameKey, string.Empty);
-                YouTubeSettings.YouTubeAPIKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeApiKeyKey, string.Empty);
-                YouTubeSettings.ConnectKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
-                Ravens.YouTubeRavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
+                YouTubeSettings.YouTubeAccountName = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, string.Empty);
+                YouTubeSettings.YouTubeAPIKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeApiKeyKey, string.Empty);
+                YouTubeSettings.ConnectKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
+                Ravens.YouTubeRavenTriggerType = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
 
                 // Twitch Info
-                TwitchSettings.TwitchAccountName = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
-                TwitchSettings.TwitchOAuth = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.OAuthKey, string.Empty);
-                Ravens.RavenTriggerType = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
-                Ravens.RavensChannelPointID = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
+                TwitchSettings.TwitchAccountName = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                TwitchSettings.TwitchOAuth = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.OAuthKey, string.Empty);
+                Ravens.RavenTriggerType = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
+                Ravens.RavensChannelPointID = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
 
                 // Raven Info
-                Ravens.RavenEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensEnabledKey, true);
-                Ravens.RavenClearDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
-                Ravens.RavenToggleDebugKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
-                Ravens.RavenSubModeToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
-                Ravens.MaxRavensCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensMaxCountKey, 5.ToString());
-                Ravens.MessageDurationInSeconds = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavensDisplayTimeInSecondsKey, 3.0f.ToString());
-                Ravens.InsultRavenSpawnCount = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
+                Ravens.RavenEnabled = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensEnabledKey, true);
+                Ravens.RavenClearDebugKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
+                Ravens.RavenToggleDebugKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+                Ravens.RavenSubModeToggleKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
+                Ravens.MaxRavensCount = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensMaxCountKey, 5.ToString());
+                Ravens.MessageDurationInSeconds = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, 3.0f.ToString());
+                Ravens.InsultRavenSpawnCount = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
 
                 // Chat Display Info
-                ChatDisplayEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.TwitchRelayEnabledKey, false);
+                ChatDisplayEnabled = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.TwitchRelayEnabledKey, false);
 
                 // Free Fly
-                FreeFlyingEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyEnabledKey, false);
-                FreeFlyToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
+                FreeFlyingEnabled = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, false);
+                FreeFlyToggleKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.FreeFlyToggleKeyKey, Keys.F1);
 
                 // Gun
-                Ravens.GunEnabled = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunEnabledKey, false);
-                Ravens.GunToggleKey = ModSettings.GetSettingOrDefault(JumpKingModSettingsContext.GunToggleKeyKey, Keys.F8);
+                Ravens.GunEnabled = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunEnabledKey, false);
+                Ravens.GunToggleKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunToggleKeyKey, Keys.F8);
             }
 
             // Load in Exclusion List
             List<string> excludedTerms = new List<string>();
-            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.ExcludedTermFilePath);
+            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.ExcludedTermFilePath);
             try
             {
                 if (File.Exists(expectedExclusionPath))
@@ -695,7 +1082,7 @@ namespace JumpKingMod.Install.UI
                     for (int i = 0; i < fileContent.Length; i++)
                     {
                         string line = fileContent[i].Trim();
-                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        if (line.Length <= 0 || line[0] == JumpKingRavensModSettingsContext.CommentCharacter)
                         {
                             continue;
                         }
@@ -717,7 +1104,7 @@ namespace JumpKingMod.Install.UI
 
             // Load in Raven Insults
             List<string> ravenInsultsFileContent = new List<string>();
-            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingModSettingsContext.RavenInsultsFilePath);
+            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.RavenInsultsFilePath);
             try
             {
                 if (File.Exists(expectedRavenInsultsPath))
@@ -726,7 +1113,7 @@ namespace JumpKingMod.Install.UI
                     for (int i = 0; i < fileContent.Length; i++)
                     {
                         string line = fileContent[i].Trim();
-                        if (line.Length <= 0 || line[0] == JumpKingModSettingsContext.CommentCharacter)
+                        if (line.Length <= 0 || line[0] == JumpKingRavensModSettingsContext.CommentCharacter)
                         {
                             continue;
                         }
@@ -736,7 +1123,7 @@ namespace JumpKingMod.Install.UI
                 }
                 else
                 {
-                    ravenInsultsFileContent.AddRange(JumpKingModSettingsContext.GetDefaultInsults());
+                    ravenInsultsFileContent.AddRange(JumpKingRavensModSettingsContext.GetDefaultInsults());
                     Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
                     File.WriteAllLines(expectedRavenInsultsPath, ravenInsultsFileContent);
                 }
@@ -746,6 +1133,39 @@ namespace JumpKingMod.Install.UI
                 logger.Error($"Encountered error when parsing Raven Insults {e.ToString()}");
             }
             Ravens.RavenInsults = new ObservableCollection<string>(ravenInsultsFileContent);
+        }
+
+        private void LoadFallDamageModSettings(bool createIfDoesntExist)
+        {
+            if (string.IsNullOrWhiteSpace(GameDirectory))
+            {
+                return;
+            }
+
+            // Load in the settings
+            string expectedSettingsFilePath = Path.Combine(GameDirectory, JumpKingModifiersModSettingsContext.SettingsFileName);
+            if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
+            {
+                FallDamageModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModifiersModSettingsContext.GetDefaultSettings(), logger);
+
+                // Load the initial data
+                FallDamageEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
+                FallDamageToggleKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, Keys.F11);
+                FallDamageModifier = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, JumpKingModifiersModSettingsContext.DefaultFallDamageModifier).ToString();
+                FallDamageBloodSplatEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
+                FallDamageClearBloodKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
+                FallDamageNiceSpawns = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, true);
+
+                ManualResizingEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
+                ManualResizingToggleKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
+                ManualResizingGrowKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, Keys.Up);
+                ManualResizingShrinkKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, Keys.Down);
+
+                RisingLavaEnabled = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
+                RisingLavaToggleKey = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F7);
+                RisingLavaSpeed = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed.ToString());
+                RisingLavaNiceSpawns = FallDamageModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, true);
+            }
         }
 
         /// <summary>
