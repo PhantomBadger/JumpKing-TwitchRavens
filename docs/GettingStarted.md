@@ -73,7 +73,9 @@ For YouTube you will also need to specify a key to be pressed to connect to the 
 ### For a breakdown of all Ravens Settings [click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/RavensModSettings.md)
 
 ## Fall Damage Mod
+
 _Added in Release v4.1_
+
 The Fall Damage Mod is currently packaged alongside the Ravens Mod released previously. However it can be used with or without the chat Ravens.
 
 ### For a breakdown of all Fall Damage Settings [click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/FallDamageModSettings.md)
