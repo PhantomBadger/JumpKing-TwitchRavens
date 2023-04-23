@@ -47,7 +47,7 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
         public void SetUpManualPatch(Harmony harmony)
         {
             var onPlayerFallMethod = AccessTools.Method("JumpKing.MiscSystems.Achievements.AchievementManager:OnPlayerFall");
-            var postfixMethod = AccessTools.Method($"JumpKingMod.Entities.Raven.Triggers.{this.GetType().Name}:PostfixTriggerMethod");
+            var postfixMethod = AccessTools.Method($"JumpKingRavensMod.Entities.Raven.Triggers.{this.GetType().Name}:PostfixTriggerMethod");
             harmony.Patch(onPlayerFallMethod, postfix: new HarmonyMethod(postfixMethod));
         }
 
