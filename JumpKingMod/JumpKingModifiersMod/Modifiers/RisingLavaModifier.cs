@@ -6,6 +6,7 @@ using JumpKingModifiersMod.Patching.Teleporting;
 using JumpKingModifiersMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
+using PBJKModBase.API;
 using PBJKModBase.Components;
 using PBJKModBase.Entities;
 using Settings;
@@ -36,6 +37,7 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly ModifierUpdatingEntity modifierUpdatingEntity;
         private readonly ModEntityManager modEntityManager;
         private readonly IPlayerStateObserver playerStateObserver;
+        private readonly IGameStateObserver gameStateObserver;
         private readonly ILogger logger;
         private readonly float lavaRisingSpeed;
         private readonly bool niceSpawns;
@@ -49,6 +51,7 @@ namespace JumpKingModifiersMod.Modifiers
         private UIImageEntity cutoutEntity;
         private float cutoutPauseCounter;
         private float oscillationCounter;
+        private bool reActivateModifier;
 
         private const float SpawnYBuffer = 0;
         private const float ScreenHeight = 360;
@@ -66,11 +69,12 @@ namespace JumpKingModifiersMod.Modifiers
         /// <param name="playerStateObserver">An implementation of <see cref="IPlayerStateObserver"/> for interacting with the player</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to log to</param>
         public RisingLavaModifier(ModifierUpdatingEntity modifierUpdatingEntity, ModEntityManager modEntityManager,
-            IPlayerStateObserver playerStateObserver, UserSettings userSettings, ILogger logger)
+            IPlayerStateObserver playerStateObserver, IGameStateObserver gameStateObserver, UserSettings userSettings, ILogger logger)
         {
             this.modifierUpdatingEntity = modifierUpdatingEntity ?? throw new ArgumentNullException(nameof(modifierUpdatingEntity));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.playerStateObserver = playerStateObserver ?? throw new ArgumentNullException(nameof(playerStateObserver));
+            this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             lavaModifierState = RisingLavaModifierState.Rising;
@@ -96,6 +100,10 @@ namespace JumpKingModifiersMod.Modifiers
 
             playerStateObserver.OnPlayerTeleported += OnPlayerTeleported;
             playerStateObserver.OnPlayerPositionRestarted += OnPlayerPositionRestarted;
+
+            gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
+            gameStateObserver.OnGameLoopRunning += OnGameLoopRunning;
+
             modifierUpdatingEntity.RegisterModifier(this);
         }
 
@@ -107,6 +115,29 @@ namespace JumpKingModifiersMod.Modifiers
             playerStateObserver.OnPlayerTeleported -= OnPlayerTeleported;
             playerStateObserver.OnPlayerPositionRestarted -= OnPlayerPositionRestarted;
             modifierUpdatingEntity.UnregisterModifier(this);
+        }
+
+        /// <summary>
+        /// If the game loop stops running we cancel the modifier
+        /// </summary>
+        private void OnGameLoopNotRunning()
+        {
+            if (IsModifierEnabled())
+            {
+                DisableModifier();
+                reActivateModifier = true;
+            }
+        }
+
+        /// <summary>
+        /// If the game loop restarts after we auto disable we re-enable
+        /// </summary>
+        private void OnGameLoopRunning()
+        {
+            if (reActivateModifier && !IsModifierEnabled())
+            {
+                EnableModifier();
+            }
         }
 
         /// <inheritdoc/>
@@ -154,6 +185,12 @@ namespace JumpKingModifiersMod.Modifiers
             if (lavaEntity != null)
             {
                 logger.Error($"Failed to Enable 'Rising Lava' Modifier, it is already enabled!");
+                return false;
+            }
+
+            if (!gameStateObserver.IsGameLoopRunning())
+            {
+                logger.Error($"Failed to Enable 'Rising Lava' Modifier, the game loop isn't running!");
                 return false;
             }
 

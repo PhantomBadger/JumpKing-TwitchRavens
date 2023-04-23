@@ -120,7 +120,7 @@ namespace JumpKingModifiersMod
                 bool isRisingLavaEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
                 if (isRisingLavaEnabled)
                 {
-                    var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, userSettings, Logger);
+                    var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance, userSettings, Logger);
                     Keys risingLavaToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F7);
 
                     var togglePair = new DebugTogglePair(risingLavaModifier, risingLavaToggleKey);

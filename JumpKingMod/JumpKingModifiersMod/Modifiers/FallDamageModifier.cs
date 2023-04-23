@@ -130,6 +130,7 @@ namespace JumpKingModifiersMod.Modifiers
             playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
             modifierUpdatingEntity.UnregisterModifier(this);
+            gameStateObserver.OnGameLoopRunning -= OnGameLoopRunning;
             gameStateObserver.OnGameLoopNotRunning -= OnGameLoopNotRunning;
         }
 
@@ -169,6 +170,12 @@ namespace JumpKingModifiersMod.Modifiers
             {
                 // Already active
                 logger.Information($"Failed to Enable Fall Damage Modifier - Effect already active");
+                return false;
+            }
+
+            if (!gameStateObserver.IsGameLoopRunning())
+            {
+                logger.Error($"Failed to Enable 'Fall Damage' Modifier, the game loop isn't running!");
                 return false;
             }
 
