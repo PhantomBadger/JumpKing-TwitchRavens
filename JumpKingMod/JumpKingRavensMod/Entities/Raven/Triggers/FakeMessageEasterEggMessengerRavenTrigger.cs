@@ -176,18 +176,18 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
                     }
                 }
             },
-            {
-                "Rainhoe", new List<EasterEggMessageInfo>()
-                {
-                    new EasterEggMessageInfo()
-                    {
-                        RavenMessage = "Please stop making me fall",
-                        RavenName = "Jump King",
-                        RavenNameColor = Color.DarkGreen,
-                        MessageOdds = 1,
-                    }
-                }
-            }
+            //{
+            //    "Rainhoe", new List<EasterEggMessageInfo>()
+            //    {
+            //        new EasterEggMessageInfo()
+            //        {
+            //            RavenMessage = "Please stop making me fall",
+            //            RavenName = "Jump King",
+            //            RavenNameColor = Color.DarkGreen,
+            //            MessageOdds = 1,
+            //        }
+            //    }
+            //}
         };
         private readonly Random random;
         private readonly ILogger logger;

@@ -97,7 +97,7 @@ namespace JumpKingModifiersMod.Modifiers
                 }
                 else
                 {
-                    logger.Error($"Unable to find 'Blood Splatter' File at '{JumpKingModifiersModSettingsContext.FallDamageSubtextsFilePath}'");
+                    logger.Warning($"Unable to find 'Blood Splatter' File at '{JumpKingModifiersModSettingsContext.FallDamageSubtextsFilePath}' - creating a new one!");
                     return false;
                 }
 

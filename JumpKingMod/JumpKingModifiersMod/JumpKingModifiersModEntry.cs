@@ -37,7 +37,7 @@ namespace JumpKingModifiersMod
                 harmony.PatchAll();
 
                 Logger.Information($"====================================");
-                Logger.Information($"Jump King Modifiers Mod!");
+                Logger.Information($"Jump King Fall Damage Mod!");
                 Logger.Information($"====================================");
 
                 // Load content & settings
@@ -69,13 +69,17 @@ namespace JumpKingModifiersMod
 
                 // Set up modifiers and trigger
                 // Not released yet ssshh....
-                var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
-                var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
-                var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
-                var invertControlsModifier = new InvertControlsModifier(playerStatePatch, Logger);
-                var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
-                var windModifier = new WindToggleModifier(windPatch, Logger);
-                var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
+                // Look if you know how to compile code you can clearly enable all these. I ask that you don't
+                // because I don't wanna release it yet, but I also dont wanna go through the faff of partially 
+                // bringing stuff into a public branch. Please be a homie ty xoxox
+
+                //var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
+                //var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
+                //var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
+                //var invertControlsModifier = new InvertControlsModifier(playerStatePatch, Logger);
+                //var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
+                //var windModifier = new WindToggleModifier(windPatch, Logger);
+                //var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
                 //debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));
@@ -100,37 +104,37 @@ namespace JumpKingModifiersMod
                     Logger.Error($"Fall Damage Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
                 }
 
-                // Manual Resizing
-                bool isShrinkingEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
-                if (isShrinkingEnabled)
-                {
-                    var manualResizeModifier = new ManualScreenResizeModifier(modifierUpdatingEntity, userSettings, Logger);
-                    Keys manualResizeToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
+                //// Manual Resizing
+                //bool isShrinkingEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
+                //if (isShrinkingEnabled)
+                //{
+                //    var manualResizeModifier = new ManualScreenResizeModifier(modifierUpdatingEntity, userSettings, Logger);
+                //    Keys manualResizeToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
 
-                    var togglePair = new DebugTogglePair(manualResizeModifier, manualResizeToggleKey);
-                    debugToggles.Add(togglePair);
-                    Logger.Information($"Manual Resize Mod is Enabled! Press the Toggle Key ({manualResizeToggleKey.ToString()}) to activate once in game!");
-                }
-                else
-                {
-                    Logger.Error($"Manual Resize Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
-                }
+                //    var togglePair = new DebugTogglePair(manualResizeModifier, manualResizeToggleKey);
+                //    debugToggles.Add(togglePair);
+                //    Logger.Information($"Manual Resize Mod is Enabled! Press the Toggle Key ({manualResizeToggleKey.ToString()}) to activate once in game!");
+                //}
+                //else
+                //{
+                //    Logger.Error($"Manual Resize Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
+                //}
 
-                // Rising Lava
-                bool isRisingLavaEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
-                if (isRisingLavaEnabled)
-                {
-                    var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance, userSettings, Logger);
-                    Keys risingLavaToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F7);
+                //// Rising Lava
+                //bool isRisingLavaEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
+                //if (isRisingLavaEnabled)
+                //{
+                //    var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance, userSettings, Logger);
+                //    Keys risingLavaToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F7);
 
-                    var togglePair = new DebugTogglePair(risingLavaModifier, risingLavaToggleKey);
-                    debugToggles.Add(togglePair);
-                    Logger.Information($"Rising Lava Mod is Enabled! Press the Toggle Key ({risingLavaToggleKey.ToString()}) to activate once in game!");
-                }
-                else
-                {
-                    Logger.Error($"Rising Lava Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
-                }
+                //    var togglePair = new DebugTogglePair(risingLavaModifier, risingLavaToggleKey);
+                //    debugToggles.Add(togglePair);
+                //    Logger.Information($"Rising Lava Mod is Enabled! Press the Toggle Key ({risingLavaToggleKey.ToString()}) to activate once in game!");
+                //}
+                //else
+                //{
+                //    Logger.Error($"Rising Lava Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
+                //}
 
                 // Make the toggle trigger
                 var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings);
