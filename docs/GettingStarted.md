@@ -4,6 +4,7 @@ _This information is accurate as of Release v4.1_
 1. [Installation](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#installation)
 2. [Chat Ravens Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#chat-ravens-mod)
 3. [Fall Damage Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#fall-damage-mod)
+4. [Editing Settings](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#editing-settings)
 
 ## Installation
 
@@ -99,6 +100,23 @@ You can add a 'FallDamageSubtexts.txt' file to the 'Content/Mods' folder of your
 ![image](https://user-images.githubusercontent.com/9095972/233860969-bfd4fb2f-2f9e-4c92-bfa0-3cf95b3a849e.png)
 
 <img src="https://user-images.githubusercontent.com/9095972/233861040-6716c32c-c59a-459c-900a-98a084b100a2.png" width="50%"/>
+
+## Editing Settings
+
+To edit your mod settings, run the `JumpKingMod.Install.UI.exe` program and ensure the **'Install Directory'** is correct using the steps outlined above. Then click 'Load Settings'.
+
+![image](https://user-images.githubusercontent.com/9095972/233861614-230aa22d-5480-44af-91f4-f76e9b268cb9.png)
+
+After which your settings should be populated!
+
+![image](https://user-images.githubusercontent.com/9095972/233861649-0fa2cadb-4269-47e8-81e0-8ecd1dc5e625.png)
+
+Once finished editing, click 'Save Settings' - you will receive a small pop-up letting you know it has been done successfully.
+
+![image](https://user-images.githubusercontent.com/9095972/233861679-6c384d86-c8bc-46ba-8689-fb8542e5b497.png)
+
+You will now need to restart Jump King for these settings to take effect.
+
 
 
 
