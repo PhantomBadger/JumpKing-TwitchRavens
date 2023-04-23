@@ -1,9 +1,9 @@
 # Getting Started
 _This information is accurate as of Release v4.1_
 
-1. [Installation](https://user-images.githubusercontent.com/9095972/233861040-6716c32c-c59a-459c-900a-98a084b100a2.png)
-2. [Chat Ravens Mod](https://user-images.githubusercontent.com/9095972/233861040-6716c32c-c59a-459c-900a-98a084b100a2.png)
-3. [Fall Damage Mod](https://user-images.githubusercontent.com/9095972/233861040-6716c32c-c59a-459c-900a-98a084b100a2.png)
+1. [Installation](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#installation)
+2. [Chat Ravens Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#chat-ravens-mod)
+3. [Fall Damage Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#fall-damage-mod)
 
 ## Installation
 
