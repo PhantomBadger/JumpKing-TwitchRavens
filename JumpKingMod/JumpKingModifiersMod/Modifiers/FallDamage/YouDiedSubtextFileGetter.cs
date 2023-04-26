@@ -18,6 +18,9 @@ namespace JumpKingModifiersMod.Modifiers
     {
         private readonly List<string> subtexts;
         private readonly Random random;
+        private readonly ILogger logger;
+
+        private DateTime lastEditTime;
 
         /// <summary>
         /// Ctor for creating a <see cref="YouDiedSubtextFileGetter"/>
@@ -25,13 +28,24 @@ namespace JumpKingModifiersMod.Modifiers
         /// <param name="logger">An implementation of <see cref="ILogger"/> for logging</param>
         public YouDiedSubtextFileGetter(ILogger logger)
         {
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             subtexts = new List<string>();
             random = new Random(DateTime.Now.Millisecond);
 
             // Parsing subtext list
+            subtexts = ParseSubtextFile();
+        }
+
+        /// <summary>
+        /// Parse the contents of the subtext file, returns default values if it fails
+        /// </summary>
+        private List<string> ParseSubtextFile()
+        {
+            List<string> subtexts = new List<string>();
             try
             {
-                if (File.Exists(JumpKingModifiersModSettingsContext.FallDamageSubtextsFilePath))
+                FileInfo fileInfo = new FileInfo(JumpKingModifiersModSettingsContext.FallDamageSubtextsFilePath);
+                if (fileInfo.Exists)
                 {
                     string[] fileContents = File.ReadAllLines(JumpKingModifiersModSettingsContext.FallDamageSubtextsFilePath);
                     for (int i = 0; i < fileContents.Length; i++)
@@ -44,6 +58,7 @@ namespace JumpKingModifiersMod.Modifiers
 
                         subtexts.Add(line);
                     }
+                    lastEditTime = fileInfo.LastWriteTimeUtc;
                     logger.Information($"Successfully loaded 'You Died' Subtexts File with '{subtexts.Count}' entries");
                 }
                 else
@@ -57,6 +72,29 @@ namespace JumpKingModifiersMod.Modifiers
                 logger.Error($"Encountered exception when loading 'You Died' Subtexts, using default values instead: {e.ToString()}");
                 subtexts.AddRange(JumpKingModifiersModSettingsContext.GetDefaultFallDamageSubtexts());
             }
+            return subtexts;
+        }
+
+        /// <summary>
+        /// Returns whether the Subtext file has changed from the last edit time recorded
+        /// </summary>
+        private bool HasSubtextFileChanged()
+        {
+            try
+            {
+                FileInfo fileInfo = new FileInfo(JumpKingModifiersModSettingsContext.FallDamageSubtextsFilePath);
+                if (fileInfo.Exists)
+                {
+                    return fileInfo.LastAccessTimeUtc > lastEditTime;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Failed to check if Subtext file has changed, using existing values!");
+                return false;
+            }
+
+            return false;
         }
 
         /// <inheritdoc/>
@@ -65,6 +103,13 @@ namespace JumpKingModifiersMod.Modifiers
             if (subtexts == null || subtexts.Count <= 0)
             {
                 return "I dont know what to put here, Have a good day!";
+            }
+
+            if (HasSubtextFileChanged())
+            {
+                logger.Information($"You Died Subtexts file has changed, reloading!");
+                subtexts.Clear();
+                subtexts.AddRange(ParseSubtextFile());
             }
 
             int index = random.Next(0, subtexts.Count);
