@@ -243,7 +243,7 @@ namespace JumpKingRavensMod.Install.UI
         {
             get
             {
-                return fallDamageModifier.ToString();
+                return fallDamageModifier.ToString(CultureInfo.InvariantCulture);
             }
             set
             {
@@ -470,7 +470,7 @@ namespace JumpKingRavensMod.Install.UI
         {
             get
             {
-                return risingLavaSpeed.ToString();
+                return risingLavaSpeed.ToString(CultureInfo.InvariantCulture);
             }
             set
             {
@@ -1000,7 +1000,7 @@ namespace JumpKingRavensMod.Install.UI
             // Fall Damage
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, FallDamageEnabled.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, FallDamageToggleKey.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, FallDamageModifier.ToString());
+            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, FallDamageModifier);
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, FallDamageBloodSplatEnabled.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, FallDamageClearBloodKey.ToString());
             FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, FallDamageNiceSpawns.ToString());

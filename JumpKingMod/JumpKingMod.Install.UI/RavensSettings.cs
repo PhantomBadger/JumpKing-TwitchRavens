@@ -179,7 +179,7 @@ namespace JumpKingRavensMod.Install.UI
         {
             get
             {
-                return messageDurationInSeconds.ToString();
+                return messageDurationInSeconds.ToString(CultureInfo.InvariantCulture);
             }
             set
             {

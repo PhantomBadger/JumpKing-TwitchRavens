@@ -127,7 +127,7 @@ namespace Settings
         /// </summary>
         public float GetSettingOrDefault(string key, float defaultValue)
         {
-            string rawValue = GetSettingOrDefault(key, defaultValue.ToString());
+            string rawValue = GetSettingOrDefault(key, defaultValue.ToString(CultureInfo.InvariantCulture));
             if (float.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float parsedValue))
             {
                 return parsedValue;
