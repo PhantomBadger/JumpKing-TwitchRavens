@@ -1,12 +1,11 @@
 ﻿using JumpKing;
-using JumpKingRavensMod.API;
-using JumpKingRavensMod.Entities;
-using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
+using PBJKModBase.YouTube.API;
+using PBJKModBase.YouTube.Settings;
 using Settings;
 using System;
 using System.Collections.Concurrent;
@@ -16,7 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.YouTube
+namespace PBJKModBase.YouTube
 {
     /// <summary>
     /// An implementation of <see cref="IYouTubeClientConnector"/> which will wait for
@@ -57,7 +56,7 @@ namespace JumpKingRavensMod.YouTube
             youtubeClient.OnDisconnected += OnYouTubeClientDisconnected;
 
             // Prime the UI Text
-            connectKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
+            connectKey = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, Keys.F9);
             connectionStatusText = new UITextEntity(modEntityManager, new Vector2(480, 0), string.Empty, Color.Red,
                             UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall);
 

@@ -1,7 +1,7 @@
 ﻿using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
-using JumpKingRavensMod.Settings;
+using PBJKModBase.YouTube.Settings;
 using Logging.API;
 using Settings;
 using System;
@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.YouTube
+namespace PBJKModBase.YouTube
 {
     /// <summary>
     /// A class representing a YouTube Chat Client

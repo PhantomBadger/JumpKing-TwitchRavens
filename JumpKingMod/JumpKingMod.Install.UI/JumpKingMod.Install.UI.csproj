@@ -141,6 +141,10 @@
       <Project>{16f1cfd5-9ec2-4a45-8eda-801310c3a866}</Project>
       <Name>PBJKModBase.Twitch.Settings</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.YouTube.Settings\PBJKModBase.YouTube.Settings.csproj">
+      <Project>{14f4d0da-85c9-48f0-921c-4304acf656a7}</Project>
+      <Name>PBJKModBase.YouTube.Settings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Settings\Settings.csproj">
       <Project>{D9C89840-A346-4334-99F2-CF323015C206}</Project>
       <Name>Settings</Name>

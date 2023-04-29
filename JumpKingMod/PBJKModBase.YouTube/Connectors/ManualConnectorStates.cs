@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.YouTube
+namespace PBJKModBase.YouTube
 {
     /// <summary>
     /// An enum of possible states for the <see cref="ManualYouTubeClientConnector"/>

@@ -1,4 +1,4 @@
-﻿using JumpKingRavensMod.Settings;
+﻿using PBJKModBase.YouTube.Settings;
 using Logging.API;
 using Settings;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.YouTube
+namespace PBJKModBase.YouTube
 {
     /// <summary>
     /// A factory which produces and caches a <see cref="YouTubeChatClient"/> based on the
@@ -40,13 +40,13 @@ namespace JumpKingRavensMod.YouTube
             else
             {
                 // Initialise the settings and attempt to load the api key
-                string channelId = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, string.Empty);
-                string apiKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeApiKeyKey, string.Empty);
+                string channelId = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
+                string apiKey = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, string.Empty);
 
                 // Check if any of the data is bad, exit now
                 if (string.IsNullOrWhiteSpace(channelId))
                 {
-                    logger.Error($"No valid YouTube ChannelName found in the {JumpKingRavensModSettingsContext.SettingsFileName} file!");
+                    logger.Error($"No valid YouTube ChannelName found in the {PBJKModBaseYouTubeSettingsContext.SettingsFileName} file!");
                     return null;
                 }
                 if (string.IsNullOrWhiteSpace(apiKey))

@@ -1,11 +1,4 @@
-﻿using JumpKingRavensMod.YouTube;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JumpKingRavensMod.API
+﻿namespace PBJKModBase.YouTube.API
 {
     /// <summary>
     /// Interface representing an object which knows how to connect a YouTube Client

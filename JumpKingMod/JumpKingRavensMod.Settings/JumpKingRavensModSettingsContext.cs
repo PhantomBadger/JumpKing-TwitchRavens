@@ -13,9 +13,6 @@ namespace JumpKingRavensMod.Settings
         public const string SelectedStreamingPlatformKey = "SelectedStreamingPlatform";
 
         // YouTube
-        public const string YouTubeApiKeyKey = "YouTubeAPIKey";
-        public const string YouTubeChannelNameKey = "YouTubeChannelName";
-        public const string YouTubeConnectKeyKey = "YouTubeConnectKey";
         public const string YouTubeRavenTriggerTypeKey = "YouTubeRavenTriggerType";
 
         // Twitch
@@ -51,9 +48,6 @@ namespace JumpKingRavensMod.Settings
                 { SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch.ToString() },
 
                 // YouTube
-                { YouTubeApiKeyKey, "" },
-                { YouTubeChannelNameKey, "" },
-                { YouTubeConnectKeyKey, Keys.F9.ToString() },
                 { YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage.ToString() },
 
                 // Twitch Chat

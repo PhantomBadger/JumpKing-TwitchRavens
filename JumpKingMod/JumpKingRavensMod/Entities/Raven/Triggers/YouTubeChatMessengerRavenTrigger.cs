@@ -1,6 +1,6 @@
 ﻿using Google.Apis.YouTube.v3.Data;
 using JumpKingRavensMod.API;
-using JumpKingRavensMod.YouTube;
+using PBJKModBase.YouTube;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.Twitch.API;

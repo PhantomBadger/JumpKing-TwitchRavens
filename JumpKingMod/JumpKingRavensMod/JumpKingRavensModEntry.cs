@@ -8,7 +8,7 @@ using JumpKingRavensMod.Entities.Raven;
 using JumpKingRavensMod.Entities.Raven.Triggers;
 using JumpKingRavensMod.Patching;
 using JumpKingRavensMod.Settings;
-using JumpKingRavensMod.YouTube;
+using PBJKModBase.YouTube;
 using Logging;
 using Logging.API;
 using PBJKModBase;
@@ -19,6 +19,8 @@ using PBJKModBase.Twitch;
 using PBJKModBase.Twitch.Settings;
 using Settings;
 using TwitchLib.Client;
+using PBJKModBase.YouTube.Settings;
+using PBJKModBase.YouTube.API;
 
 namespace JumpKingRavensMod
 {
@@ -195,7 +197,7 @@ namespace JumpKingRavensMod
                                             var filter = new ExcludedTermListFilter(Logger);
 
                                             // Easter Egg
-                                            string youTubeChannelId = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, string.Empty);
+                                            string youTubeChannelId = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
                                             if (easterEggEnabled &&
                                                 TryGetAndStartEasterEggTrigger(youTubeChannelId, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                             {

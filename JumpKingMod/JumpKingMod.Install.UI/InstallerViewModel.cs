@@ -18,6 +18,7 @@ using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
 using System.Globalization;
 using PBJKModBase.Twitch.Settings;
+using PBJKModBase.YouTube.Settings;
 
 namespace JumpKingRavensMod.Install.UI
 {
@@ -956,9 +957,9 @@ namespace JumpKingRavensMod.Install.UI
             RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, SelectedStreamingPlatform.ToString());
 
             // YouTube
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, YouTubeSettings.YouTubeAccountName);
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeApiKeyKey, YouTubeSettings.YouTubeAPIKey);
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeConnectKeyKey, YouTubeSettings.ConnectKey.ToString());
+            RavenModSettings.SetOrCreateSetting(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, YouTubeSettings.YouTubeAccountName);
+            RavenModSettings.SetOrCreateSetting(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, YouTubeSettings.YouTubeAPIKey);
+            RavenModSettings.SetOrCreateSetting(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, YouTubeSettings.ConnectKey.ToString());
             RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, Ravens.YouTubeRavenTriggerType.ToString());
 
             // Twitch
@@ -1040,9 +1041,9 @@ namespace JumpKingRavensMod.Install.UI
                 SelectedStreamingPlatform = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
 
                 // YouTube Info
-                YouTubeSettings.YouTubeAccountName = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeChannelNameKey, string.Empty);
-                YouTubeSettings.YouTubeAPIKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeApiKeyKey, string.Empty);
-                YouTubeSettings.ConnectKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeConnectKeyKey, Keys.F9);
+                YouTubeSettings.YouTubeAccountName = RavenModSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
+                YouTubeSettings.YouTubeAPIKey = RavenModSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, string.Empty);
+                YouTubeSettings.ConnectKey = RavenModSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, Keys.F9);
                 Ravens.YouTubeRavenTriggerType = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
 
                 // Twitch Info

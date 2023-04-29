@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.YouTube
+namespace PBJKModBase.YouTube
 {
     /// <summary>
     /// An aggregate class representing info about a YouTube LiveStream Chat connection

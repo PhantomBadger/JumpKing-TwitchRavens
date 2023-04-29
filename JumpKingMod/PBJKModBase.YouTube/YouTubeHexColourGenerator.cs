@@ -1,6 +1,5 @@
 ﻿using Logging.API;
 using Microsoft.Xna.Framework;
-using PBJKModBase.Twitch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.YouTube
+namespace PBJKModBase.YouTube
 {
     public abstract class YouTubeHexColourGenerator
     {
@@ -21,7 +20,7 @@ namespace JumpKingRavensMod.YouTube
                     byte[] data = md5.ComputeHash(Encoding.UTF8.GetBytes(colourName));
                     string hexCode = $"#{BitConverter.ToString(data).Replace("-", string.Empty).Substring(0, 6)}";
 
-                    return TwitchHexColourParser.ParseColourFromHex(hexCode, logger);
+                    return YouTubeHexColourParser.ParseColourFromHex(hexCode, logger);
                 }
             }
             catch (Exception ex)

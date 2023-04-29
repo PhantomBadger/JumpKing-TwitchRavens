@@ -96,7 +96,6 @@
     <Compile Include="API\IInsultGetter.cs" />
     <Compile Include="API\IMessengerRavenTrigger.cs" />
     <Compile Include="API\IRavenLandingPositionsCache.cs" />
-    <Compile Include="API\IYouTubeClientConnector.cs" />
     <Compile Include="Entities\GunEntity.cs" />
     <Compile Include="Entities\MessengerRavenSpawningEntity.cs" />
     <Compile Include="Entities\RavenDebugSpawningEntity.cs" />
@@ -117,15 +116,6 @@
     <Compile Include="Entities\Raven\Triggers\PlayerFallMessengerRavenTrigger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\Raven\Triggers\TwitchChatMessengerRavenTrigger.cs" />
-    <Compile Include="YouTube\Connectors\ManualConnectionRequest.cs" />
-    <Compile Include="YouTube\Connectors\ManualConnectorStates.cs" />
-    <Compile Include="YouTube\Connectors\ManualYouTubeClientConnector.cs" />
-    <Compile Include="YouTube\YouTubeChatClient.cs" />
-    <Compile Include="YouTube\YouTubeChatClientFactory.cs" />
-    <Compile Include="YouTube\YouTubeChatMessageBatchArgs.cs" />
-    <Compile Include="YouTube\YouTubeChatSessionInfo.cs" />
-    <Compile Include="YouTube\YouTubeHexColourGenerator.cs" />
-    <Compile Include="YouTube\YouTubeLiveStreamData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JumpKingRavensMod.Settings\JumpKingRavensMod.Settings.csproj">
@@ -143,6 +133,14 @@
     <ProjectReference Include="..\PBJKModBase.Twitch\PBJKModBase.Twitch.csproj">
       <Project>{450e7ceb-0885-4f44-a452-d351656edfac}</Project>
       <Name>PBJKModBase.Twitch</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.YouTube.Settings\PBJKModBase.YouTube.Settings.csproj">
+      <Project>{14f4d0da-85c9-48f0-921c-4304acf656a7}</Project>
+      <Name>PBJKModBase.YouTube.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.YouTube\PBJKModBase.YouTube.csproj">
+      <Project>{5bf5ab1d-1edb-40c0-98c8-add0914e9dc9}</Project>
+      <Name>PBJKModBase.YouTube</Name>
     </ProjectReference>
     <ProjectReference Include="..\PBJKModBase\PBJKModBase.csproj">
       <Project>{DE2B97BE-F646-4158-A63B-330DAFEF06E2}</Project>
