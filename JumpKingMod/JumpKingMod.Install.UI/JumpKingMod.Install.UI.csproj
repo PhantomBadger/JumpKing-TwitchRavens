@@ -137,6 +137,10 @@
       <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
       <Name>Logging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.Twitch.Settings\PBJKModBase.Twitch.Settings.csproj">
+      <Project>{16f1cfd5-9ec2-4a45-8eda-801310c3a866}</Project>
+      <Name>PBJKModBase.Twitch.Settings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Settings\Settings.csproj">
       <Project>{D9C89840-A346-4334-99F2-CF323015C206}</Project>
       <Name>Settings</Name>

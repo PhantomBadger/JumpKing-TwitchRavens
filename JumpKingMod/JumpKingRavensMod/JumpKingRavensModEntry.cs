@@ -8,7 +8,6 @@ using JumpKingRavensMod.Entities.Raven;
 using JumpKingRavensMod.Entities.Raven.Triggers;
 using JumpKingRavensMod.Patching;
 using JumpKingRavensMod.Settings;
-using JumpKingRavensMod.Twitch;
 using JumpKingRavensMod.YouTube;
 using Logging;
 using Logging.API;
@@ -16,6 +15,8 @@ using PBJKModBase;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
 using PBJKModBase.Patching;
+using PBJKModBase.Twitch;
+using PBJKModBase.Twitch.Settings;
 using Settings;
 using TwitchLib.Client;
 
@@ -123,7 +124,7 @@ namespace JumpKingRavensMod
                                             var filter = new ExcludedTermListFilter(Logger);
 
                                             // Easter Egg
-                                            string twitchName = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                                            string twitchName = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                                             if (easterEggEnabled &&
                                                 TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                             {
@@ -150,7 +151,7 @@ namespace JumpKingRavensMod
                                             var filter = new ExcludedTermListFilter(Logger);
 
                                             // Easter Egg
-                                            string twitchName = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                                            string twitchName = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                                             if (easterEggEnabled &&
                                                 TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                             {

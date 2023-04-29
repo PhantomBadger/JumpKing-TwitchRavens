@@ -6,8 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.Twitch
+namespace PBJKModBase.Twitch
 {
+    /// <summary>
+    /// Utility function to parse the colour hex provided by the Twitch API into a MonoGame.Framework <see cref="Color"/>
+    /// </summary>
     public abstract class TwitchHexColourParser
     {
         public static Color ParseColourFromHex(string colourHex, ILogger logger = null)

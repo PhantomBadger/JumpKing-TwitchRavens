@@ -1,6 +1,6 @@
-﻿using JumpKingRavensMod.API;
-using JumpKingRavensMod.Settings;
+﻿using PBJKModBase.Twitch.Settings;
 using Logging.API;
+using PBJKModBase.Twitch.API;
 using Settings;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.Twitch
+namespace PBJKModBase.Twitch
 {
     /// <summary>
     /// An implementation of <see cref="IExcludedTermFilter"/> which checks against a loaded list of excluded phrases
@@ -28,13 +28,13 @@ namespace JumpKingRavensMod.Twitch
             // Parsing Excluded Term List
             try
             {
-                if (File.Exists(JumpKingRavensModSettingsContext.ExcludedTermFilePath))
+                if (File.Exists(PBJKModBaseTwitchSettingsContext.ExcludedTermFilePath))
                 {
-                    string[] fileContents = File.ReadAllLines(JumpKingRavensModSettingsContext.ExcludedTermFilePath);
+                    string[] fileContents = File.ReadAllLines(PBJKModBaseTwitchSettingsContext.ExcludedTermFilePath);
                     for (int i = 0; i < fileContents.Length; i++)
                     {
                         string line = fileContents[i].Trim();
-                        if (line.Length <= 0 || line[0] == JumpKingRavensModSettingsContext.CommentCharacter)
+                        if (line.Length <= 0 || line[0] == PBJKModBaseTwitchSettingsContext.CommentCharacter)
                         {
                             continue;
                         }
@@ -45,7 +45,7 @@ namespace JumpKingRavensMod.Twitch
                 }
                 else
                 {
-                    logger.Error($"Unable to find Excluded Term File List at '{JumpKingRavensModSettingsContext.ExcludedTermFilePath}'");
+                    logger.Error($"Unable to find Excluded Term File List at '{PBJKModBaseTwitchSettingsContext.ExcludedTermFilePath}'");
                 }
             }
             catch (Exception e)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.API
+namespace PBJKModBase.Twitch.API
 {
     /// <summary>
     /// An interface representing a filter which can check against an exclusion list

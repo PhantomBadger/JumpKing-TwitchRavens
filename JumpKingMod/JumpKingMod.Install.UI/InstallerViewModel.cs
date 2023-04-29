@@ -17,6 +17,7 @@ using System.Windows;
 using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
 using System.Globalization;
+using PBJKModBase.Twitch.Settings;
 
 namespace JumpKingRavensMod.Install.UI
 {
@@ -961,8 +962,8 @@ namespace JumpKingRavensMod.Install.UI
             RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, Ravens.YouTubeRavenTriggerType.ToString());
 
             // Twitch
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, TwitchSettings.TwitchAccountName);
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.OAuthKey, TwitchSettings.TwitchOAuth);
+            RavenModSettings.SetOrCreateSetting(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, TwitchSettings.TwitchAccountName);
+            RavenModSettings.SetOrCreateSetting(PBJKModBaseTwitchSettingsContext.OAuthKey, TwitchSettings.TwitchOAuth);
             RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, Ravens.RavenTriggerType.ToString());
             RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, Ravens.RavensChannelPointID);
 
@@ -982,7 +983,7 @@ namespace JumpKingRavensMod.Install.UI
             RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
 
             // Exclusion List
-            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.ExcludedTermFilePath);
+            string expectedExclusionPath = Path.Combine(GameDirectory, PBJKModBaseTwitchSettingsContext.ExcludedTermFilePath);
             Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
             File.WriteAllLines(expectedExclusionPath, Ravens.ExcludedTerms);
 
@@ -1045,8 +1046,8 @@ namespace JumpKingRavensMod.Install.UI
                 Ravens.YouTubeRavenTriggerType = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
 
                 // Twitch Info
-                TwitchSettings.TwitchAccountName = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
-                TwitchSettings.TwitchOAuth = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.OAuthKey, string.Empty);
+                TwitchSettings.TwitchAccountName = RavenModSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                TwitchSettings.TwitchOAuth = RavenModSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.OAuthKey, string.Empty);
                 Ravens.RavenTriggerType = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
                 Ravens.RavensChannelPointID = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
 
@@ -1073,7 +1074,7 @@ namespace JumpKingRavensMod.Install.UI
 
             // Load in Exclusion List
             List<string> excludedTerms = new List<string>();
-            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.ExcludedTermFilePath);
+            string expectedExclusionPath = Path.Combine(GameDirectory, PBJKModBaseTwitchSettingsContext.ExcludedTermFilePath);
             try
             {
                 if (File.Exists(expectedExclusionPath))

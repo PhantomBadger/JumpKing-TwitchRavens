@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 
-namespace JumpKingRavensMod.Twitch
+namespace PBJKModBase.Twitch
 {
     /// <summary>
     /// A class responsible for relaying the twitch chat and acting on incoming messages

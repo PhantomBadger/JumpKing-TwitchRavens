@@ -6,7 +6,6 @@ namespace JumpKingRavensMod.Settings
     public abstract class JumpKingRavensModSettingsContext
     {
         public const string SettingsFileName = "JumpKingMod.settings";
-        public const string ExcludedTermFilePath = "Content/Mods/ExcludedTermList.txt";
         public const string RavenInsultsFilePath = "Content/Mods/RavenInsultsList.txt";
         public const char CommentCharacter = '#';
 
@@ -20,8 +19,6 @@ namespace JumpKingRavensMod.Settings
         public const string YouTubeRavenTriggerTypeKey = "YouTubeRavenTriggerType";
 
         // Twitch
-        public const string ChatListenerTwitchAccountNameKey = "ChatListenerTwitchAccountName";
-        public const string OAuthKey = "OAuth";
         public const string RavenTriggerTypeKey = "RavenTriggerType";
 
         // Twitch Relay
@@ -60,8 +57,6 @@ namespace JumpKingRavensMod.Settings
                 { YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage.ToString() },
 
                 // Twitch Chat
-                { ChatListenerTwitchAccountNameKey, "" },
-                { OAuthKey, "" },
                 { RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage.ToString() },
 
                 // Chat Display

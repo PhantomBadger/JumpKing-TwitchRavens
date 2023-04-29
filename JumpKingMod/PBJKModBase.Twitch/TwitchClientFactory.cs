@@ -1,4 +1,4 @@
-﻿using JumpKingRavensMod.Settings;
+﻿using PBJKModBase.Twitch.Settings;
 using Logging.API;
 using Settings;
 using System;
@@ -11,7 +11,7 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 
-namespace JumpKingRavensMod.Twitch
+namespace PBJKModBase.Twitch
 {
     /// <summary>
     /// A class whose purpose is to make a <see cref="TwitchClient"/>
@@ -48,18 +48,18 @@ namespace JumpKingRavensMod.Twitch
             else
             {
                 // Initialise the settings and attempt to load the OAuth Token
-                string oAuthToken = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.OAuthKey, string.Empty);
-                string twitchName = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                string oAuthToken = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.OAuthKey, string.Empty);
+                string twitchName = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
 
                 // If the Oauth Token is bad, exit now
                 if (string.IsNullOrWhiteSpace(oAuthToken))
                 {
-                    logger.Error($"No valid OAuth token found in the {JumpKingRavensModSettingsContext.SettingsFileName} file!");
+                    logger.Error($"No valid OAuth token found in the {PBJKModBaseTwitchSettingsContext.SettingsFileName} file!");
                     return null;
                 }
                 if (string.IsNullOrWhiteSpace(twitchName))
                 {
-                    logger.Error($"No valid TwitchAccountName found in the {JumpKingRavensModSettingsContext.SettingsFileName} file!");
+                    logger.Error($"No valid TwitchAccountName found in the {PBJKModBaseTwitchSettingsContext.SettingsFileName} file!");
                     return null;
                 }
 
