@@ -3,7 +3,6 @@ using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.Twitch;
-using PBJKModBase.Twitch.API;
 using Settings;
 using System;
 using System.Collections.Concurrent;

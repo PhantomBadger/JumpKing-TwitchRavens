@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PBJKModBase.Twitch.API
+﻿namespace JumpKingRavensMod.API
 {
     /// <summary>
     /// An interface representing a filter which can check against an exclusion list

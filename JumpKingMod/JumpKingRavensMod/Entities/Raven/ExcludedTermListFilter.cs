@@ -1,6 +1,4 @@
-﻿using PBJKModBase.Twitch.Settings;
-using Logging.API;
-using PBJKModBase.Twitch.API;
+﻿using Logging.API;
 using Settings;
 using System;
 using System.Collections.Generic;
@@ -8,8 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JumpKingRavensMod.Settings;
+using JumpKingRavensMod.API;
 
-namespace PBJKModBase.Twitch
+namespace JumpKingRavensMod.Entities.Raven
 {
     /// <summary>
     /// An implementation of <see cref="IExcludedTermFilter"/> which checks against a loaded list of excluded phrases
@@ -28,13 +28,13 @@ namespace PBJKModBase.Twitch
             // Parsing Excluded Term List
             try
             {
-                if (File.Exists(PBJKModBaseTwitchSettingsContext.ExcludedTermFilePath))
+                if (File.Exists(JumpKingRavensModSettingsContext.ExcludedTermFilePath))
                 {
-                    string[] fileContents = File.ReadAllLines(PBJKModBaseTwitchSettingsContext.ExcludedTermFilePath);
+                    string[] fileContents = File.ReadAllLines(JumpKingRavensModSettingsContext.ExcludedTermFilePath);
                     for (int i = 0; i < fileContents.Length; i++)
                     {
                         string line = fileContents[i].Trim();
-                        if (line.Length <= 0 || line[0] == PBJKModBaseTwitchSettingsContext.CommentCharacter)
+                        if (line.Length <= 0 || line[0] == JumpKingRavensModSettingsContext.CommentCharacter)
                         {
                             continue;
                         }
@@ -45,7 +45,7 @@ namespace PBJKModBase.Twitch
                 }
                 else
                 {
-                    logger.Error($"Unable to find Excluded Term File List at '{PBJKModBaseTwitchSettingsContext.ExcludedTermFilePath}'");
+                    logger.Error($"Unable to find Excluded Term File List at '{JumpKingRavensModSettingsContext.ExcludedTermFilePath}'");
                 }
             }
             catch (Exception e)

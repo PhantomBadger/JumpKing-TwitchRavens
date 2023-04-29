@@ -6,6 +6,7 @@ namespace JumpKingRavensMod.Settings
     public abstract class JumpKingRavensModSettingsContext
     {
         public const string SettingsFileName = "JumpKingMod.settings";
+        public const string ExcludedTermFilePath = "Content/Mods/ExcludedTermList.txt";
         public const string RavenInsultsFilePath = "Content/Mods/RavenInsultsList.txt";
         public const char CommentCharacter = '#';
 

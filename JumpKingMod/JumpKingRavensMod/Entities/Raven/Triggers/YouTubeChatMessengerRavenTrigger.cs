@@ -3,7 +3,6 @@ using JumpKingRavensMod.API;
 using PBJKModBase.YouTube;
 using Logging.API;
 using Microsoft.Xna.Framework;
-using PBJKModBase.Twitch.API;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

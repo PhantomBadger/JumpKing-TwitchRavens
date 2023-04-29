@@ -9,8 +9,6 @@ namespace PBJKModBase.Twitch.Settings
     public abstract class PBJKModBaseTwitchSettingsContext
     {
         public const string SettingsFileName = "PBJKModBase.Twitch.settings";
-        public const string ExcludedTermFilePath = "Content/Mods/ExcludedTermList.txt";
-        public const char CommentCharacter = '#';
 
         // Twitch
         public const string ChatListenerTwitchAccountNameKey = "ChatListenerTwitchAccountName";
