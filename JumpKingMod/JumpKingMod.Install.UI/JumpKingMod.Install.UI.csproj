@@ -67,9 +67,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="RavensSettings.cs" />
-    <Compile Include="TwitchSettings.cs" />
-    <Compile Include="YouTubeSettings.cs" />
+    <Compile Include="Settings\ModifiersSettingsViewModel.cs" />
+    <Compile Include="Settings\RavensSettingsViewModel.cs" />
+    <Compile Include="Settings\TwitchSettingsViewModel.cs" />
+    <Compile Include="Settings\YouTubeSettingsViewModel.cs" />
     <Page Include="AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
