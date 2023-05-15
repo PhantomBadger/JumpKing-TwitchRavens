@@ -350,30 +350,31 @@ namespace JumpKingModifiersMod.Patching
         }
 
         /// <inheritdoc/>
-        public void RestartPlayerPosition(bool niceSpawns)
+        public void RestartPlayerPosition(bool niceSpawns, out SaveState saveState)
         {
+            saveState = SaveState.GetDefault();
+
             if (playerEntityInstance != null)
             {
-                SaveState defaultSaveState = SaveState.GetDefault();
                 // If we're in NB+ then we will want to start them at the Imp room
                 if (EventFlagsSave.ContainsFlag(StoryEventFlags.StartedNBP) && niceSpawns)
                 {
                     logger.Information($"NBP Detected - Resetting to Imp Room");
-                    defaultSaveState.position = new Vector2(177f, -15585f);
+                    saveState.position = new Vector2(177f, -15585f);
                 }
                 else if (EventFlagsSave.ContainsFlag(StoryEventFlags.StartedGhost) && niceSpawns)
                 {
                     logger.Information($"GotB Detected - Resetting to bottom of Bog");
-                    defaultSaveState.position = new Vector2(209.5f, -36110f);
+                    saveState.position = new Vector2(209.5f, -36110f);
                 }
                 else
-                { 
-                    defaultSaveState.position -= new Vector2(0, 10); // Move the player up a tiny bit, fixes odd issues where we clip into the ground a tad
+                {
+                    saveState.position -= new Vector2(0, 10); // Move the player up a tiny bit, fixes odd issues where we clip into the ground a tad
                     logger.Information($"Applying Default Save State!");
                 }
-                playerEntityInstance.ApplySaveState(defaultSaveState);
-                Camera.UpdateCamera(defaultSaveState.position.ToPoint());
-                OnPlayerPositionRestarted?.Invoke(defaultSaveState.position);
+                playerEntityInstance.ApplySaveState(saveState);
+                Camera.UpdateCamera(saveState.position.ToPoint());
+                OnPlayerPositionRestarted?.Invoke(saveState.position);
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using JumpKing;
 using JumpKing.Player;
+using JumpKing.SaveThread;
 using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Entities;
 using JumpKingModifiersMod.Modifiers;
@@ -62,6 +63,7 @@ namespace JumpKingModifiersMod.Modifiers
         private bool reActivateModifier;
         private FallDamageModifierState fallModifierState;
         private bool clearBloodKeyReset;
+        private bool hasAlreadyDied;
 
         private float youDiedAlphaLerpCounter = 0;
         private float youDiedSubtextAlphaLerpCounter = 0;
@@ -100,6 +102,7 @@ namespace JumpKingModifiersMod.Modifiers
 
             bloodSplatters = new BloodSplatterPersistence(modEntityManager, userSettings, random, logger);
             fallModifierState = FallDamageModifierState.Playing;
+            hasAlreadyDied = false;
 
             gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
             gameStateObserver.OnGameLoopRunning += OnGameLoopRunning;
@@ -223,6 +226,11 @@ namespace JumpKingModifiersMod.Modifiers
             {
                 bloodSplatters.LoadBloodSplatters();
             }
+
+            hasAlreadyDied = false;
+            processSplat = false;
+            lastOnGroundPosition = null;
+
             logger.Information($"Enable Fall Damage Modifier");
             return true;
         }
@@ -261,6 +269,7 @@ namespace JumpKingModifiersMod.Modifiers
 
             lastOnGroundPosition = null;
             processSplat = false;
+            hasAlreadyDied = false;
 
             if (isBloodEnabled)
             {
@@ -348,38 +357,7 @@ namespace JumpKingModifiersMod.Modifiers
             if (processSplat && lastOnGroundPosition.HasValue)
             {
                 processSplat = false;
-                Vector2 newSplatPosition = playerState.Position;
-
-                // Get the distance fallen and turn that into a damage value
-                float yDiff = Math.Abs(lastOnGroundPosition.Value.Y - newSplatPosition.Y);
-                float rawDamage = (yDiff * distanceDamageModifier);
-                int damage = Math.Max(1, (int)rawDamage);
-
-                // If we landed on snow, deal no damage
-                if (playerState.IsOnSnow)
-                {
-                    damage = 0;
-                }
-
-                // If we're on that one drop screen in GotB, deal no damage
-                if (Camera.CurrentScreen == 160 && 
-                    JumpKing.SaveThread.EventFlagsSave.ContainsFlag(JumpKing.SaveThread.StoryEventFlags.StartedGhost))
-                {
-                    damage = 0;
-                }
-
-                // Apply the damage to the health
-                healthValue = Math.Max(0, healthValue - damage);
-                logger.Information($"Dealing Damage of '{damage}' (Raw damage '{rawDamage}') - Remaining Health: {healthValue}");
-
-                // Spawn the damage text
-                SpawnDamageTextEntity(damage, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
-
-                if (damage > 0 && isBloodEnabled)
-                {
-                    // Spawn a blood splat
-                    SpawnBloodSplatEntity(playerState.Position);
-                }
+                ProcessSplatDamage(playerState);
             }
             else if (playerState.IsOnGround)
             {
@@ -413,8 +391,10 @@ namespace JumpKingModifiersMod.Modifiers
             healthBarFrontEntity.DestinationRectangle = destRectForHealth;
 
             // We have died, enter the death state and restart
-            if (healthValue <= 0)
+            if (healthValue <= 0 && !hasAlreadyDied)
             {
+                hasAlreadyDied = true;
+
                 // Disable walking so user can only jump + pause
                 playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: true, isXVelocityDisabled: true);
 
@@ -426,6 +406,50 @@ namespace JumpKingModifiersMod.Modifiers
                 fallModifierState = FallDamageModifierState.DisplayingYouDied;
                 JKContentManager.Audio.RaymanSFX.Play();
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
+            }
+        }
+
+        /// <summary>
+        /// Identifies how much damage to apply to the player and inflicts it
+        /// </summary>
+        private void ProcessSplatDamage(PlayerState playerState)
+        {
+            if (hasAlreadyDied)
+            {
+                return;
+            }
+
+            Vector2 newSplatPosition = playerState.Position;
+
+            // Get the distance fallen and turn that into a damage value
+            float yDiff = Math.Abs(lastOnGroundPosition.Value.Y - newSplatPosition.Y);
+            float rawDamage = (yDiff * distanceDamageModifier);
+            int damage = Math.Max(1, (int)rawDamage);
+
+            // If we landed on snow, deal no damage
+            if (playerState.IsOnSnow)
+            {
+                damage = 0;
+            }
+
+            // If we're on that one drop screen in GotB, deal no damage
+            if (Camera.CurrentScreen == 160 &&
+                JumpKing.SaveThread.EventFlagsSave.ContainsFlag(JumpKing.SaveThread.StoryEventFlags.StartedGhost))
+            {
+                damage = 0;
+            }
+
+            // Apply the damage to the health
+            healthValue = Math.Max(0, healthValue - damage);
+            logger.Information($"Dealing Damage of '{damage}' (Raw damage '{rawDamage}') - Remaining Health: {healthValue}");
+
+            // Spawn the damage text
+            SpawnDamageTextEntity(damage, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
+
+            if (damage > 0 && isBloodEnabled)
+            {
+                // Spawn a blood splat
+                SpawnBloodSplatEntity(playerState.Position);
             }
         }
 
@@ -509,6 +533,9 @@ namespace JumpKingModifiersMod.Modifiers
             InputState inputState = playerStateObserver.GetInputState();
             if (inputState.Jump)
             {
+                processSplat = false;
+                hasAlreadyDied = false;
+
                 // Clear up the You Died & Text Entities
                 youDiedEntity?.Dispose();
                 youDiedEntity = null;
@@ -523,11 +550,12 @@ namespace JumpKingModifiersMod.Modifiers
                 playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
                 // Restart the player position and reset the health
-                playerStateObserver.RestartPlayerPosition(niceSpawns);
+                playerStateObserver.RestartPlayerPosition(niceSpawns, out _);
                 healthValue = MaxHealthValue;
                 fallModifierState = FallDamageModifierState.Playing;
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
 
+                lastOnGroundPosition = null;
                 JKContentManager.Audio.PressStart.Play();
             }
         }
@@ -538,7 +566,10 @@ namespace JumpKingModifiersMod.Modifiers
         private void OnSplat()
         {
             logger.Information($"Received Splat notification");
-            processSplat = true;
+            if (!hasAlreadyDied)
+            {
+                processSplat = true;
+            }
         }
 
         /// <summary>
