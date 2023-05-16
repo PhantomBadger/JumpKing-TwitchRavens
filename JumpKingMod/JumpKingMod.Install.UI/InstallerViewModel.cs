@@ -20,6 +20,7 @@ using System.Globalization;
 using PBJKModBase.Twitch.Settings;
 using PBJKModBase.YouTube.Settings;
 using JumpKingMod.Install.UI.Settings;
+using JumpKingMod.Install.UI.API;
 
 namespace JumpKingRavensMod.Install.UI
 {
@@ -90,6 +91,11 @@ namespace JumpKingRavensMod.Install.UI
         /// An aggregate class of Modifiers Settings
         /// </summary>
         public ModifiersSettingsViewModel ModifiersSettings { get; set; }
+
+        /// <summary>
+        /// An aggregate class of Streaming Settings
+        /// </summary>
+        public StreamingSettingsViewModel StreamingSettings { get; set; }
 
         /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
@@ -171,6 +177,7 @@ namespace JumpKingRavensMod.Install.UI
 
         private readonly ILogger logger;
         private readonly UserSettings installerSettings;
+        private readonly List<IInstallerSettingsViewModel> registeredSettings;
 
         private const string ExpectedFrameworkDllName = "MonoGame.Framework.dll";
         private const string ExpectedModDllName = "JumpKingModLoader.dll";
@@ -183,13 +190,21 @@ namespace JumpKingRavensMod.Install.UI
         {
             logger = new ConsoleLogger();
             installerSettings = new UserSettings(JumpKingModInstallerSettingsContext.SettingsFileName, JumpKingModInstallerSettingsContext.GetDefaultSettings(), logger);
+            registeredSettings = new List<IInstallerSettingsViewModel>();
 
             InitialiseCommands();
 
-            RavensSettings = new RavensSettings(UpdateSettingsCommand, LoadSettingsCommand);
-            ModifiersSettings = new ModifiersSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand);
-            TwitchSettings = new TwitchSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand);
-            YouTubeSettings = new YouTubeSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand);
+            RavensSettings = new RavensSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+            ModifiersSettings = new ModifiersSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+            TwitchSettings = new TwitchSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+            YouTubeSettings = new YouTubeSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+            StreamingSettings = new StreamingSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+
+            registeredSettings.Add(RavensSettings);
+            registeredSettings.Add(ModifiersSettings);
+            registeredSettings.Add(TwitchSettings);
+            registeredSettings.Add(YouTubeSettings);
+            registeredSettings.Add(StreamingSettings);
 
             GameDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.GameDirectoryKey, string.Empty);
             ModDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.ModDirectoryKey, string.Empty);
@@ -222,14 +237,18 @@ namespace JumpKingRavensMod.Install.UI
             BrowseGameDirectoryCommand = new DelegateCommand(_ => { BrowseForGameDirectory(); });
             BrowseModDirectoryCommand = new DelegateCommand(_ => { BrowseForModDirectory(); });
             InstallCommand = new DelegateCommand(_ => { InstallMod(); }, _ => { return CanInstallMod(); });
-            UpdateSettingsCommand = new DelegateCommand(_ => { UpdateModSettings(); }, _ => { return AreRavenModSettingsLoaded && CanUpdateModSettings(); });
-            LoadSettingsCommand = new DelegateCommand(_ => 
+            UpdateSettingsCommand = new DelegateCommand(_ => 
             { 
-                RavensSettings.LoadRavenModSettings(GameDirectory, createIfDoesntExist: true);
-                ModifiersSettings.LoadFallDamageModSettings(createIfDoesntExist: true);
-                TwitchSettings.LoadTwitchSettings(GameDirectory, createIfDoesntExist: true);
-                YouTubeSettings.LoadYouTubeSettings(GameDirectory, createIfDoesntExist: true);
-            }, _ => { return CanUpdateModSettings(); });
+                UpdateModSettings(); 
+            }, 
+            _ => 
+            { 
+                return registeredSettings.All(settings => settings.AreSettingsLoaded()); 
+            });
+            LoadSettingsCommand = new DelegateCommand(_ => 
+            {
+                LoadModSettings();
+            });
             
             RavensSettings.InitialiseCommands();
         }
@@ -348,10 +367,10 @@ namespace JumpKingRavensMod.Install.UI
             // Load in any settings at the mod location
             if (success)
             {
-                RavensSettings.LoadRavenModSettings(createIfDoesntExist: true);
-                LoadFallDamageModSettings(createIfDoesntExist: true);
-                TwitchSettings.LoadTwitchSettings(GameDirectory, createIfDoesntExist: true);
-                YouTubeSettings.LoadYouTubeSettings(GameDirectory, createIfDoesntExist: true);
+                for (int i = 0; i < registeredSettings.Count; i++)
+                {
+                    registeredSettings[i].LoadSettings(gameDirectory, createIfDoesntExist: true);
+                }
             }
 
             // Report the result
@@ -446,6 +465,9 @@ namespace JumpKingRavensMod.Install.UI
             installerSettings.SetOrCreateSetting(JumpKingModInstallerSettingsContext.ModDirectoryKey, modDirectory);
         }
 
+        /// <summary>
+        /// Loads all the settings using the registered ViewModels
+        /// </summary>
         private void LoadModSettings()
         {
             if (string.IsNullOrWhiteSpace(GameDirectory))
@@ -453,11 +475,22 @@ namespace JumpKingRavensMod.Install.UI
                 return;
             }
 
-            // TODO - Call load on all viewmodels
-            // - Return bools to validate success!!
+            bool success = true;
+            for (int i = 0; i < registeredSettings.Count; i++)
+            {
+                success &= registeredSettings[i].LoadSettings(gameDirectory, createIfDoesntExist: true);
+            }
+
+            if (!success)
+            {
+                MessageBox.Show($"Failed to load settings! Check the console logs for more info!");
+            }
+            else
+            {
+                MessageBox.Show($"Settings loaded successfully!");
+            }
         }
 
-        // TODO - split across viewmodels
         /// <summary>
         /// Updates the settings that the mod will use based on the current values in the ViewModel
         /// </summary>
@@ -468,81 +501,20 @@ namespace JumpKingRavensMod.Install.UI
                 return;
             }
 
-            // Perform some validation on conflicting settings
-            if (SelectedStreamingPlatform == AvailableStreamingPlatforms.Twitch &&
-                RavensSettings.RavenEnabled && 
-                (RavensSettings.RavenTriggerType == TwitchRavenTriggerTypes.ChannelPointReward || RavensSettings.RavenTriggerType == TwitchRavenTriggerTypes.ChatMessage) && 
-                ChatDisplayEnabled)
+            bool success = true;
+            for (int i = 0; i < registeredSettings.Count; i++)
             {
-                MessageBoxResult result = MessageBox.Show($"If Chat Display is active, the Chat-based Raven Triggers will not function. Are you sure you want to proceed?", "Setting Conflict!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                if (result == MessageBoxResult.Cancel || result == MessageBoxResult.No || result == MessageBoxResult.None)
-                {
-                    return;
-                }
+                success &= registeredSettings[i].SaveSettings(gameDirectory);
             }
 
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, SelectedStreamingPlatform.ToString());
-
-            // YouTube
-            YouTubeSettings.SaveYouTubeSettings(GameDirectory);
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, RavensSettings.YouTubeRavenTriggerType.ToString());
-
-            // Twitch
-            TwitchSettings.SaveTwitchSettings(GameDirectory);
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, RavensSettings.RavenTriggerType.ToString());
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, RavensSettings.RavensChannelPointID);
-
-            // Ravens
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensEnabledKey, RavensSettings.RavenEnabled.ToString());
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, RavensSettings.RavenToggleDebugKey.ToString());
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, RavensSettings.RavenClearDebugKey.ToString());
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, RavensSettings.RavenSubModeToggleKey.ToString());
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensMaxCountKey, RavensSettings.MaxRavensCount);
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, RavensSettings.MessageDurationInSeconds);
-
-            // Chat Display
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
-
-            // Free Fly
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
-
-            // Exclusion List
-            string expectedExclusionPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.ExcludedTermFilePath);
-            Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
-            File.WriteAllLines(expectedExclusionPath, RavensSettings.ExcludedTerms);
-
-            // Raven Insults
-            string expectedRavenInsultsPath = Path.Combine(GameDirectory, JumpKingRavensModSettingsContext.RavenInsultsFilePath);
-            Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
-            File.WriteAllLines(expectedRavenInsultsPath, RavensSettings.RavenInsults);
-
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, RavensSettings.InsultRavenSpawnCount.ToString());
-
-            // Gun Mode
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.GunEnabledKey, RavensSettings.GunEnabled.ToString());
-            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.GunToggleKeyKey, RavensSettings.GunToggleKey.ToString());
-
-            // Fall Damage
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, FallDamageEnabled.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, FallDamageToggleKey.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, FallDamageModifier);
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, FallDamageBloodSplatEnabled.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, FallDamageClearBloodKey.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, FallDamageNiceSpawns.ToString());
-
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, ManualResizingEnabled.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, ManualResizingToggleKey.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, ManualResizingGrowKey.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, ManualResizingShrinkKey.ToString());
-
-            // Rising Lava
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, RisingLavaEnabled.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, RisingLavaToggleKey.ToString());
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, RisingLavaSpeed);
-            FallDamageModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, RisingLavaNiceSpawns.ToString());
-
-            MessageBox.Show($"Settings updated successfully!");
+            if (!success)
+            {
+                MessageBox.Show($"Failed to save settings! Check the console logs for more info!");
+            }
+            else
+            {
+                MessageBox.Show($"Settings updated successfully!");
+            }      
         }
 
         /// <summary>

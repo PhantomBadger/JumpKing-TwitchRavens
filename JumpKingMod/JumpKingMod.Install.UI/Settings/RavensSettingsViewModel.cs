@@ -1,4 +1,5 @@
-﻿using JumpKingRavensMod.Settings;
+﻿using JumpKingMod.Install.UI.API;
+using JumpKingRavensMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework.Input;
 using PBJKModBase.YouTube.Settings;
@@ -10,6 +11,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -19,7 +21,7 @@ namespace JumpKingRavensMod.Install.UI
     /// <summary>
     /// An aggregate class of all settings for the Ravens Mod
     /// </summary>
-    public class RavensSettingsViewModel : INotifyPropertyChanged
+    public class RavensSettingsViewModel : INotifyPropertyChanged, IInstallerSettingsViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -48,60 +50,6 @@ namespace JumpKingRavensMod.Install.UI
         /// </summary>
         public ICommand RemoveRavenInsultCommand { get; private set; }
         #endregion
-
-        // TODO - split into higher level 'streaming' settings
-        /// <summary>
-        /// What streaming platform is selected for use with the Mod
-        /// </summary>
-        public AvailableStreamingPlatforms SelectedStreamingPlatform
-        {
-            get
-            {
-                return selectedStreamingPlatform;
-            }
-            set
-            {
-                if (selectedStreamingPlatform != value)
-                {
-                    selectedStreamingPlatform = value;
-                    RaisePropertyChanged(nameof(SelectedStreamingPlatform));
-                    RaisePropertyChanged(nameof(IsStreamingOnTwitch));
-                    RaisePropertyChanged(nameof(IsStreamingOnYouTube));
-                }
-            }
-        }
-        private AvailableStreamingPlatforms selectedStreamingPlatform;
-
-
-        /// <summary>
-        /// Converts the <see cref="SelectedStreamingPlatform"/> property into a bool which can be bound to the UI or filtered against
-        /// </summary>
-        public bool IsStreamingOnTwitch
-        {
-            get
-            {
-                return selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch;
-            }
-            set
-            {
-                SelectedStreamingPlatform = value ? AvailableStreamingPlatforms.Twitch : AvailableStreamingPlatforms.YouTube;
-            }
-        }
-
-        /// <summary>
-        /// Converts the <see cref="SelectedStreamingPlatform"/> property into a bool which can be bound to the UI or filtered against
-        /// </summary>
-        public bool IsStreamingOnYouTube
-        {
-            get
-            {
-                return selectedStreamingPlatform == AvailableStreamingPlatforms.YouTube;
-            }
-            set
-            {
-                SelectedStreamingPlatform = value ? AvailableStreamingPlatforms.YouTube : AvailableStreamingPlatforms.Twitch;
-            }
-        }
 
         /// <summary>
         /// Whether the Raven system is enabled or not
@@ -669,21 +617,22 @@ namespace JumpKingRavensMod.Install.UI
         /// <summary>
         /// Creates or loads the Raven mod settings from the given install directory
         /// </summary>
-        public void LoadRavenModSettings(string gameDirectory, bool createIfDoesntExist)
+        public bool LoadSettings(string gameDirectory, bool createIfDoesntExist)
         {
-            if (RavenModSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
+            if (string.IsNullOrWhiteSpace(gameDirectory))
             {
-                return;
+                logger.Error("Failed to load Raven settings as provided Game Directory was empty!");
+                return false;
             }
 
             // Load in the settings
             string expectedSettingsFilePath = Path.Combine(gameDirectory, JumpKingRavensModSettingsContext.SettingsFileName);
             if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
             {
-                RavenModSettings = new UserSettings(expectedSettingsFilePath, JumpKingRavensModSettingsContext.GetDefaultSettings(), logger);
-
-                // Load the initial data
-                SelectedStreamingPlatform = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
+                if (RavenModSettings == null)
+                {
+                    RavenModSettings = new UserSettings(expectedSettingsFilePath, JumpKingRavensModSettingsContext.GetDefaultSettings(), logger);
+                }
 
                 // YouTube Info
                 YouTubeRavenTriggerType = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
@@ -698,7 +647,7 @@ namespace JumpKingRavensMod.Install.UI
                 RavenToggleDebugKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
                 RavenSubModeToggleKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
                 MaxRavensCount = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensMaxCountKey, 5.ToString());
-                MessageDurationInSeconds = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, 3.0f.ToString());
+                MessageDurationInSeconds = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, 3.0f.ToString(CultureInfo.InvariantCulture));
                 InsultRavenSpawnCount = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, 3.ToString());
 
                 // Chat Display Info
@@ -711,6 +660,11 @@ namespace JumpKingRavensMod.Install.UI
                 // Gun
                 GunEnabled = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunEnabledKey, false);
                 GunToggleKey = RavenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunToggleKeyKey, Keys.F8);
+            }
+            else
+            {
+                logger.Error($"Failed to load Raven settings as the settings file couldnt be found at '{expectedSettingsFilePath}'");
+                return false;
             }
 
             // Load in Exclusion List
@@ -741,6 +695,7 @@ namespace JumpKingRavensMod.Install.UI
             catch (Exception e)
             {
                 logger.Error($"Encountered error when parsing Exclusion List {e.ToString()}");
+                return false;
             }
             ExcludedTerms = new ObservableCollection<string>(excludedTerms);
 
@@ -773,8 +728,72 @@ namespace JumpKingRavensMod.Install.UI
             catch (Exception e)
             {
                 logger.Error($"Encountered error when parsing Raven Insults {e.ToString()}");
+                return false;
             }
             RavenInsults = new ObservableCollection<string>(ravenInsultsFileContent);
+            return true;
+        }
+
+        public bool SaveSettings(string gameDirectory)
+        {
+            if (RavenModSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
+            {
+                logger.Error($"Failed to save raven settings, either internal settings object ({RavenModSettings}) is null, or no game directory was provided ({gameDirectory})");
+                return false;
+            }
+
+            // YouTube
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerType.ToString());
+
+            // Twitch
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, RavenTriggerType.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, RavensChannelPointID);
+
+            // Raven Info
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensEnabledKey, RavenEnabled.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, RavenClearDebugKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, RavenToggleDebugKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, RavenSubModeToggleKey.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensMaxCountKey, MaxRavensCount);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavensDisplayTimeInSecondsKey, MessageDurationInSeconds);
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, InsultRavenSpawnCount);
+
+            // Chat display info
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.TwitchRelayEnabledKey, ChatDisplayEnabled.ToString());
+
+            // Free fly
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, FreeFlyingEnabled.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.FreeFlyToggleKeyKey, FreeFlyToggleKey.ToString());
+
+            // Gun
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.GunEnabledKey, GunEnabled.ToString());
+            RavenModSettings.SetOrCreateSetting(JumpKingRavensModSettingsContext.GunToggleKeyKey, GunToggleKey.ToString());
+
+            try
+            {
+                // Exclusion List
+                string expectedExclusionPath = Path.Combine(gameDirectory, JumpKingRavensModSettingsContext.ExcludedTermFilePath);
+                Directory.CreateDirectory(Path.GetDirectoryName(expectedExclusionPath));
+                File.WriteAllLines(expectedExclusionPath, ExcludedTerms);
+
+                // Raven Insults
+                string expectedRavenInsultsPath = Path.Combine(gameDirectory, JumpKingRavensModSettingsContext.RavenInsultsFilePath);
+                Directory.CreateDirectory(Path.GetDirectoryName(expectedRavenInsultsPath));
+                File.WriteAllLines(expectedRavenInsultsPath, RavenInsults);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Encountered exception when saving exclusion list or insult list: {e.ToString()}");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public bool AreSettingsLoaded()
+        {
+            return AreRavenModSettingsLoaded;
         }
 
         /// <summary>
@@ -784,5 +803,6 @@ namespace JumpKingRavensMod.Install.UI
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
 }

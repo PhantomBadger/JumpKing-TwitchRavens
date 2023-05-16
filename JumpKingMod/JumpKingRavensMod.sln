@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase.YouTube", "PBJK
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase.YouTube.Settings", "PBJKModBase.YouTube.Settings\PBJKModBase.YouTube.Settings.csproj", "{14F4D0DA-85C9-48F0-921C-4304ACF656A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase.Streaming.Settings", "PBJKModBase.Streaming.Settings\PBJKModBase.Streaming.Settings.csproj", "{04A526F8-568E-417A-8C4E-C0F2418292CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{14F4D0DA-85C9-48F0-921C-4304ACF656A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14F4D0DA-85C9-48F0-921C-4304ACF656A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14F4D0DA-85C9-48F0-921C-4304ACF656A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04A526F8-568E-417A-8C4E-C0F2418292CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04A526F8-568E-417A-8C4E-C0F2418292CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04A526F8-568E-417A-8C4E-C0F2418292CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04A526F8-568E-417A-8C4E-C0F2418292CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JumpKingRavensMod.Settings
+namespace PBJKModBase.Streaming.Settings
 {
     public enum AvailableStreamingPlatforms
     {

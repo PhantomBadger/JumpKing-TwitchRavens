@@ -21,6 +21,7 @@ using Settings;
 using TwitchLib.Client;
 using PBJKModBase.YouTube.Settings;
 using PBJKModBase.YouTube.API;
+using PBJKModBase.Streaming.Settings;
 
 namespace JumpKingRavensMod
 {
@@ -53,24 +54,25 @@ namespace JumpKingRavensMod
                 Logger.Information($"====================================");
 
                 // Load Settings
-                var userSettings = new UserSettings(JumpKingRavensModSettingsContext.SettingsFileName, JumpKingRavensModSettingsContext.GetDefaultSettings(), Logger);
+                var ravenModSettings = new UserSettings(JumpKingRavensModSettingsContext.SettingsFileName, JumpKingRavensModSettingsContext.GetDefaultSettings(), Logger);
+                var streamingSettings = new UserSettings(PBJKModBaseStreamingSettingsContext.SettingsFileName, PBJKModBaseStreamingSettingsContext.GetDefaultSettings(), Logger);
                 RavensModContentManager.LoadContent(Logger);
 
                 // Get the observer
                 var gameStateObserver = GameStateObserverManualPatch.Instance;
 
                 // Twitch Chat Client
-                var twitchClientFactory = new TwitchClientFactory(userSettings, Logger);
+                var twitchClientFactory = new TwitchClientFactory(ravenModSettings, Logger);
 
                 // YouTube Chat Client
-                var youtubeChatClientFactory = new YouTubeChatClientFactory(userSettings, Logger);
+                var youtubeChatClientFactory = new YouTubeChatClientFactory(ravenModSettings, Logger);
 
                 // Free Fly Patch
-                bool freeFlyEnabled = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, false);
+                bool freeFlyEnabled = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, false);
                 if (freeFlyEnabled)
                 {
                     Logger.Information($"Initialising Free Fly Mod");
-                    IManualPatch freeFlyPatch = new FreeFlyManualPatch(userSettings, ModEntityManager.Instance, Logger);
+                    IManualPatch freeFlyPatch = new FreeFlyManualPatch(ravenModSettings, ModEntityManager.Instance, Logger);
                     freeFlyPatch.SetUpManualPatch(harmony);
 
                     IManualPatch achievementDisablePatch = new AchievementRegisterDisableManualPatch();
@@ -88,7 +90,7 @@ namespace JumpKingRavensMod
                         }
 
                         // Get the Streaming Platform being used
-                        AvailableStreamingPlatforms selectedStreamingPlatform = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
+                        AvailableStreamingPlatforms selectedStreamingPlatform = streamingSettings.GetSettingOrDefault(PBJKModBaseStreamingSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
                         
                         // Twitch Chat Relay - DEPRECATED
                         //if (selectedStreamingPlatform == AvailableStreamingPlatforms.Twitch)
@@ -102,10 +104,10 @@ namespace JumpKingRavensMod
                         //}
 
                         // Ravens
-                        bool ravensEnabled = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensEnabledKey, false);
+                        bool ravensEnabled = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensEnabledKey, false);
                         if (ravensEnabled)
                         {
-                            bool easterEggEnabled = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenEasterEggEnabledKey, true);
+                            bool easterEggEnabled = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenEasterEggEnabledKey, true);
 
                             var ravenTriggers = new List<IMessengerRavenTrigger>();
 
@@ -114,7 +116,7 @@ namespace JumpKingRavensMod
                             {
                                 // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
                                 // using that trigger
-                                TwitchRavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
+                                TwitchRavenTriggerTypes ravenTriggerType = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
 
                                 switch (ravenTriggerType)
                                 {
@@ -126,7 +128,7 @@ namespace JumpKingRavensMod
                                             var filter = new ExcludedTermListFilter(Logger);
 
                                             // Easter Egg
-                                            string twitchName = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                                            string twitchName = ravenModSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                                             if (easterEggEnabled &&
                                                 TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                             {
@@ -136,7 +138,7 @@ namespace JumpKingRavensMod
                                             TwitchClient client = twitchClientFactory.GetTwitchClient();
                                             if (client != null)
                                             {
-                                                var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                                var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), ravenModSettings, filter, Logger);
                                                 ravenTriggers.Add(chatTrigger);
                                             }
                                             else
@@ -153,14 +155,14 @@ namespace JumpKingRavensMod
                                             var filter = new ExcludedTermListFilter(Logger);
 
                                             // Easter Egg
-                                            string twitchName = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                                            string twitchName = ravenModSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                                             if (easterEggEnabled &&
                                                 TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                             {
                                                 ravenTriggers.Add(easterEggTrigger);
                                             }
 
-                                            var channelPointTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), userSettings, filter, Logger);
+                                            var channelPointTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), ravenModSettings, filter, Logger);
                                             ravenTriggers.Add(channelPointTrigger);
                                             break;
                                         }
@@ -171,7 +173,7 @@ namespace JumpKingRavensMod
                                             // Make the Insult Getter
                                             var insultGetter = new RavenInsultFileInsultGetter(Logger);
 
-                                            var fallTrigger = new PlayerFallMessengerRavenTrigger(userSettings, insultGetter, Logger);
+                                            var fallTrigger = new PlayerFallMessengerRavenTrigger(ravenModSettings, insultGetter, Logger);
                                             fallTrigger.SetUpManualPatch(harmony);
                                             ravenTriggers.Add(fallTrigger);
                                             break;
@@ -185,7 +187,7 @@ namespace JumpKingRavensMod
                             {
                                 // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
                                 // using that trigger
-                                YouTubeRavenTriggerTypes ravenTriggerType = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
+                                YouTubeRavenTriggerTypes ravenTriggerType = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
 
                                 switch (ravenTriggerType)
                                 {
@@ -197,7 +199,7 @@ namespace JumpKingRavensMod
                                             var filter = new ExcludedTermListFilter(Logger);
 
                                             // Easter Egg
-                                            string youTubeChannelId = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
+                                            string youTubeChannelId = ravenModSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
                                             if (easterEggEnabled &&
                                                 TryGetAndStartEasterEggTrigger(youTubeChannelId, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                             {
@@ -206,7 +208,7 @@ namespace JumpKingRavensMod
 
                                             // Create the YouTube Client and kick off the connection process
                                             YouTubeChatClient youtubeClient = youtubeChatClientFactory.GetYouTubeClient();
-                                            IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, ModEntityManager.Instance, userSettings, Logger);
+                                            IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, ModEntityManager.Instance, ravenModSettings, Logger);
                                             clientController.StartAttemptingConnection();
 
                                             // Create the Trigger
@@ -223,14 +225,14 @@ namespace JumpKingRavensMod
                             if (ravenTriggers != null && ravenTriggers.Count > 0)
                             {
                                 Logger.Information($"Initialising Messenger Ravens");
-                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(userSettings, ModEntityManager.Instance, ravenTriggers, isGameLoopRunning: true, Logger);
+                                MessengerRavenSpawningEntity spawningEntity = new MessengerRavenSpawningEntity(ravenModSettings, ModEntityManager.Instance, ravenTriggers, isGameLoopRunning: true, Logger);
 
                                 // Initialise the Gun
-                                bool gunEnabled = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunEnabledKey, false);
+                                bool gunEnabled = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunEnabledKey, false);
                                 if (gunEnabled)
                                 {
                                     Logger.Information($"Initialising Gun");
-                                    GunEntity gunEntity = new GunEntity(spawningEntity, ModEntityManager.Instance, userSettings, Logger);
+                                    GunEntity gunEntity = new GunEntity(spawningEntity, ModEntityManager.Instance, ravenModSettings, Logger);
                                 }
 
                                 // Bind to the events so we can start/stop ravens and invalidate caches

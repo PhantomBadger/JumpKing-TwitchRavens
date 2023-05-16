@@ -10,9 +10,6 @@ namespace JumpKingRavensMod.Settings
         public const string RavenInsultsFilePath = "Content/Mods/RavenInsultsList.txt";
         public const char CommentCharacter = '#';
 
-        // Streaming
-        public const string SelectedStreamingPlatformKey = "SelectedStreamingPlatform";
-
         // YouTube
         public const string YouTubeRavenTriggerTypeKey = "YouTubeRavenTriggerType";
 
@@ -45,9 +42,6 @@ namespace JumpKingRavensMod.Settings
         {
 ;           return new Dictionary<string, string>()
             {
-                // Selected Streaming Platform
-                { SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch.ToString() },
-
                 // YouTube
                 { YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage.ToString() },
 

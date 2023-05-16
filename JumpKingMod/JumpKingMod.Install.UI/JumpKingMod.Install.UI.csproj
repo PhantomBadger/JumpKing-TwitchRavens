@@ -67,8 +67,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="API\IInstallerSettingsViewModel.cs" />
     <Compile Include="Settings\ModifiersSettingsViewModel.cs" />
     <Compile Include="Settings\RavensSettingsViewModel.cs" />
+    <Compile Include="Settings\StreamingSettingsViewModel.cs" />
     <Compile Include="Settings\TwitchSettingsViewModel.cs" />
     <Compile Include="Settings\YouTubeSettingsViewModel.cs" />
     <Page Include="AboutWindow.xaml">
@@ -137,6 +139,10 @@
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
       <Name>Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.Streaming.Settings\PBJKModBase.Streaming.Settings.csproj">
+      <Project>{04A526F8-568E-417A-8C4E-C0F2418292CB}</Project>
+      <Name>PBJKModBase.Streaming.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="..\PBJKModBase.Twitch.Settings\PBJKModBase.Twitch.Settings.csproj">
       <Project>{16f1cfd5-9ec2-4a45-8eda-801310c3a866}</Project>

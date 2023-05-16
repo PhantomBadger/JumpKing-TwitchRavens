@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using JumpKingMod.Install.UI.API;
+using Logging.API;
+using Microsoft.Xna.Framework.Input;
 using PBJKModBase.Twitch.Settings;
 using PBJKModBase.YouTube.Settings;
 using Settings;
@@ -11,12 +13,13 @@ namespace JumpKingRavensMod.Install.UI
     /// <summary>
     /// An aggregatce alss of YouTube Settings
     /// </summary>
-    public class YouTubeSettingsViewModel : INotifyPropertyChanged
+    public class YouTubeSettingsViewModel : INotifyPropertyChanged, IInstallerSettingsViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly DelegateCommand updateSettingsCommand;
         private readonly DelegateCommand loadSettingsCommand;
+        private readonly ILogger logger;
 
         /// <summary>
         /// The name of the youtube account to use
@@ -115,29 +118,42 @@ namespace JumpKingRavensMod.Install.UI
         /// <param name="updateSettingsCommand">A <see cref="DelegateCommand"/> in the UI for handling the updating of settings</param>
         /// <param name="loadSettingsCommand">A <see cref="DelegateCommand"/> in the UI for handling the loading of settings</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public YouTubeSettingsViewModel(DelegateCommand updateSettingsCommand, DelegateCommand loadSettingsCommand)
+        public YouTubeSettingsViewModel(DelegateCommand updateSettingsCommand, DelegateCommand loadSettingsCommand, ILogger logger)
         {
             this.updateSettingsCommand = updateSettingsCommand ?? throw new ArgumentNullException(nameof(updateSettingsCommand));
             this.loadSettingsCommand = loadSettingsCommand ?? throw new ArgumentNullException(nameof(loadSettingsCommand));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
         /// Loads the youtube settings from disk, optionally creating the file if it doesnt exist
         /// </summary>
-        public void LoadYouTubeSettings(string gameDirectory, bool createIfDoesntExist)
+        public bool LoadSettings(string gameDirectory, bool createIfDoesntExist)
         {
-            if (YouTubeBaseSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
+            if (string.IsNullOrWhiteSpace(gameDirectory))
             {
-                return;
+                logger.Error("Failed to load YouTube settings as provided Game Directory was empty!");
+                return false;
             }
 
             // Load in the settings
             string expectedSettingsFilePath = Path.Combine(gameDirectory, PBJKModBaseYouTubeSettingsContext.SettingsFileName);
             if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
             {
+                if (YouTubeBaseSettings == null)
+                {
+                    YouTubeBaseSettings = new UserSettings(expectedSettingsFilePath, PBJKModBaseYouTubeSettingsContext.GetDefaultSettings(), logger);
+                }
+
                 YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, YouTubeAccountName);
                 YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, YouTubeAPIKey);
                 YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, ConnectKey.ToString());
+                return true;
+            }
+            else
+            {
+                logger.Error($"Failed to load YouTube settings as the settings file couldnt be found at '{expectedSettingsFilePath}'");
+                return false;
             }
         }
 
@@ -145,16 +161,24 @@ namespace JumpKingRavensMod.Install.UI
         /// Saves the youtube settings back to disk
         /// </summary>
         /// <param name="gameDirectory"></param>
-        public void SaveYouTubeSettings(string gameDirectory)
+        public bool SaveSettings(string gameDirectory)
         {
             if (YouTubeBaseSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
             {
-                return;
+                logger.Error($"Failed to save raven settings, either internal settings object ({YouTubeBaseSettings}) is null, or no game directory was provided ({gameDirectory})");
+                return false;
             }
 
             YouTubeBaseSettings.SetOrCreateSetting(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, YouTubeAccountName);
             YouTubeBaseSettings.SetOrCreateSetting(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, YouTubeAPIKey);
             YouTubeBaseSettings.SetOrCreateSetting(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, ConnectKey.ToString());
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public bool AreSettingsLoaded()
+        {
+            return AreYouTubeSettingsLoaded;
         }
 
         /// <summary>

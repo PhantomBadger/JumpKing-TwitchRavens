@@ -1,5 +1,7 @@
-﻿using JumpKingModifiersMod.Settings;
+﻿using JumpKingMod.Install.UI.API;
+using JumpKingModifiersMod.Settings;
 using JumpKingRavensMod.Install.UI;
+using Logging.API;
 using Microsoft.Xna.Framework.Input;
 using Settings;
 using System;
@@ -16,12 +18,13 @@ namespace JumpKingMod.Install.UI.Settings
     /// <summary>
     /// An aggregate of all settings for the Modifiers Mod
     /// </summary>
-    public class ModifiersSettingsViewModel : INotifyPropertyChanged
+    public class ModifiersSettingsViewModel : INotifyPropertyChanged, IInstallerSettingsViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly DelegateCommand updateSettingsCommand;
         private readonly DelegateCommand loadSettingsCommand;
+        private readonly ILogger logger;
 
         /// <summary>
         /// Returns whether the Fall Damage Mod should be enabled
@@ -383,32 +386,35 @@ namespace JumpKingMod.Install.UI.Settings
         /// <param name="updateSettingsCommand">A <see cref="DelegateCommand"/> in the UI for handling the updating of settings</param>
         /// <param name="loadSettingsCommand">A <see cref="DelegateCommand"/> in the UI for handling the loading of settings</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ModifiersSettingsViewModel(DelegateCommand updateSettingsCommand, DelegateCommand loadSettingsCommand)
+        public ModifiersSettingsViewModel(DelegateCommand updateSettingsCommand, DelegateCommand loadSettingsCommand, ILogger logger)
         {
             this.updateSettingsCommand = updateSettingsCommand ?? throw new ArgumentNullException(nameof(updateSettingsCommand));
             this.loadSettingsCommand = loadSettingsCommand ?? throw new ArgumentNullException(nameof(loadSettingsCommand));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Creates or loads the Modifiers mod settings from the given install directory
-        /// </summary>
-        public void LoadModifiersModSettings(string gameDirectory, bool createIfDoesntExist)
+        /// <inheritdoc/>
+        public bool LoadSettings(string gameDirectory, bool createIfDoesntExist)
         {
             if (string.IsNullOrWhiteSpace(gameDirectory))
             {
-                return;
+                logger.Error("Failed to load Modifier settings as provided Game Directory was empty!");
+                return false;
             }
 
             // Load in the settings
             string expectedSettingsFilePath = Path.Combine(gameDirectory, JumpKingModifiersModSettingsContext.SettingsFileName);
             if (File.Exists(expectedSettingsFilePath) || createIfDoesntExist)
             {
-                ModifiersModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModifiersModSettingsContext.GetDefaultSettings(), logger);
+                if (ModifiersModSettings == null)
+                {
+                    ModifiersModSettings = new UserSettings(expectedSettingsFilePath, JumpKingModifiersModSettingsContext.GetDefaultSettings(), logger);
+                }
 
                 // Load the initial data
                 FallDamageEnabled = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
                 FallDamageToggleKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, Keys.F11);
-                FallDamageModifier = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, JumpKingModifiersModSettingsContext.DefaultFallDamageModifier).ToString();
+                FallDamageModifier = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, JumpKingModifiersModSettingsContext.DefaultFallDamageModifier).ToString(CultureInfo.InvariantCulture);
                 FallDamageBloodSplatEnabled = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
                 FallDamageClearBloodKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
                 FallDamageNiceSpawns = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, true);
@@ -420,19 +426,50 @@ namespace JumpKingMod.Install.UI.Settings
 
                 RisingLavaEnabled = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
                 RisingLavaToggleKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F7);
-                RisingLavaSpeed = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed.ToString());
+                RisingLavaSpeed = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed.ToString(CultureInfo.InvariantCulture));
                 RisingLavaNiceSpawns = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, true);
+                return true;
+            }
+            else
+            {
+                logger.Error($"Failed to load Modifier settings as the settings file couldnt be found at '{expectedSettingsFilePath}'");
+                return false;
             }
         }
 
-        /// <summary>
-        /// Saves the Modifiers mod settings to disk
-        /// </summary>
-        public void SaveModifiersModSettings()
+        /// <inheritdoc/>
+        public bool SaveSettings(string gameDirectory)
         {
-            // TODO
+            if (ModifiersModSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
+            {
+                logger.Error($"Failed to save modifier settings, either internal settings object ({ModifiersModSettings}) is null, or no game directory was provided ({gameDirectory})");
+                return false;
+            }
+
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, FallDamageEnabled.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, FallDamageToggleKey.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, FallDamageModifier);
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, FallDamageBloodSplatEnabled.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, FallDamageClearBloodKey.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, FallDamageNiceSpawns.ToString());
+
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, ManualResizingEnabled.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, ManualResizingToggleKey.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, ManualResizingGrowKey.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, manualResizingShrinkKey.ToString());
+
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, RisingLavaEnabled.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, RisingLavaToggleKey.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, RisingLavaSpeed.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, RisingLavaNiceSpawns.ToString());
+            return true;
         }
 
+        /// <inheritdoc/>
+        public bool AreSettingsLoaded()
+        {
+            return AreFallDamageModSettingsLoaded;
+        }
 
         /// <summary>
         /// Invokes the <see cref="PropertyChanged"/> event
@@ -441,5 +478,6 @@ namespace JumpKingMod.Install.UI.Settings
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
 }
