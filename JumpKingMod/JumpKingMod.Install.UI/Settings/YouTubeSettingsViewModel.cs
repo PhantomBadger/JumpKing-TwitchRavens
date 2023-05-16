@@ -145,9 +145,9 @@ namespace JumpKingRavensMod.Install.UI
                     YouTubeBaseSettings = new UserSettings(expectedSettingsFilePath, PBJKModBaseYouTubeSettingsContext.GetDefaultSettings(), logger);
                 }
 
-                YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, YouTubeAccountName);
-                YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, YouTubeAPIKey);
-                YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, ConnectKey.ToString());
+                YouTubeAccountName = YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
+                YouTubeAPIKey = YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, string.Empty);
+                ConnectKey = YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, Keys.F9);
                 return true;
             }
             else
