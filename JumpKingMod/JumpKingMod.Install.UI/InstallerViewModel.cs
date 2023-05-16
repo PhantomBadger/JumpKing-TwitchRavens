@@ -191,7 +191,7 @@ namespace JumpKingRavensMod.Install.UI
             logger = new ConsoleLogger();
             installerSettings = new UserSettings(JumpKingModInstallerSettingsContext.SettingsFileName, JumpKingModInstallerSettingsContext.GetDefaultSettings(), logger);
             registeredSettings = new List<IInstallerSettingsViewModel>();
-
+            
             InitialiseCommands();
 
             RavensSettings = new RavensSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
@@ -218,6 +218,8 @@ namespace JumpKingRavensMod.Install.UI
                     ModDirectory = directoryInfo.FullName;
                 }
             }
+
+            RavensSettings.InitialiseCommands();
         }
 
         /// <summary>
@@ -249,8 +251,6 @@ namespace JumpKingRavensMod.Install.UI
             {
                 LoadModSettings();
             });
-            
-            RavensSettings.InitialiseCommands();
         }
 
         /// <summary>
