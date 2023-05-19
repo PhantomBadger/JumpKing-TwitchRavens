@@ -50,6 +50,18 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="TwitchLib.Client, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TwitchLib.Client.3.2.3\lib\netstandard2.0\TwitchLib.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client.Enums, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TwitchLib.Client.Enums.3.2.3\lib\netstandard2.0\TwitchLib.Client.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client.Models, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TwitchLib.Client.Models.3.2.3\lib\netstandard2.0\TwitchLib.Client.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Communication, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TwitchLib.Communication.1.0.3\lib\netstandard2.0\TwitchLib.Communication.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\IGameRectFlipper.cs" />
@@ -86,8 +98,11 @@
     <Compile Include="Patching\WindObserverManualPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModifiersModContentManager.cs" />
+    <Compile Include="Triggers\ActiveModifierCountdown.cs" />
     <Compile Include="Triggers\DebugModifierTrigger.cs" />
     <Compile Include="Triggers\DebugTogglePair.cs" />
+    <Compile Include="Triggers\ModifierTwitchPoll.cs" />
+    <Compile Include="Triggers\TwitchPollTrigger.cs" />
     <Compile Include="Visuals\ModifierNotifications.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +113,10 @@
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
       <Name>Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.Twitch\PBJKModBase.Twitch.csproj">
+      <Project>{450e7ceb-0885-4f44-a452-d351656edfac}</Project>
+      <Name>PBJKModBase.Twitch</Name>
     </ProjectReference>
     <ProjectReference Include="..\PBJKModBase\PBJKModBase.csproj">
       <Project>{DE2B97BE-F646-4158-A63B-330DAFEF06E2}</Project>

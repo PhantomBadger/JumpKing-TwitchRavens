@@ -34,6 +34,11 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
         private readonly TwitchClient twitchClient;
         private readonly Thread processingThread;
 
+        private readonly HashSet<string> simpleNumbersToIgnore = new HashSet<string>()
+        { 
+            "0", "1", "2", "3", "4", "5"
+        };
+
         /// <summary>
         /// Constructor for creating a <see cref="TwitchChatMessengerRavenTrigger"/>
         /// </summary>
@@ -110,6 +115,13 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
                         continue;
                     }
 
+                    // Skip any simple numbers, as they're often used in polls
+                    if (simpleNumbersToIgnore.Contains(e.ChatMessage.Message.Trim()))
+                    {
+                        continue;
+                    }
+
+                    // If you're a cool cat then always put the message through >:)
                     bool isPriority = false;
                     if (e.ChatMessage.DisplayName.Equals("PhantomBadger", StringComparison.OrdinalIgnoreCase))
                     {
