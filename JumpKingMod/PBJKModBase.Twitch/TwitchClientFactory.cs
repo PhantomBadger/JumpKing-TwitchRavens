@@ -10,6 +10,7 @@ using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
+using System.Net;
 
 namespace PBJKModBase.Twitch
 {
@@ -33,6 +34,7 @@ namespace PBJKModBase.Twitch
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             twitchClient = null;
         }
 

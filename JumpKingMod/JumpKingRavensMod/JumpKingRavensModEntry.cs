@@ -56,16 +56,18 @@ namespace JumpKingRavensMod
                 // Load Settings
                 var ravenModSettings = new UserSettings(JumpKingRavensModSettingsContext.SettingsFileName, JumpKingRavensModSettingsContext.GetDefaultSettings(), Logger);
                 var streamingSettings = new UserSettings(PBJKModBaseStreamingSettingsContext.SettingsFileName, PBJKModBaseStreamingSettingsContext.GetDefaultSettings(), Logger);
+                var twitchSettings = new UserSettings(PBJKModBaseTwitchSettingsContext.SettingsFileName, PBJKModBaseTwitchSettingsContext.GetDefaultSettings(), Logger);
+                var youtubeSettings = new UserSettings(PBJKModBaseYouTubeSettingsContext.SettingsFileName, PBJKModBaseYouTubeSettingsContext.GetDefaultSettings(), Logger);
                 RavensModContentManager.LoadContent(Logger);
 
                 // Get the observer
                 var gameStateObserver = GameStateObserverManualPatch.Instance;
 
                 // Twitch Chat Client
-                var twitchClientFactory = new TwitchClientFactory(ravenModSettings, Logger);
+                var twitchClientFactory = new TwitchClientFactory(twitchSettings, Logger);
 
                 // YouTube Chat Client
-                var youtubeChatClientFactory = new YouTubeChatClientFactory(ravenModSettings, Logger);
+                var youtubeChatClientFactory = new YouTubeChatClientFactory(youtubeSettings, Logger);
 
                 // Free Fly Patch
                 bool freeFlyEnabled = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.FreeFlyEnabledKey, false);
