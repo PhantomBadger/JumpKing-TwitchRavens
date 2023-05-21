@@ -4,6 +4,7 @@ using Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using TwitchLib.Client;
@@ -33,6 +34,7 @@ namespace JumpKingRavensMod.Twitch
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             twitchClient = null;
         }
 
