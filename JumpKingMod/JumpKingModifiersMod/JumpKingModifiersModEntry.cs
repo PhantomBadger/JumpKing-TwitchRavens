@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Modifiers;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Settings;
@@ -11,6 +12,8 @@ using PBJKModBase;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
 using PBJKModBase.Patching;
+using PBJKModBase.Twitch;
+using PBJKModBase.Twitch.Settings;
 using Settings;
 using System;
 using System.Collections.Generic;
@@ -68,6 +71,7 @@ namespace JumpKingModifiersMod
                 var modifierUpdatingEntity = new ModifierUpdatingEntity(ModEntityManager.Instance, Logger);
 
                 // Set up modifiers and trigger
+                List<IModifier> availableModifiers = new List<IModifier>();
                 var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
                 var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
                 var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
@@ -75,6 +79,13 @@ namespace JumpKingModifiersMod
                 var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
                 var windModifier = new WindToggleModifier(windPatch, Logger);
                 var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
+
+                availableModifiers.Add(walkSpeedModifier);
+                availableModifiers.Add(bouncyFloorModifier);
+                availableModifiers.Add(flipScreenModifier);
+                availableModifiers.Add(invertControlsModifier);
+                availableModifiers.Add(windModifier);
+                availableModifiers.Add(lowVisibilityModifier);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
                 //debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));
@@ -91,6 +102,7 @@ namespace JumpKingModifiersMod
 
                     var togglePair = new DebugTogglePair(fallDamageModifier, fallDamageToggleKey);
                     debugToggles.Add(togglePair);
+                    availableModifiers.Add(fallDamageModifier);
 
                     Logger.Information($"Fall Damage Mod is Enabled! Press the Toggle Key ({fallDamageToggleKey.ToString()}) to activate once in game!");
                 }
@@ -124,6 +136,7 @@ namespace JumpKingModifiersMod
 
                     var togglePair = new DebugTogglePair(risingLavaModifier, risingLavaToggleKey);
                     debugToggles.Add(togglePair);
+                    availableModifiers.Add(risingLavaModifier);
                     Logger.Information($"Rising Lava Mod is Enabled! Press the Toggle Key ({risingLavaToggleKey.ToString()}) to activate once in game!");
                 }
                 else
@@ -131,7 +144,13 @@ namespace JumpKingModifiersMod
                     Logger.Error($"Rising Lava Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
                 }
 
+                // Make twitch client factory
+                var twitchSettings = new UserSettings(PBJKModBaseTwitchSettingsContext.SettingsFileName, PBJKModBaseTwitchSettingsContext.GetDefaultSettings(), Logger);
+                var clientFactory = new TwitchClientFactory(twitchSettings, Logger);
+
                 // Make the toggle trigger
+                var twitchPollTrigger = new TwitchPollTrigger(clientFactory.GetTwitchClient(), availableModifiers, ModEntityManager.Instance, Logger);
+                twitchPollTrigger.EnableTrigger();
                 var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings);
                 debugTrigger.EnableTrigger();
 

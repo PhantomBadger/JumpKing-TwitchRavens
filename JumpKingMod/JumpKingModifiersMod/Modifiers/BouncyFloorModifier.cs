@@ -164,6 +164,11 @@ namespace JumpKingModifiersMod.Modifiers
 
                 // Check to see if the player just landed
                 PlayerState playerState = playerStateAccessor.GetPlayerState();
+                if (playerState == null)
+                {
+                    return;
+                }
+
                 if (playerState.IsOnGround)
                 {
                     if (isInAir)

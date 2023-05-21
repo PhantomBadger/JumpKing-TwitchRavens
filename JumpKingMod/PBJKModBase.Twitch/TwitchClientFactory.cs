@@ -22,7 +22,8 @@ namespace PBJKModBase.Twitch
         private readonly ILogger logger;
         private readonly UserSettings userSettings;
 
-        private TwitchClient twitchClient;
+        private static TwitchClient twitchClient;
+        private static object clientLock = new object();
 
         /// <summary>
         /// Constructor for creating a <see cref="TwitchClientFactory"/>
@@ -43,49 +44,52 @@ namespace PBJKModBase.Twitch
         /// </summary>
         public TwitchClient GetTwitchClient()
         {
-            if (twitchClient != null)
+            lock (clientLock)
             {
-                return twitchClient;
-            }
-            else
-            {
-                // Initialise the settings and attempt to load the OAuth Token
-                string oAuthToken = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.OAuthKey, string.Empty);
-                string twitchName = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
-
-                // If the Oauth Token is bad, exit now
-                if (string.IsNullOrWhiteSpace(oAuthToken))
+                if (twitchClient != null)
                 {
-                    logger.Error($"No valid OAuth token found in the {PBJKModBaseTwitchSettingsContext.SettingsFileName} file!");
-                    return null;
-                }
-                if (string.IsNullOrWhiteSpace(twitchName))
-                {
-                    logger.Error($"No valid TwitchAccountName found in the {PBJKModBaseTwitchSettingsContext.SettingsFileName} file!");
-                    return null;
-                }
-
-                oAuthToken = oAuthToken.Trim();
-                twitchName = twitchName.Trim();
-                logger.Information($"Setting up Twitch Chat Client for '{twitchName}'");
-
-                try
-                {
-                    var credentials = new ConnectionCredentials(twitchName, oAuthToken);
-                    var clientOptions = new ClientOptions();
-                    WebSocketClient webSocketClient = new WebSocketClient(clientOptions);
-                    twitchClient = new TwitchClient(webSocketClient);
-                    twitchClient.Initialize(credentials, twitchName);
-
-                    //twitchClient.OnLog += TwitchClient_OnLog;
-
-                    twitchClient.Connect();
                     return twitchClient;
                 }
-                catch (Exception e)
+                else
                 {
-                    logger.Error($"Encountered error when trying to create Twitch Client. Check your Oauth token is correct!");
-                    return null;
+                    // Initialise the settings and attempt to load the OAuth Token
+                    string oAuthToken = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.OAuthKey, string.Empty);
+                    string twitchName = userSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+
+                    // If the Oauth Token is bad, exit now
+                    if (string.IsNullOrWhiteSpace(oAuthToken))
+                    {
+                        logger.Error($"No valid OAuth token found in the {PBJKModBaseTwitchSettingsContext.SettingsFileName} file!");
+                        return null;
+                    }
+                    if (string.IsNullOrWhiteSpace(twitchName))
+                    {
+                        logger.Error($"No valid TwitchAccountName found in the {PBJKModBaseTwitchSettingsContext.SettingsFileName} file!");
+                        return null;
+                    }
+
+                    oAuthToken = oAuthToken.Trim();
+                    twitchName = twitchName.Trim();
+                    logger.Information($"Setting up Twitch Chat Client for '{twitchName}'");
+
+                    try
+                    {
+                        var credentials = new ConnectionCredentials(twitchName, oAuthToken);
+                        var clientOptions = new ClientOptions();
+                        WebSocketClient webSocketClient = new WebSocketClient(clientOptions);
+                        twitchClient = new TwitchClient(webSocketClient);
+                        twitchClient.Initialize(credentials, twitchName);
+
+                        //twitchClient.OnLog += TwitchClient_OnLog;
+
+                        twitchClient.Connect();
+                        return twitchClient;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error($"Encountered error when trying to create Twitch Client. Check your Oauth token is correct!");
+                        return null;
+                    }
                 }
             }
         }

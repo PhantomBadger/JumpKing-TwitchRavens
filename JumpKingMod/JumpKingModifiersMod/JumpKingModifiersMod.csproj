@@ -101,7 +101,8 @@
     <Compile Include="Triggers\ActiveModifierCountdown.cs" />
     <Compile Include="Triggers\DebugModifierTrigger.cs" />
     <Compile Include="Triggers\DebugTogglePair.cs" />
-    <Compile Include="Triggers\ModifierTwitchPoll.cs" />
+    <Compile Include="Triggers\TwitchPoll\ModifierTwitchPoll.cs" />
+    <Compile Include="Triggers\TwitchPoll\ModifierTwitchPollOption.cs" />
     <Compile Include="Triggers\TwitchPollTrigger.cs" />
     <Compile Include="Visuals\ModifierNotifications.cs" />
   </ItemGroup>
@@ -113,6 +114,10 @@
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
       <Name>Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.Twitch.Settings\PBJKModBase.Twitch.Settings.csproj">
+      <Project>{16F1CFD5-9EC2-4A45-8EDA-801310C3A866}</Project>
+      <Name>PBJKModBase.Twitch.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="..\PBJKModBase.Twitch\PBJKModBase.Twitch.csproj">
       <Project>{450e7ceb-0885-4f44-a452-d351656edfac}</Project>
