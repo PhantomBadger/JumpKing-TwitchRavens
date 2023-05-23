@@ -19,8 +19,11 @@ namespace JumpKingModifiersMod.Triggers
     /// An implementation of <see cref="IModifierTrigger"/> which triggers the effects based on a twitch poll.
     /// Will select a random subst of modifiers, ask the users to vote on it, then enables it for a set amount of time
     /// </summary>
-    public class TwitchPollTrigger : IModifierTrigger, IForegroundModEntity
+    public class TwitchPollTrigger : IModifierTrigger, IModEntity
     {
+        public delegate void TwitchPollStartedDelegate(ModifierTwitchPoll poll);
+        public delegate void TwitchPollEndedDelegate(ModifierTwitchPoll poll);
+
         private enum TwitchPollTriggerState
         {
             CreatingPoll,
@@ -30,6 +33,8 @@ namespace JumpKingModifiersMod.Triggers
 
         public event ModifierEnabledDelegate OnModifierEnabled;
         public event ModifierDisabledDelegate OnModifierDisabled;
+        public event TwitchPollStartedDelegate OnTwitchPollStarted;
+        public event TwitchPollEndedDelegate OnTwitchPollEnded;
 
         private readonly ILogger logger;
         private readonly List<IModifier> availableModifiers;
@@ -77,7 +82,7 @@ namespace JumpKingModifiersMod.Triggers
         /// <inheritdoc/>
         public bool EnableTrigger()
         {
-            if (!modEntityManager.AddForegroundEntity(this))
+            if (!modEntityManager.AddEntity(this, zOrder: 0))
             {
                 logger.Information($"Failed to enabled '{this.GetType().Name}' Modifier Trigger as it didn't add to the entity managed correctly");
                 return false;
@@ -93,11 +98,19 @@ namespace JumpKingModifiersMod.Triggers
         /// <inheritdoc/>
         public bool DisableTrigger()
         {
-            if (!modEntityManager.RemoveForegroundEntity(this))
+            if (!modEntityManager.RemoveEntity(this))
             {
                 logger.Information($"Failed to disable '{this.GetType().Name}' Modifier Trigger as it didn't remove from the entity managed correctly");
                 return false;
             }
+
+            // End the poll prematurely if we had one active
+            if (currentPoll != null)
+            {
+                OnTwitchPollEnded?.Invoke(currentPoll);
+                currentPoll = null;
+            }
+
             isEnabled = true;
             logger.Information($"Disabled '{this.GetType().Name}' Modifier Trigger");
             return true;
@@ -262,6 +275,8 @@ namespace JumpKingModifiersMod.Triggers
 
                             triggerState = TwitchPollTriggerState.CollectingVotes;
                             pollTimeCounter = 0;
+
+                            OnTwitchPollStarted?.Invoke(currentPoll);
                             logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             break;
                         }
@@ -307,8 +322,9 @@ namespace JumpKingModifiersMod.Triggers
                             activeModifiers.Add(new ActiveModifierCountdown(winningModifier.Modifier, ActiveModifierDurationInSeconds));
 
                             // Clear the current poll and queue up a next one
-                            currentPoll = null;
+                            OnTwitchPollEnded?.Invoke(currentPoll);
                             triggerState = TwitchPollTriggerState.CreatingPoll;
+                            currentPoll = null;
                             logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             break;
                         }
@@ -320,7 +336,7 @@ namespace JumpKingModifiersMod.Triggers
             }
         }
 
-        public void ForegroundDraw()
+        public void Draw()
         {
             // Do nothing
         }

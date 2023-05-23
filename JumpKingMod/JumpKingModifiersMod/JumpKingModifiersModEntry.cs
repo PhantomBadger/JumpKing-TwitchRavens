@@ -150,7 +150,42 @@ namespace JumpKingModifiersMod
 
                 // Make the toggle trigger
                 var twitchPollTrigger = new TwitchPollTrigger(clientFactory.GetTwitchClient(), availableModifiers, ModEntityManager.Instance, Logger);
-                twitchPollTrigger.EnableTrigger();
+                Task.Run(() =>
+                {
+                    bool enableKeyPressed = false;
+                    bool disableKeyPressed = false;
+                    while (true)
+                    {
+                        KeyboardState kb = Keyboard.GetState();
+                        if (kb.IsKeyDown(Keys.Q))
+                        {
+                            if (!enableKeyPressed)
+                            {
+                                enableKeyPressed = true;
+                                twitchPollTrigger.EnableTrigger();
+                            }
+                        }
+                        else
+                        {
+                            enableKeyPressed = false;
+                        }
+
+                        if (kb.IsKeyDown(Keys.E))
+                        {
+                            if (!disableKeyPressed)
+                            {
+                                disableKeyPressed = true;
+                                twitchPollTrigger.DisableTrigger();
+                            }
+                        }
+                        else
+                        {
+                            disableKeyPressed = false;
+                        }
+                    }
+                });
+                var pollVisual = new TwitchPollVisual(ModEntityManager.Instance, twitchPollTrigger, Logger);
+
                 var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings);
                 debugTrigger.EnableTrigger();
 

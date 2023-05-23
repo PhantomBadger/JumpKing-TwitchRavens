@@ -105,6 +105,7 @@
     <Compile Include="Triggers\TwitchPoll\ModifierTwitchPollOption.cs" />
     <Compile Include="Triggers\TwitchPollTrigger.cs" />
     <Compile Include="Visuals\ModifierNotifications.cs" />
+    <Compile Include="Visuals\TwitchPollVisual.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj">
