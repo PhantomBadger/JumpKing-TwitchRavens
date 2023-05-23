@@ -190,7 +190,7 @@ namespace JumpKingModifiersMod
                 debugTrigger.EnableTrigger();
 
                 // Make the modifier notification
-                var modifierNotification = new ModifierNotifications(ModEntityManager.Instance, new List<API.IModifierTrigger>() { debugTrigger }, Logger);
+                var modifierNotification = new ModifierNotifications(ModEntityManager.Instance, new List<API.IModifierTrigger>() { debugTrigger, twitchPollTrigger }, Logger);
             }
             catch (Exception e)
             {

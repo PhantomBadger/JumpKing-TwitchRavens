@@ -56,6 +56,7 @@ namespace JumpKingModifiersMod.Visuals
             trigger.OnTwitchPollStarted -= OnTwitchPollStarted;
             trigger.OnTwitchPollEnded -= OnTwitchPollEnded;
             modEntityManager.RemoveEntity(this);
+            CleanUpUIEntities();
         }
 
         /// <summary>
@@ -78,17 +79,13 @@ namespace JumpKingModifiersMod.Visuals
             var choicesNumberList = currentPoll.Choices.Keys.ToList();
             for (int i = 0; i < choicesNumberList.Count; i++)
             {
-                if (i == choicesNumberList.Count - 2)
+                if (i == choicesNumberList.Count - 1)
                 {
-                    descriptionText.Append(choicesNumberList[i] + " or ");
-                }
-                else if (i == choicesNumberList.Count - 1)
-                {
-                    descriptionText.Append(choicesNumberList[i] + " ");
+                    descriptionText.Append($"or {choicesNumberList[i]} ");
                 }
                 else
                 {
-                    descriptionText.Append(choicesNumberList[i] + ", ");
+                    descriptionText.Append($"{choicesNumberList[i]}, ");
                 }
             }
             descriptionText.Append("in chat!");
@@ -100,10 +97,9 @@ namespace JumpKingModifiersMod.Visuals
 
             // Make each of the choices
             var choicesList = currentPoll.Choices.Values.ToList();
-            float currentY = descriptionPosition.Y;
+            float currentY = descriptionPosition.Y + pollDescriptionEntity.TextFont.MeasureString(descriptionText.ToString()).Y;
             for (int i = 0; i < choicesList.Count; i++)
             {
-                currentY -= YPadding;
 
                 string pollOptionText = GetPollOptionText(choicesList[i]);
                 Vector2 pollOptionPosition = JumpGame.GAME_RECT.Size.ToVector2();
@@ -112,6 +108,8 @@ namespace JumpKingModifiersMod.Visuals
                 var pollOptionEntity = new UITextEntity(modEntityManager, pollOptionPosition, pollOptionText,
                     Color.White, UIEntityAnchor.TopRight, zOrder: 2);
                 pollOptionEntities.Add(new Tuple<ModifierTwitchPollOption, UITextEntity>(choicesList[i], pollOptionEntity));
+                
+                currentY += (YPadding + pollOptionEntity.TextFont.MeasureString(pollOptionText).Y);
             }
         }
 
@@ -120,9 +118,10 @@ namespace JumpKingModifiersMod.Visuals
         /// </summary>
         private void OnTwitchPollEnded(ModifierTwitchPoll poll)
         {
-            // TODO
+            // TODO - show winner somehow
             logger.Information($"Received OnTwitchPollEnded Event");
             currentPoll = null;
+            CleanUpUIEntities();
         }
 
         /// <summary>
@@ -131,6 +130,20 @@ namespace JumpKingModifiersMod.Visuals
         private string GetPollOptionText(ModifierTwitchPollOption pollOption)
         {
             return $"{pollOption.ChoiceNumber}. {pollOption.Modifier.DisplayName} - {pollOption.Count}";
+        }
+
+        /// <summary>
+        /// Disposes and cleans up all known UI entities for the visual
+        /// </summary>
+        private void CleanUpUIEntities()
+        {
+            pollDescriptionEntity?.Dispose();
+            pollDescriptionEntity = null;
+            for (int i = 0; i < pollOptionEntities.Count; i++)
+            {
+                pollOptionEntities[i].Item2?.Dispose();
+            }
+            pollOptionEntities.Clear();
         }
 
         /// <inheritdoc/>
