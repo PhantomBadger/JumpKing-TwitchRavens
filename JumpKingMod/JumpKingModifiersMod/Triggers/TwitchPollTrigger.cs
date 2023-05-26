@@ -22,18 +22,22 @@ namespace JumpKingModifiersMod.Triggers
     public class TwitchPollTrigger : IModifierTrigger, IModEntity
     {
         public delegate void TwitchPollStartedDelegate(ModifierTwitchPoll poll);
+        public delegate void TwitchPollClosedDelegate(ModifierTwitchPoll poll);
         public delegate void TwitchPollEndedDelegate(ModifierTwitchPoll poll);
 
         private enum TwitchPollTriggerState
         {
             CreatingPoll,
             CollectingVotes,
-            ExecutingPoll,
+            ClosingPoll,
+            ExecutingWinningOption,
+            DownTimeBetweenPolls,
         }
 
         public event ModifierEnabledDelegate OnModifierEnabled;
         public event ModifierDisabledDelegate OnModifierDisabled;
         public event TwitchPollStartedDelegate OnTwitchPollStarted;
+        public event TwitchPollClosedDelegate OnTwitchPollClosed;
         public event TwitchPollEndedDelegate OnTwitchPollEnded;
 
         private readonly ILogger logger;
@@ -44,15 +48,20 @@ namespace JumpKingModifiersMod.Triggers
         private readonly ModEntityManager modEntityManager;
         private readonly Random random;
         private readonly Thread processingThread;
+        private readonly ConcurrentDictionary<string, byte> alreadyVotedChatters;
 
         private TwitchPollTriggerState triggerState;
         private ModifierTwitchPoll currentPoll;
         private float pollTimeCounter;
+        private float closingPollTimeCounter;
+        private float timeBetweenPollsCounter;
         private bool isEnabled;
 
         private const int NumberOfModifiersInPoll = 4;
         private const float PollTimeInSeconds = 30.0f;
+        private const float PollClosedTimeInSeconds = 5.0f;
         private const float ActiveModifierDurationInSeconds = 20f;
+        private const float TimeBetweenPollsInSeconds = 5.0f;
 
         /// <summary>
         /// Ctor for creating a <see cref="TwitchPollTrigger"/>
@@ -67,6 +76,7 @@ namespace JumpKingModifiersMod.Triggers
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.random = new Random(DateTime.Now.Second + DateTime.Now.Millisecond);
 
+            alreadyVotedChatters = new ConcurrentDictionary<string, byte>();
             activeModifiers = new List<ActiveModifierCountdown>();
             relayRequestQueue = new BlockingCollection<OnMessageReceivedArgs>();
             this.twitchClient.OnMessageReceived += OnMessageReceived;
@@ -89,6 +99,7 @@ namespace JumpKingModifiersMod.Triggers
             }
             isEnabled = true;
             currentPoll = null;
+            alreadyVotedChatters.Clear();
             triggerState = TwitchPollTriggerState.CreatingPoll;
 
             logger.Information($"Enabled '{this.GetType().Name}' Modifier Trigger");
@@ -112,6 +123,7 @@ namespace JumpKingModifiersMod.Triggers
             }
 
             isEnabled = true;
+            alreadyVotedChatters.Clear();
             logger.Information($"Disabled '{this.GetType().Name}' Modifier Trigger");
             return true;
         }
@@ -173,6 +185,12 @@ namespace JumpKingModifiersMod.Triggers
                         continue;
                     }
 
+                    // If they have already voted, then dip
+                    if (alreadyVotedChatters.ContainsKey(e.ChatMessage.UserId))
+                    {
+                        continue;
+                    }
+
                     // Get the choice number from the message
                     if (!TryGetPollChoiceNumberFromMessage(e.ChatMessage.Message, out int choiceNumber))
                     {
@@ -188,6 +206,7 @@ namespace JumpKingModifiersMod.Triggers
                     // Increment that value in the poll
                     ModifierTwitchPollOption option = currentPoll.Choices[choiceNumber];
                     option.IncrementCount();
+                    alreadyVotedChatters.TryAdd(e.ChatMessage.UserId, 0);
                 }
                 catch (Exception ex)
                 {
@@ -207,8 +226,12 @@ namespace JumpKingModifiersMod.Triggers
                 return false;
             }
             string trimmedMessage = message.Trim();
+            if (trimmedMessage.Length == 0)
+            {
+                return false;
+            }
 
-            if (int.TryParse(trimmedMessage, out choiceNumber))
+            if (int.TryParse(trimmedMessage[0].ToString(), out choiceNumber))
             {
                 return true;
             }
@@ -265,6 +288,8 @@ namespace JumpKingModifiersMod.Triggers
 
                             // Set the active poll object
                             currentPoll = new ModifierTwitchPoll(modifiersToChooseBetween);
+                            alreadyVotedChatters.Clear();
+
                             StringBuilder logBuilder = new StringBuilder();
                             logBuilder.Append($"Creating a Twitch Poll with '{modifiersToChooseBetween.Count}' choices for '{PollTimeInSeconds.ToString()}' seconds: ");
                             foreach (var choice in currentPoll.Choices)
@@ -289,14 +314,29 @@ namespace JumpKingModifiersMod.Triggers
                                 return;
                             }
 
-                            if ((pollTimeCounter += p_delta) > PollTimeInSeconds)
+                            pollTimeCounter += p_delta;
+                            currentPoll.TimeRemainingInSeconds = Math.Max(0, (PollTimeInSeconds - pollTimeCounter));
+
+                            if (pollTimeCounter > PollTimeInSeconds)
                             {
-                                triggerState = TwitchPollTriggerState.ExecutingPoll;
+                                closingPollTimeCounter = 0;
+                                triggerState = TwitchPollTriggerState.ClosingPoll;
+                                OnTwitchPollClosed?.Invoke(currentPoll);
+                                alreadyVotedChatters.Clear();
                                 logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             }
                             break;
                         }
-                    case TwitchPollTriggerState.ExecutingPoll:
+                    case TwitchPollTriggerState.ClosingPoll:
+                        {
+                            if ((closingPollTimeCounter += p_delta) > PollClosedTimeInSeconds)
+                            {
+                                triggerState = TwitchPollTriggerState.ExecutingWinningOption;
+                                logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
+                            }
+                            break;
+                        }
+                    case TwitchPollTriggerState.ExecutingWinningOption:
                         {
                             if (currentPoll == null)
                             {
@@ -323,11 +363,22 @@ namespace JumpKingModifiersMod.Triggers
 
                             // Clear the current poll and queue up a next one
                             OnTwitchPollEnded?.Invoke(currentPoll);
-                            triggerState = TwitchPollTriggerState.CreatingPoll;
+                            triggerState = TwitchPollTriggerState.DownTimeBetweenPolls;
                             currentPoll = null;
+                            timeBetweenPollsCounter = 0;
                             logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             break;
                         }
+                    case TwitchPollTriggerState.DownTimeBetweenPolls:
+                        {
+                            if ((timeBetweenPollsCounter += p_delta) > TimeBetweenPollsInSeconds)
+                            {
+                                triggerState = TwitchPollTriggerState.CreatingPoll;
+                                logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
+                            }
+                            break;
+                        }
+
                 }
             }
             catch (Exception ex)
@@ -336,6 +387,7 @@ namespace JumpKingModifiersMod.Triggers
             }
         }
 
+        /// <inheritdoc/>
         public void Draw()
         {
             // Do nothing
