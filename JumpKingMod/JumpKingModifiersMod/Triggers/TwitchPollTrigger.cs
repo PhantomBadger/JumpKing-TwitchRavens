@@ -61,7 +61,7 @@ namespace JumpKingModifiersMod.Triggers
 
         private const int NumberOfModifiersInPoll = 4;
         private const float PollTimeInSeconds = 30.0f;
-        private const float PollClosedTimeInSeconds = 5.0f;
+        private const float PollClosedTimeInSeconds = 2.5f;
         private const float ActiveModifierDurationInSeconds = 20f;
         private const float TimeBetweenPollsInSeconds = 5.0f;
 
