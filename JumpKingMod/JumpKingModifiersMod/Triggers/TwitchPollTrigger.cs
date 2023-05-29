@@ -60,10 +60,10 @@ namespace JumpKingModifiersMod.Triggers
         private bool isEnabled;
 
         private const int NumberOfModifiersInPoll = 4;
-        private const float PollTimeInSeconds = 30.0f;
+        private const float PollTimeInSeconds = 20.0f;
         private const float PollClosedTimeInSeconds = 2.5f;
-        private const float ActiveModifierDurationInSeconds = 20f;
-        private const float TimeBetweenPollsInSeconds = 5.0f;
+        private const float ActiveModifierDurationInSeconds = 30f;
+        private const float TimeBetweenPollsInSeconds = 2.5f;
 
         /// <summary>
         /// Ctor for creating a <see cref="TwitchPollTrigger"/>
@@ -120,6 +120,9 @@ namespace JumpKingModifiersMod.Triggers
             RestoreCachedModifiers();
         }
 
+        /// <summary>
+        /// Caches any active modifiers and disables them
+        /// </summary>
         private void CacheActiveModifiers()
         {
             previouslyActiveModifiers.Clear();
@@ -136,6 +139,9 @@ namespace JumpKingModifiersMod.Triggers
             }
         }
 
+        /// <summary>
+        /// Restores any cached modifiers and enables them
+        /// </summary>
         private void RestoreCachedModifiers()
         {
             activeModifiers.Clear();
@@ -265,8 +271,9 @@ namespace JumpKingModifiersMod.Triggers
                         continue;
                     }
 
-                    // If they have already voted, then dip
-                    if (alreadyVotedChatters.ContainsKey(e.ChatMessage.UserId))
+                    // If they have already voted, then dip (unless it's me because im special hehe)
+                    if (alreadyVotedChatters.ContainsKey(e.ChatMessage.UserId) && 
+                        !e.ChatMessage.DisplayName.Equals("PhantomBadger", StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
@@ -322,6 +329,14 @@ namespace JumpKingModifiersMod.Triggers
         }
 
         /// <summary>
+        /// Returns a list of the active modifiers and their countdowns
+        /// </summary>
+        public IReadOnlyList<ActiveModifierCountdown> GetActiveModifierCountdowns()
+        {
+            return activeModifiers;
+        }
+
+        /// <summary>
         /// Called by the <see cref="ModEntityManager"/>
         /// </summary>
         /// <param name="p_delta"></param>
@@ -354,6 +369,10 @@ namespace JumpKingModifiersMod.Triggers
                         {
                             // Identify what four modifiers we want to choose from and start the query
                             List<IModifier> possibleModifiers = availableModifiers.Where(modifier => !modifier.IsModifierEnabled()).ToList();
+                            if (possibleModifiers.Count == 0)
+                            {
+                                return;
+                            }
 
                             List<IModifier> modifiersToChooseBetween = new List<IModifier>();
                             if (possibleModifiers.Count < NumberOfModifiersInPoll)

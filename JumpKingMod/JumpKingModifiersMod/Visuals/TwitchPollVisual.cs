@@ -27,10 +27,14 @@ namespace JumpKingModifiersMod.Visuals
         private UITextEntity pollDescriptionEntity;
         private UITextEntity pollCountdownEntity;
         private List<Tuple<ModifierTwitchPollOption, UITextEntity>> pollOptionEntities;
+        private List<UITextEntity> activeModifierEntitiesPool;
+        private float bottomOfOptionsYValue;
 
         private const float YPadding = 1;
         private const float CountdownYPadding = 5;
         private const float InitialPositionXPadding = 8f;
+        private const int MaxActiveModifiersOnDisplay = 5;
+        private const float ActiveModifierYPadding = 5;
 
         /// <summary>
         /// Ctor for creating a <see cref="TwitchPollVisual"/>
@@ -111,6 +115,13 @@ namespace JumpKingModifiersMod.Visuals
                     }
                 }
             }
+            if (activeModifierEntitiesPool == null)
+            {
+                for (int i = 0; i < activeModifierEntitiesPool.Count; i++)
+                {
+                    activeModifierEntitiesPool[i].IsEnabled = false;
+                }
+            }
         }
 
         /// <summary>
@@ -136,6 +147,13 @@ namespace JumpKingModifiersMod.Visuals
                     }
                 }
             }
+            if (activeModifierEntitiesPool == null)
+            {
+                for (int i = 0; i < activeModifierEntitiesPool.Count; i++)
+                {
+                    activeModifierEntitiesPool[i].IsEnabled = true;
+                }
+            }
         }
 
         /// <summary>
@@ -159,16 +177,16 @@ namespace JumpKingModifiersMod.Visuals
             descriptionPosition.X -= InitialPositionXPadding;
             pollDescriptionEntity = new UITextEntity(modEntityManager, descriptionPosition, descriptionText,
                 Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
-            float currentY = descriptionPosition.Y + pollDescriptionEntity.TextFont.MeasureString(descriptionText).Y;
+            bottomOfOptionsYValue = descriptionPosition.Y + pollDescriptionEntity.TextFont.MeasureString(descriptionText).Y;
 
             // Make the countdown text
             string countdownText = $"Time Remaining: {((int)currentPoll.TimeRemainingInSeconds).ToString().PadLeft(2, '0')}";
             Vector2 countdownPosition = JumpGame.GAME_RECT.Size.ToVector2();
-            countdownPosition.Y = currentY;
+            countdownPosition.Y = bottomOfOptionsYValue;
             countdownPosition.X -= InitialPositionXPadding;
             pollCountdownEntity = new UITextEntity(modEntityManager, countdownPosition, countdownText, 
-                Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 1);
-            currentY += (CountdownYPadding + pollDescriptionEntity.TextFont.MeasureString(descriptionText).Y);
+                Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
+            bottomOfOptionsYValue += (CountdownYPadding + pollDescriptionEntity.TextFont.MeasureString(descriptionText).Y);
 
             // Make each of the choices
             var choicesList = currentPoll.Choices.Values.ToList();
@@ -177,13 +195,13 @@ namespace JumpKingModifiersMod.Visuals
 
                 string pollOptionText = GetPollOptionText(choicesList[i]);
                 Vector2 pollOptionPosition = JumpGame.GAME_RECT.Size.ToVector2();
-                pollOptionPosition.Y = currentY;
+                pollOptionPosition.Y = bottomOfOptionsYValue;
                 pollOptionPosition.X -= InitialPositionXPadding;
                 var pollOptionEntity = new UITextEntity(modEntityManager, pollOptionPosition, pollOptionText,
-                    Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 1);
+                    Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
                 pollOptionEntities.Add(new Tuple<ModifierTwitchPollOption, UITextEntity>(choicesList[i], pollOptionEntity));
-                
-                currentY += (YPadding + pollOptionEntity.TextFont.MeasureString(pollOptionText).Y);
+
+                bottomOfOptionsYValue += (YPadding + pollOptionEntity.TextFont.MeasureString(pollOptionText).Y);
             }
         }
 
@@ -242,6 +260,15 @@ namespace JumpKingModifiersMod.Visuals
                 pollOptionEntities[i].Item2?.Dispose();
             }
             pollOptionEntities.Clear();
+            if (activeModifierEntitiesPool == null)
+            {
+                for (int i = 0; i < activeModifierEntitiesPool.Count; i++)
+                {
+                    activeModifierEntitiesPool[i]?.Dispose();
+                }
+                activeModifierEntitiesPool.Clear();
+                activeModifierEntitiesPool = null;
+            }
         }
 
         /// <inheritdoc/>
@@ -253,9 +280,19 @@ namespace JumpKingModifiersMod.Visuals
         /// <inheritdoc/>
         public void Update(float p_delta)
         {
+            if (activeModifierEntitiesPool == null)
+            {
+                activeModifierEntitiesPool = new List<UITextEntity>();
+                for (int i = 0; i < MaxActiveModifiersOnDisplay; i++)
+                {
+                    activeModifierEntitiesPool.Add(new UITextEntity(modEntityManager, Vector2.Zero, string.Empty,
+                        new Color(150, 150, 200, 127), UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2));
+                }
+            }
+
             if (currentPoll != null)
             {
-                string countdownText = $"Time Remaining: {((int)currentPoll.TimeRemainingInSeconds).ToString().PadLeft(2, '0')}";
+                string countdownText = $"Time Remaining: {((int)currentPoll.TimeRemainingInSeconds).ToString()}s";
                 pollCountdownEntity.TextValue = countdownText;
 
                 // Update the current options
@@ -264,6 +301,34 @@ namespace JumpKingModifiersMod.Visuals
                     ModifierTwitchPollOption option = pollOptionEntities[i].Item1;
                     UITextEntity optionEntity = pollOptionEntities[i].Item2;
                     optionEntity.TextValue = GetPollOptionText(option);
+                }
+            }
+
+            // Show all active modifiers
+            if (trigger != null && activeModifierEntitiesPool != null)
+            {
+                float currentYValue = bottomOfOptionsYValue + ActiveModifierYPadding;
+                IReadOnlyList<ActiveModifierCountdown> activeModifierCountdowns = trigger.GetActiveModifierCountdowns();
+                for (int i = 0; i < activeModifierEntitiesPool.Count; i++)
+                {
+                    Vector2 position = JumpGame.GAME_RECT.Size.ToVector2();
+                    position.Y = currentYValue;
+                    position.X -= InitialPositionXPadding;
+
+                    // Show as many active modifiers we have that fit within the pool
+                    // Hide any left over
+                    if (i < activeModifierCountdowns.Count)
+                    {
+                        activeModifierEntitiesPool[i].ScreenSpacePosition = position;
+                        activeModifierEntitiesPool[i].TextValue = 
+                            $"{activeModifierCountdowns[i].Modifier.DisplayName}: {((int)activeModifierCountdowns[i].DurationCounter).ToString()}s";
+                    }
+                    else
+                    {
+                        activeModifierEntitiesPool[i].TextValue = string.Empty;
+                    }
+
+                    currentYValue += activeModifierEntitiesPool[i].TextFont.MeasureString(activeModifierEntitiesPool[i].TextValue).Y;
                 }
             }
         }
