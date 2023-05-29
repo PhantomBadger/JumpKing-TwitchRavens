@@ -67,6 +67,10 @@ namespace JumpKingModifiersMod
                 var windPatch = new WindObserverManualPatch(Logger);
                 windPatch.SetUpManualPatch(harmony);
 
+                // Set up gravity patching
+                var gravityPatch = new LowGravityObserverManualPatch(Logger);
+                gravityPatch.SetUpManualPatch(harmony);
+
                 // Make the Modifier Updating Entity
                 var modifierUpdatingEntity = new ModifierUpdatingEntity(ModEntityManager.Instance, Logger);
 
@@ -79,6 +83,7 @@ namespace JumpKingModifiersMod
                 var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
                 var windModifier = new WindToggleModifier(windPatch, Logger);
                 var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
+                var lowGravityModifier = new LowGravityModifier(gravityPatch, Logger);
 
                 availableModifiers.Add(walkSpeedModifier);
                 availableModifiers.Add(bouncyFloorModifier);
@@ -86,6 +91,7 @@ namespace JumpKingModifiersMod
                 availableModifiers.Add(invertControlsModifier);
                 availableModifiers.Add(windModifier);
                 availableModifiers.Add(lowVisibilityModifier);
+                availableModifiers.Add(lowGravityModifier);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
                 //debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));
