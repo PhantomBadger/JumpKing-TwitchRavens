@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.Visuals
 {
-    // TODO: Handle game pausing and exiting - show active modifiers on Pause screen? :) ;) ;P
     /// <summary>
     /// An implementation of <see cref="IModEntity"/> which acts as the visual component to a provided
     /// <see cref="TwitchPollTrigger"/>, creating and managing UI texts to display the poll state to the chat
@@ -21,6 +20,7 @@ namespace JumpKingModifiersMod.Visuals
     {
         private readonly ModEntityManager modEntityManager;
         private readonly TwitchPollTrigger trigger;
+        private readonly IGameStateObserver gameStateObserver;
         private readonly ILogger logger;
 
         private ModifierTwitchPoll currentPoll;
@@ -37,15 +37,19 @@ namespace JumpKingModifiersMod.Visuals
         /// </summary>
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register to</param>
         /// <param name="trigger">The <see cref="TwitchPollTrigger"/> to act as a visual for</param>
+        /// <param name="gameStateObserver">An implementation of <see cref="IGameStateObserver"/> to determine when we should draw</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to use for logging</param>
-        public TwitchPollVisual(ModEntityManager modEntityManager, TwitchPollTrigger trigger, ILogger logger)
+        public TwitchPollVisual(ModEntityManager modEntityManager, TwitchPollTrigger trigger, IGameStateObserver gameStateObserver, ILogger logger)
         {
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.trigger = trigger ?? throw new ArgumentNullException(nameof(trigger));
+            this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             pollOptionEntities = new List<Tuple<ModifierTwitchPollOption, UITextEntity>>();
 
+            this.gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
+            this.gameStateObserver.OnGameLoopRunning += OnGameLoopRunning;
             this.trigger.OnTwitchPollStarted += OnTwitchPollStarted;
             this.trigger.OnTwitchPollClosed += OnTwitchPollClosed;
             this.trigger.OnTwitchPollEnded += OnTwitchPollEnded;
@@ -57,11 +61,81 @@ namespace JumpKingModifiersMod.Visuals
         /// </summary>
         public void Dispose()
         {
+            gameStateObserver.OnGameLoopNotRunning -= OnGameLoopNotRunning;
+            gameStateObserver.OnGameLoopRunning -= OnGameLoopRunning;
             trigger.OnTwitchPollStarted -= OnTwitchPollStarted;
             trigger.OnTwitchPollClosed -= OnTwitchPollClosed;
             trigger.OnTwitchPollEnded -= OnTwitchPollEnded;
             modEntityManager.RemoveEntity(this);
             CleanUpUIEntities();
+        }
+
+        /// <summary>
+        /// Called by <see cref="IGameStateObserver.OnGameLoopNotRunning"/> hides all active UI entities
+        /// </summary>
+        private void OnGameLoopNotRunning()
+        {
+            logger.Information($"Called OnGameLoopNotRunning in TwitchPollVisual - Hiding all UI");
+            HideAllUI();
+        }
+
+        /// <summary>
+        /// Called by <see cref="IGameStateObserver.OnGameLoopRunning"/> shows all active UI entities
+        /// </summary>
+        private void OnGameLoopRunning()
+        {
+            logger.Information($"Called OnGameLoopRunning in TwitchPollVisual - Showing all UI");
+            ShowAllUI();
+        }
+
+        /// <summary>
+        /// Hides all UI entities
+        /// </summary>
+        private void HideAllUI()
+        {
+            if (pollDescriptionEntity != null)
+            {
+                pollDescriptionEntity.IsEnabled = false;
+            }
+            if (pollCountdownEntity != null)
+            {
+                pollCountdownEntity.IsEnabled = false;
+            }
+            if (pollOptionEntities != null)
+            {
+                for (int i = 0; i < pollOptionEntities.Count; i++)
+                {
+                    if (pollOptionEntities[i].Item2 != null)
+                    {
+                        pollOptionEntities[i].Item2.IsEnabled = false;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Shows all UI entities
+        /// </summary>
+        private void ShowAllUI()
+        {
+            if (pollDescriptionEntity != null)
+            {
+                pollDescriptionEntity.IsEnabled = true;
+            }
+            if (pollCountdownEntity != null)
+            {
+                pollCountdownEntity.IsEnabled = true;
+            }
+            if (pollOptionEntities != null)
+            {
+                for (int i = 0; i < pollOptionEntities.Count; i++)
+                {
+                    if (pollOptionEntities[i].Item2 != null)
+                    {
+                        pollOptionEntities[i].Item2.IsEnabled = true;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -93,7 +167,7 @@ namespace JumpKingModifiersMod.Visuals
             countdownPosition.Y = currentY;
             countdownPosition.X -= InitialPositionXPadding;
             pollCountdownEntity = new UITextEntity(modEntityManager, countdownPosition, countdownText, 
-                Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
+                Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 1);
             currentY += (CountdownYPadding + pollDescriptionEntity.TextFont.MeasureString(descriptionText).Y);
 
             // Make each of the choices
@@ -106,7 +180,7 @@ namespace JumpKingModifiersMod.Visuals
                 pollOptionPosition.Y = currentY;
                 pollOptionPosition.X -= InitialPositionXPadding;
                 var pollOptionEntity = new UITextEntity(modEntityManager, pollOptionPosition, pollOptionText,
-                    Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
+                    Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 1);
                 pollOptionEntities.Add(new Tuple<ModifierTwitchPollOption, UITextEntity>(choicesList[i], pollOptionEntity));
                 
                 currentY += (YPadding + pollOptionEntity.TextFont.MeasureString(pollOptionText).Y);

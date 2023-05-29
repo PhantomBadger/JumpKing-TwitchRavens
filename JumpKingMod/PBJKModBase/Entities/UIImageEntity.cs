@@ -14,6 +14,7 @@ namespace PBJKModBase.Entities
         public Vector2 ScreenSpacePosition { get; set; }
         public Rectangle? DestinationRectangle { get; set; }
         public Sprite ImageValue { get; set; }
+        public bool IsEnabled { get; set; }
 
         private readonly ModEntityManager modEntityManager;
 
@@ -22,6 +23,7 @@ namespace PBJKModBase.Entities
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             ScreenSpacePosition = screenSpacePosition;
             ImageValue = imageValue ?? throw new ArgumentNullException(nameof(imageValue));
+            IsEnabled = true;
 
             modEntityManager.AddForegroundEntity(this, zOrder);
         }
@@ -31,6 +33,7 @@ namespace PBJKModBase.Entities
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             DestinationRectangle = destinationRectangle;
             ImageValue = imageValue ?? throw new ArgumentNullException(nameof(imageValue));
+            IsEnabled = true;
 
             modEntityManager.AddForegroundEntity(this, zOrder);
         }
@@ -42,14 +45,17 @@ namespace PBJKModBase.Entities
 
         public void ForegroundDraw()
         {
-            if (!DestinationRectangle.HasValue)
+            if (IsEnabled)
             {
-                // JK+ Changes some of the method signatures so we have to call a different one and pray
-                ImageValue.Draw(ScreenSpacePosition.ToPoint(), Microsoft.Xna.Framework.Graphics.SpriteEffects.None);
-            }
-            else
-            {
-                ImageValue.Draw(DestinationRectangle.Value);
+                if (!DestinationRectangle.HasValue)
+                {
+                    // JK+ Changes some of the method signatures so we have to call a different one and pray
+                    ImageValue.Draw(ScreenSpacePosition.ToPoint(), Microsoft.Xna.Framework.Graphics.SpriteEffects.None);
+                }
+                else
+                {
+                    ImageValue.Draw(DestinationRectangle.Value);
+                }
             }
         }
 

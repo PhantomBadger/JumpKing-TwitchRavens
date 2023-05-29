@@ -17,12 +17,12 @@ namespace JumpKingModifiersMod.Visuals
     /// An implementation of <see cref="IModEntity"/> and <see cref="IDisposable"/> which handles spawning and positioning
     /// text notifications for modifiers being enabled and disabled
     /// </summary>
-    public class ModifierNotifications : IModEntity, IDisposable
+    public class ModifierToggleNotifications : IModEntity, IDisposable
     {
         /// <summary>
         /// A private aggregate class for the Modifier and whether its being enabled or disabled
         /// </summary>
-        private class ModifierState
+        private class ModifierToggleNotification
         {
             /// <summary>
             /// An implementation of <see cref="IModifier"/> that has changed state
@@ -35,18 +35,18 @@ namespace JumpKingModifiersMod.Visuals
             public bool IsEnabled { get; private set; }
 
             /// <summary>
-            /// Ctor for creating a <see cref="ModifierState"/>
+            /// Ctor for creating a <see cref="ModifierToggleNotification"/>
             /// </summary>
             /// <param name="modifier">An implementation of <see cref="IModifier"/> that has changed state</param>
             /// <param name="isEnabled">Whether the provided modifier is being enabled or disabled. <c>true</c> will mean the modifier is being enabled</param>
-            public ModifierState(IModifier modifier, bool isEnabled)
+            public ModifierToggleNotification(IModifier modifier, bool isEnabled)
             {
                 Modifier = modifier ?? throw new ArgumentNullException(nameof(modifier));
                 IsEnabled = isEnabled;
             }  
         }
 
-        private readonly ConcurrentQueue<ModifierState> modifierStatesToDisplay;
+        private readonly ConcurrentQueue<ModifierToggleNotification> modifierNotificationsToDisplay;
         private readonly ConcurrentQueue<UITextEntity> modifierNotifications;
         private readonly ModEntityManager modEntityManager;
         private readonly List<IModifierTrigger> triggers;
@@ -63,18 +63,18 @@ namespace JumpKingModifiersMod.Visuals
         private const float MaxAlpha = 102f;
 
         /// <summary>
-        /// Ctor for creating a <see cref="ModifierNotifications"/>
+        /// Ctor for creating a <see cref="ModifierToggleNotifications"/>
         /// </summary>
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register with</param>
         /// <param name="triggers">A list of <see cref="IModifierTrigger"/> implementations to listed to for modifier state changes</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to use for logging</param>
-        public ModifierNotifications(ModEntityManager modEntityManager, List<IModifierTrigger> triggers, ILogger logger)
+        public ModifierToggleNotifications(ModEntityManager modEntityManager, List<IModifierTrigger> triggers, ILogger logger)
         {
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.triggers = triggers ?? throw new ArgumentNullException(nameof(triggers));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            modifierStatesToDisplay = new ConcurrentQueue<ModifierState>();
+            modifierNotificationsToDisplay = new ConcurrentQueue<ModifierToggleNotification>();
             modifierNotifications = new ConcurrentQueue<UITextEntity>();
 
             for (int i = 0; i < triggers.Count; i++)
@@ -107,7 +107,7 @@ namespace JumpKingModifiersMod.Visuals
         /// </summary>
         private void OnModifierDisabled(IModifier modifier)
         {
-            modifierStatesToDisplay.Enqueue(new ModifierState(modifier, isEnabled: false));
+            modifierNotificationsToDisplay.Enqueue(new ModifierToggleNotification(modifier, isEnabled: false));
             timeSinceLastUpdateCounter = 0;
             fadeOutCounter = 0;
         }
@@ -117,7 +117,7 @@ namespace JumpKingModifiersMod.Visuals
         /// </summary>
         private void OnModifierEnabled(IModifier modifier)
         {
-            modifierStatesToDisplay.Enqueue(new ModifierState(modifier, isEnabled: true));
+            modifierNotificationsToDisplay.Enqueue(new ModifierToggleNotification(modifier, isEnabled: true));
             timeSinceLastUpdateCounter = 0;
             fadeOutCounter = 0;
         }
@@ -126,7 +126,7 @@ namespace JumpKingModifiersMod.Visuals
         public void Update(float p_delta)
         {
             // Do we have any modifier states to display?
-            if (modifierStatesToDisplay.TryDequeue(out ModifierState modifierState))
+            if (modifierNotificationsToDisplay.TryDequeue(out ModifierToggleNotification modifierState))
             {
                 // Check if we already have too many notifications
                 if (modifierNotifications.Count > MaxNumberOfNotificationsAtOnce)

@@ -23,6 +23,7 @@ namespace PBJKModBase.Entities
         /// The image for the entity to draw
         /// </summary>
         public Sprite ImageValue { get; set; }
+        public bool IsEnabled { get; set; }
 
         private readonly ModEntityManager modEntityManager;
 
@@ -38,6 +39,7 @@ namespace PBJKModBase.Entities
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             WorldSpacePosition = worldSpacePosition;
             ImageValue = imageValue ?? throw new ArgumentNullException(nameof(imageValue));
+            IsEnabled = true;
 
             modEntityManager.AddForegroundEntity(this, zOrder);
         }
@@ -53,8 +55,11 @@ namespace PBJKModBase.Entities
         /// <inheritdoc/>
         public void ForegroundDraw()
         {
-            // JK+ Changes some of the method signatures so we have to call a different one and pray
-            ImageValue.Draw(Camera.TransformVector2(WorldSpacePosition).ToPoint(), Microsoft.Xna.Framework.Graphics.SpriteEffects.None);
+            if (IsEnabled)
+            {
+                // JK+ Changes some of the method signatures so we have to call a different one and pray
+                ImageValue.Draw(Camera.TransformVector2(WorldSpacePosition).ToPoint(), Microsoft.Xna.Framework.Graphics.SpriteEffects.None);
+            }
         }
 
         /// <inheritdoc/>

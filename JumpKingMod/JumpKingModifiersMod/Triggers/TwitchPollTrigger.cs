@@ -19,7 +19,7 @@ namespace JumpKingModifiersMod.Triggers
     /// An implementation of <see cref="IModifierTrigger"/> which triggers the effects based on a twitch poll.
     /// Will select a random subst of modifiers, ask the users to vote on it, then enables it for a set amount of time
     /// </summary>
-    public class TwitchPollTrigger : IModifierTrigger, IModEntity
+    public class TwitchPollTrigger : IModifierTrigger, IModEntity, IDisposable
     {
         public delegate void TwitchPollStartedDelegate(ModifierTwitchPoll poll);
         public delegate void TwitchPollClosedDelegate(ModifierTwitchPoll poll);
@@ -41,8 +41,10 @@ namespace JumpKingModifiersMod.Triggers
         public event TwitchPollEndedDelegate OnTwitchPollEnded;
 
         private readonly ILogger logger;
+        private readonly IGameStateObserver gameStateObserver;
         private readonly List<IModifier> availableModifiers;
         private readonly List<ActiveModifierCountdown> activeModifiers;
+        private readonly List<ActiveModifierCountdown> previouslyActiveModifiers;
         private readonly BlockingCollection<OnMessageReceivedArgs> relayRequestQueue;
         private readonly TwitchClient twitchClient;
         private readonly ModEntityManager modEntityManager;
@@ -66,11 +68,10 @@ namespace JumpKingModifiersMod.Triggers
         /// <summary>
         /// Ctor for creating a <see cref="TwitchPollTrigger"/>
         /// </summary>
-        /// <param name="twitchClient"></param>
-        /// <param name="logger"></param>
-        public TwitchPollTrigger(TwitchClient twitchClient, List<IModifier> availableModifiers, ModEntityManager modEntityManager, ILogger logger)
+        public TwitchPollTrigger(TwitchClient twitchClient, List<IModifier> availableModifiers, ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
             this.twitchClient = twitchClient ?? throw new ArgumentNullException(nameof(twitchClient));
             this.availableModifiers = availableModifiers ?? throw new ArgumentNullException(nameof(availableModifiers));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
@@ -78,15 +79,77 @@ namespace JumpKingModifiersMod.Triggers
 
             alreadyVotedChatters = new ConcurrentDictionary<string, byte>();
             activeModifiers = new List<ActiveModifierCountdown>();
+            previouslyActiveModifiers = new List<ActiveModifierCountdown>();
             relayRequestQueue = new BlockingCollection<OnMessageReceivedArgs>();
             this.twitchClient.OnMessageReceived += OnMessageReceived;
             triggerState = TwitchPollTriggerState.CreatingPoll;
             currentPoll = null;
             isEnabled = false;
 
+            gameStateObserver.OnGameLoopRunning += OnGameLoopRunning;
+            gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
+
             // Kick off the processing thread
             processingThread = new Thread(ProcessRelayRequests);
             processingThread.Start();
+        }
+
+        /// <summary>
+        /// Implementation of <see cref="IDisposable.Dispose"/>
+        /// </summary>
+        public void Dispose()
+        {
+            gameStateObserver.OnGameLoopRunning -= OnGameLoopRunning;
+            gameStateObserver.OnGameLoopNotRunning -= OnGameLoopNotRunning;
+            twitchClient.OnMessageReceived -= OnMessageReceived;
+            twitchClient.Disconnect();
+        }
+        /// <summary>
+        /// Called by <see cref="IGameStateObserver.OnGameLoopNotRunning"/> we cache all our known active modifiers and disable them
+        /// </summary>
+        private void OnGameLoopNotRunning()
+        {
+            CacheActiveModifiers();
+        }
+
+        /// <summary>
+        /// Called by <see cref="IGameStateObserver.OnGameLoopRunning"/> we restore any cached active modifiers and renable them
+        /// </summary>
+        private void OnGameLoopRunning()
+        {
+            RestoreCachedModifiers();
+        }
+
+        private void CacheActiveModifiers()
+        {
+            previouslyActiveModifiers.Clear();
+            // If the game loop is stopped, we disable all modifiers we know to be active and keep a cache of them
+            if (activeModifiers != null & activeModifiers.Count > 0)
+            {
+                logger.Information($"Caching {activeModifiers.Count} active modifiers to be re-enabled later");
+                previouslyActiveModifiers.AddRange(activeModifiers);
+                activeModifiers.Clear();
+                for (int i = 0; i < previouslyActiveModifiers.Count; i++)
+                {
+                    previouslyActiveModifiers[i].Modifier.DisableModifier();
+                }
+            }
+        }
+
+        private void RestoreCachedModifiers()
+        {
+            activeModifiers.Clear();
+            if (previouslyActiveModifiers != null && previouslyActiveModifiers.Count > 0)
+            {
+                logger.Information($"Restoring {previouslyActiveModifiers.Count} cached active modifiers");
+                // If we have a cache of any previously active modifiers, we enable them again now
+                activeModifiers.AddRange(previouslyActiveModifiers);
+                previouslyActiveModifiers.Clear();
+                for (int i = 0; i < activeModifiers.Count; i++)
+                {
+                    activeModifiers[i].Modifier.EnableModifier();
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -94,12 +157,21 @@ namespace JumpKingModifiersMod.Triggers
         {
             if (!modEntityManager.AddEntity(this, zOrder: 0))
             {
-                logger.Information($"Failed to enabled '{this.GetType().Name}' Modifier Trigger as it didn't add to the entity managed correctly");
+                logger.Information($"Failed to enable '{this.GetType().Name}' Modifier Trigger as it didn't add to the entity managed correctly");
                 return false;
             }
+
+            if (gameStateObserver == null || !gameStateObserver.IsGameLoopRunning())
+            {
+                logger.Information($"Failed to enable '{this.GetType().Name}' Modifier Trigger as the game loop is not currently running");
+                return false;
+            }
+
             isEnabled = true;
             currentPoll = null;
             alreadyVotedChatters.Clear();
+            previouslyActiveModifiers.Clear();
+            activeModifiers.Clear();
             triggerState = TwitchPollTriggerState.CreatingPoll;
 
             logger.Information($"Enabled '{this.GetType().Name}' Modifier Trigger");
@@ -124,6 +196,8 @@ namespace JumpKingModifiersMod.Triggers
 
             isEnabled = true;
             alreadyVotedChatters.Clear();
+            previouslyActiveModifiers.Clear();
+            activeModifiers.Clear();
             logger.Information($"Disabled '{this.GetType().Name}' Modifier Trigger");
             return true;
         }
@@ -172,6 +246,12 @@ namespace JumpKingModifiersMod.Triggers
 
                     // If the trigger isn't active then dip
                     if (!isEnabled)
+                    {
+                        continue;
+                    }
+
+                    // If the game loop isn't running we drop the messages
+                    if (gameStateObserver == null || !gameStateObserver.IsGameLoopRunning())
                     {
                         continue;
                     }
@@ -249,6 +329,12 @@ namespace JumpKingModifiersMod.Triggers
         {
             try
             {
+                // If the game loop isn't running we drop what we're doing
+                if (gameStateObserver == null || !gameStateObserver.IsGameLoopRunning())
+                {
+                    return;
+                }
+
                 // Check duration of the active modifiers and disable any that are done
                 activeModifiers.RemoveAll(modifierCountdown =>
                 {

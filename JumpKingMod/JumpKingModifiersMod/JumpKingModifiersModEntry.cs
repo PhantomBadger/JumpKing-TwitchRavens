@@ -148,20 +148,26 @@ namespace JumpKingModifiersMod
                 var clientFactory = new TwitchClientFactory(twitchSettings, Logger);
 
                 // Make the toggle trigger
-                var twitchPollTrigger = new TwitchPollTrigger(clientFactory.GetTwitchClient(), availableModifiers, ModEntityManager.Instance, Logger);
-                var pollVisual = new TwitchPollVisual(ModEntityManager.Instance, twitchPollTrigger, Logger);
+                var twitchPollTrigger = new TwitchPollTrigger(clientFactory.GetTwitchClient(), availableModifiers, 
+                    ModEntityManager.Instance, GameStateObserverManualPatch.Instance, Logger);
+                var pollVisual = new TwitchPollVisual(ModEntityManager.Instance, twitchPollTrigger, GameStateObserverManualPatch.Instance, Logger);
 
                 var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings);
+                debugTrigger.EnableTrigger();
 
+                // Once the gamee is running then enable the twitch poll trigger
                 Task.Run(() =>
                 {
-                    Task.Delay(10000).Wait();
+                    while (!GameStateObserverManualPatch.Instance.IsGameLoopRunning())
+                    {
+                        Task.Delay(500).Wait();
+                    }
+
                     twitchPollTrigger.EnableTrigger();
-                    debugTrigger.EnableTrigger();
                 });
 
                 // Make the modifier notification
-                var modifierNotification = new ModifierNotifications(ModEntityManager.Instance, new List<API.IModifierTrigger>() { debugTrigger, twitchPollTrigger }, Logger);
+                var modifierNotification = new ModifierToggleNotifications(ModEntityManager.Instance, new List<API.IModifierTrigger>() { debugTrigger, twitchPollTrigger }, Logger);
             }
             catch (Exception e)
             {
