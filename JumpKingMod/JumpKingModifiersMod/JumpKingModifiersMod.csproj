@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\IGameRectFlipper.cs" />
+    <Compile Include="API\IDrawForegroundObserver.cs" />
     <Compile Include="API\ILowGravityObserver.cs" />
     <Compile Include="API\IModifier.cs" />
     <Compile Include="API\IModifierTrigger.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Modifiers\FallDamageModifier.cs" />
     <Compile Include="Modifiers\FallDamage\BloodSplatterPersistence.cs" />
     <Compile Include="Modifiers\FlipScreenModifier.cs" />
+    <Compile Include="Modifiers\HideForegroundModifier.cs" />
     <Compile Include="Modifiers\InvertControlsModifier.cs" />
     <Compile Include="Modifiers\LowGravityModifier.cs" />
     <Compile Include="Modifiers\LowVisibilityModifier.cs" />
@@ -91,6 +93,7 @@
     <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
     <Compile Include="Modifiers\WindToggleModifier.cs" />
     <Compile Include="ModifierUpdatingEntity.cs" />
+    <Compile Include="Patching\DrawForegroundObserverManualPatch.cs" />
     <Compile Include="Patching\DrawRenderTargetManualPatch.cs" />
     <Compile Include="Patching\LowGravityObserverManualPatch.cs" />
     <Compile Include="Patching\OnIceObserverManualPatch.cs" />

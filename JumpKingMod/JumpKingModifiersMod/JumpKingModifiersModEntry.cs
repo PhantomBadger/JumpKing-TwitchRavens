@@ -62,6 +62,8 @@ namespace JumpKingModifiersMod
                 gravityPatch.SetUpManualPatch(harmony);
                 var icePatch = new OnIceObserverManualPatch(Logger);
                 icePatch.SetUpManualPatch(harmony);
+                var drawForegroundPatch = new DrawForegroundObserverManualPatch(Logger);
+                drawForegroundPatch.SetUpManualPatch(harmony);
 
                 // Make the Modifier Updating Entity
                 var modifierUpdatingEntity = new ModifierUpdatingEntity(ModEntityManager.Instance, Logger);
@@ -77,6 +79,7 @@ namespace JumpKingModifiersMod
                 var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
                 var lowGravityModifier = new LowGravityModifier(gravityPatch, Logger);
                 var iceModifier = new OnIceModifier(icePatch, Logger);
+                var hideForegroundModifier = new HideForegroundModifier(drawForegroundPatch, Logger);
 
                 availableModifiers.Add(walkSpeedModifier);
                 availableModifiers.Add(bouncyFloorModifier);
@@ -86,6 +89,7 @@ namespace JumpKingModifiersMod
                 availableModifiers.Add(lowVisibilityModifier);
                 availableModifiers.Add(lowGravityModifier);
                 availableModifiers.Add(iceModifier);
+                availableModifiers.Add(hideForegroundModifier);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
                 //debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));
