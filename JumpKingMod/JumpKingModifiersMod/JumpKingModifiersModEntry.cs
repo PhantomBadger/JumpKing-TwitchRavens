@@ -80,6 +80,7 @@ namespace JumpKingModifiersMod
                 var lowGravityModifier = new LowGravityModifier(gravityPatch, Logger);
                 var iceModifier = new OnIceModifier(icePatch, Logger);
                 var hideForegroundModifier = new HideForegroundModifier(drawForegroundPatch, Logger);
+                var screenShakeModifier = new ScreenShakeModifier(Logger);
 
                 availableModifiers.Add(walkSpeedModifier);
                 availableModifiers.Add(bouncyFloorModifier);
@@ -90,6 +91,7 @@ namespace JumpKingModifiersMod
                 availableModifiers.Add(lowGravityModifier);
                 availableModifiers.Add(iceModifier);
                 availableModifiers.Add(hideForegroundModifier);
+                availableModifiers.Add(screenShakeModifier);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
                 //debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));

@@ -42,6 +42,7 @@ namespace JumpKingModifiersMod.Patching
         {
             if (isOverridingDrawForeground)
             {
+                // TODO: Figure out how to get weather to still draw?
                 return false;
             }
             return true;

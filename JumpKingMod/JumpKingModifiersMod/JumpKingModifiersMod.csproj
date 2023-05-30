@@ -89,6 +89,7 @@
     <Compile Include="Modifiers\ManualScreenResizeModifier.cs" />
     <Compile Include="Modifiers\OnIceModifier.cs" />
     <Compile Include="Modifiers\RisingLavaModifier.cs" />
+    <Compile Include="Modifiers\ScreenShakeModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />
     <Compile Include="Modifiers\FallDamage\YouDiedSubtextFileGetter.cs" />
     <Compile Include="Modifiers\WindToggleModifier.cs" />
