@@ -109,7 +109,15 @@ namespace JumpKingModifiersMod.Triggers
         /// </summary>
         private void OnGameLoopNotRunning()
         {
-            CacheActiveModifiers();
+            //CacheActiveModifiers();
+            if (activeModifiers != null && activeModifiers.Count > 0)
+            {
+                for (int i = 0; i < activeModifiers.Count; i++)
+                {
+                    activeModifiers[i]?.Modifier?.DisableModifier();
+                }
+                activeModifiers.Clear();
+            }
         }
 
         /// <summary>
@@ -117,7 +125,7 @@ namespace JumpKingModifiersMod.Triggers
         /// </summary>
         private void OnGameLoopRunning()
         {
-            RestoreCachedModifiers();
+            //RestoreCachedModifiers();
         }
 
         /// <summary>
@@ -198,6 +206,14 @@ namespace JumpKingModifiersMod.Triggers
             {
                 OnTwitchPollEnded?.Invoke(currentPoll);
                 currentPoll = null;
+            }
+
+            if (activeModifiers != null && activeModifiers.Count > 0)
+            {
+                for (int i = 0; i < activeModifiers.Count; i++)
+                {
+                    activeModifiers[i]?.Modifier?.DisableModifier();
+                }
             }
 
             isEnabled = true;
