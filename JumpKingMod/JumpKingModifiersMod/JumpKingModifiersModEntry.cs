@@ -70,17 +70,17 @@ namespace JumpKingModifiersMod
 
                 // Set up modifiers and trigger
                 List<IModifier> availableModifiers = new List<IModifier>();
-                var walkSpeedModifier = new WalkSpeedModifier(2f, playerValues, Logger);
+                var walkSpeedModifier = new WalkSpeedModifier(WalkSpeedModifier.DefaultModifier, playerValues, Logger);
                 var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
                 var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
                 var invertControlsModifier = new InvertControlsModifier(playerStatePatch, Logger);
-                var bombCountdownModifier = new BombCountdownModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, jumpStatePatch, Logger);
                 var windModifier = new WindToggleModifier(windPatch, Logger);
                 var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
                 var lowGravityModifier = new LowGravityModifier(gravityPatch, Logger);
                 var iceModifier = new OnIceModifier(icePatch, Logger);
                 var hideForegroundModifier = new HidePlatformsModifier(drawForegroundPatch, Logger);
                 var screenShakeModifier = new ScreenShakeModifier(Logger);
+                var jumpTimeModifier = new JumpTimeModifier(JumpTimeModifier.DefaultModifier, playerValues, Logger);
 
                 availableModifiers.Add(walkSpeedModifier);
                 availableModifiers.Add(bouncyFloorModifier);
@@ -92,6 +92,7 @@ namespace JumpKingModifiersMod
                 availableModifiers.Add(iceModifier);
                 availableModifiers.Add(hideForegroundModifier);
                 availableModifiers.Add(screenShakeModifier);
+                availableModifiers.Add(jumpTimeModifier);
 
                 List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
                 //debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));

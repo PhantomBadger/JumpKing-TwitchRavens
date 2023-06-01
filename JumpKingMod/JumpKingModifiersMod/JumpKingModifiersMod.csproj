@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="API\IGameRectFlipper.cs" />
     <Compile Include="API\IDrawPlatformObserver.cs" />
+    <Compile Include="API\IJumpTimeModifier.cs" />
     <Compile Include="API\ILowGravityObserver.cs" />
     <Compile Include="API\IModifier.cs" />
     <Compile Include="API\IModifierTrigger.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Modifiers\FlipScreenModifier.cs" />
     <Compile Include="Modifiers\HidePlatformsModifier.cs" />
     <Compile Include="Modifiers\InvertControlsModifier.cs" />
+    <Compile Include="Modifiers\JumpTimeModifier.cs" />
     <Compile Include="Modifiers\LowGravityModifier.cs" />
     <Compile Include="Modifiers\LowVisibilityModifier.cs" />
     <Compile Include="Modifiers\ManualScreenResizeModifier.cs" />

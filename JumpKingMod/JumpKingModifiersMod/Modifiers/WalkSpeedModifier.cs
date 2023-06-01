@@ -20,6 +20,9 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly ILogger logger;
         private readonly IWalkSpeedModifier walkSpeedModifierAccessor;
 
+        private const float OriginalValue = 1.0f;
+        public const float DefaultModifier = 2.0f;
+
         /// <summary>
         /// Ctor for creating a <see cref="WalkSpeedModifier"/>
         /// </summary>
@@ -38,7 +41,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// </summary>
         public bool IsModifierEnabled()
         {
-            return Math.Abs(walkSpeedModifierAccessor.GetWalkSpeedModifier() - 1f) > float.Epsilon;
+            return Math.Abs(walkSpeedModifierAccessor.GetWalkSpeedModifier() - OriginalValue) > float.Epsilon;
         }
 
         /// <summary>
@@ -59,7 +62,7 @@ namespace JumpKingModifiersMod.Modifiers
         public bool DisableModifier()
         {
             logger.Information($"Disable Walk Speed Modifier");
-            walkSpeedModifierAccessor.SetWalkSpeedModifer(1f);
+            walkSpeedModifierAccessor.SetWalkSpeedModifer(OriginalValue);
             return true;
         }
 

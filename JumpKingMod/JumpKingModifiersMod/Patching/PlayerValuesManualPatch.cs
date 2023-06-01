@@ -15,10 +15,11 @@ namespace JumpKingModifiersMod.Patching
     /// An implementation of <see cref="IManualPatch"/> and <see cref="IWalkSpeedModifier"/> which allows us to apply modifiers to
     /// the values in 'JumpKing.PlayerValues'
     /// </summary>
-    public class PlayerValuesManualPatch : IManualPatch, IWalkSpeedModifier
+    public class PlayerValuesManualPatch : IManualPatch, IWalkSpeedModifier, IJumpTimeModifier
     {
         private static ILogger logger;
         private static float walkSpeedModifier = 1f;
+        private static float jumpTimeModifier = 0.6f;
 
         /// <summary>
         /// Ctor for creating a <see cref="PlayerValuesManualPatch"/>
@@ -35,6 +36,10 @@ namespace JumpKingModifiersMod.Patching
             var walkSpeedGetter = AccessTools.Method("JumpKing.PlayerValues:get_WALK_SPEED");
             var postfixwalkSpeedGetter = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixWalkSpeedGetter");
             harmony.Patch(walkSpeedGetter, postfix: new HarmonyMethod(postfixwalkSpeedGetter));
+
+            var jumpTimeGetter = AccessTools.Method("JumpKing.PlayerValues:get_JUMP_TIME");
+            var postfixJumpTimeGetter = AccessTools.Method($"JumpKingModifiersMod.Patching.{this.GetType().Name}:PostfixJumpTimeGetter");
+            harmony.Patch(jumpTimeGetter, postfix: new HarmonyMethod(postfixJumpTimeGetter));
         }
 
         /// <summary>
@@ -43,6 +48,14 @@ namespace JumpKingModifiersMod.Patching
         public static void PostfixWalkSpeedGetter(object __instance, ref Single __result)
         {
             __result *= walkSpeedModifier;
+        }
+
+        /// <summary>
+        /// Called after 'JumpKing.PlayerValues:get_JUMP_TIME' and applies a modifier to the returned value
+        /// </summary>
+        public static void PostfixJumpTimeGetter(object __instance, ref Single __result)
+        {
+            __result *= jumpTimeModifier;
         }
 
         /// <summary>
@@ -59,6 +72,23 @@ namespace JumpKingModifiersMod.Patching
         public float GetWalkSpeedModifier()
         {
             return PlayerValuesManualPatch.walkSpeedModifier;
+        }
+
+        /// <summary>
+        /// An implementation of <see cref="IJumpTimeModifier.SetJumpTimeModifer(float)"/> which applies a modifier
+        /// </summary>
+        public void SetJumpTimeModifer(float newModifier)
+        {
+            PlayerValuesManualPatch.jumpTimeModifier = newModifier;
+        }
+
+        /// <summary>
+        /// An implementation of <see cref="IJumpTimeModifier.GetJumpTimeModifier"/> which gets the currently active modifier
+        /// </summary>
+        /// <returns></returns>
+        public float GetJumpTimeModifier()
+        {
+            return PlayerValuesManualPatch.jumpTimeModifier;
         }
     }
 }
