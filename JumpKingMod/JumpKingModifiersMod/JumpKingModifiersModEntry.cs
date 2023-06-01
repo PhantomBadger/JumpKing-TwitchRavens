@@ -62,7 +62,7 @@ namespace JumpKingModifiersMod
                 gravityPatch.SetUpManualPatch(harmony);
                 var icePatch = new OnIceObserverManualPatch(Logger);
                 icePatch.SetUpManualPatch(harmony);
-                var drawForegroundPatch = new DrawForegroundObserverManualPatch(Logger);
+                var drawForegroundPatch = new DrawPlatformsObserverManualPatch(Logger);
                 drawForegroundPatch.SetUpManualPatch(harmony);
 
                 // Make the Modifier Updating Entity
@@ -79,7 +79,7 @@ namespace JumpKingModifiersMod
                 var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
                 var lowGravityModifier = new LowGravityModifier(gravityPatch, Logger);
                 var iceModifier = new OnIceModifier(icePatch, Logger);
-                var hideForegroundModifier = new HideForegroundModifier(drawForegroundPatch, Logger);
+                var hideForegroundModifier = new HidePlatformsModifier(drawForegroundPatch, Logger);
                 var screenShakeModifier = new ScreenShakeModifier(Logger);
 
                 availableModifiers.Add(walkSpeedModifier);

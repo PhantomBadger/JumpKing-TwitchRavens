@@ -11,34 +11,34 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which hides the foreground platforms
     /// </summary>
-    public class HideForegroundModifier : IModifier
+    public class HidePlatformsModifier : IModifier
     {
         public string DisplayName => "Hide Platforms";
 
-        private readonly IDrawForegroundObserver drawForegroundObserver;
+        private readonly IDrawPlatformObserver drawPlatformObserver;
         private readonly ILogger logger;
 
         /// <summary>
-        /// Ctor for creating a <see cref="HideForegroundModifier"/>
+        /// Ctor for creating a <see cref="HidePlatformsModifier"/>
         /// </summary>
-        /// <param name="drawForegroundObserver">An implementation of <see cref="IDrawForegroundObserver"/> for overriding the foreground drawing logic</param>
+        /// <param name="drawForegroundObserver">An implementation of <see cref="IDrawPlatformObserver"/> for overriding the platform drawing logic</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> for logging</param>
-        public HideForegroundModifier(IDrawForegroundObserver drawForegroundObserver, ILogger logger)
+        public HidePlatformsModifier(IDrawPlatformObserver drawForegroundObserver, ILogger logger)
         {
-            this.drawForegroundObserver = drawForegroundObserver ?? throw new ArgumentNullException(nameof(drawForegroundObserver));
+            this.drawPlatformObserver = drawForegroundObserver ?? throw new ArgumentNullException(nameof(drawForegroundObserver));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc/>
         public bool DisableModifier()
         {
-            if (!drawForegroundObserver.GetDrawForegroundOverride())
+            if (!drawPlatformObserver.GetDrawPlatformOverride())
             {
                 logger.Error($"Failed to disable '{DisplayName}' Modifier as it is already disabled!");
                 return false;
             }
 
-            drawForegroundObserver.SetDrawForegroundOverride(drawForegroundOverride: false);
+            drawPlatformObserver.SetDrawPlatformOverride(drawPlatformOverride: false);
             logger.Information($"Disabled '{DisplayName}' Modifier");
             return true;
         }
@@ -46,13 +46,13 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public bool EnableModifier()
         {
-            if (drawForegroundObserver.GetDrawForegroundOverride())
+            if (drawPlatformObserver.GetDrawPlatformOverride())
             {
                 logger.Error($"Failed to enable '{DisplayName}' Modifier as it is already enabled!");
                 return false;
             }
 
-            drawForegroundObserver.SetDrawForegroundOverride(drawForegroundOverride: true);
+            drawPlatformObserver.SetDrawPlatformOverride(drawPlatformOverride: true);
             logger.Information($"Enabled '{DisplayName}' Modifier");
             return true;
         }
@@ -60,7 +60,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public bool IsModifierEnabled()
         {
-            return drawForegroundObserver.GetDrawForegroundOverride();
+            return drawPlatformObserver.GetDrawPlatformOverride();
         }
 
         /// <inheritdoc/>
