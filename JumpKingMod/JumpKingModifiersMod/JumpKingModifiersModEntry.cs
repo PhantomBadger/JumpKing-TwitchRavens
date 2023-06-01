@@ -142,7 +142,7 @@ namespace JumpKingModifiersMod
 
                     var togglePair = new DebugTogglePair(risingLavaModifier, risingLavaToggleKey);
                     debugToggles.Add(togglePair);
-                    availableModifiers.Add(risingLavaModifier);
+
                     Logger.Information($"Rising Lava Mod is Enabled! Press the Toggle Key ({risingLavaToggleKey.ToString()}) to activate once in game!");
                 }
                 else
