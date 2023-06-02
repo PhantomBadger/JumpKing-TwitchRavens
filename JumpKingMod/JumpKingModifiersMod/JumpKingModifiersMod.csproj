@@ -86,10 +86,12 @@
     <Compile Include="Modifiers\HidePlatformsModifier.cs" />
     <Compile Include="Modifiers\InvertControlsModifier.cs" />
     <Compile Include="Modifiers\JumpTimeModifier.cs" />
+    <Compile Include="Modifiers\LongerDurationMetaModifier.cs" />
     <Compile Include="Modifiers\LowGravityModifier.cs" />
     <Compile Include="Modifiers\LowVisibilityModifier.cs" />
     <Compile Include="Modifiers\ManualScreenResizeModifier.cs" />
     <Compile Include="Modifiers\OnIceModifier.cs" />
+    <Compile Include="Modifiers\QuickerPollMetaModifier.cs" />
     <Compile Include="Modifiers\RisingLavaModifier.cs" />
     <Compile Include="Modifiers\ScreenShakeModifier.cs" />
     <Compile Include="Modifiers\WalkSpeedModifier.cs" />

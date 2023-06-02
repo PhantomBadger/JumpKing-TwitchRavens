@@ -159,6 +159,12 @@ namespace JumpKingModifiersMod
                     ModEntityManager.Instance, GameStateObserverManualPatch.Instance, Logger);
                 var pollVisual = new TwitchPollVisual(ModEntityManager.Instance, twitchPollTrigger, GameStateObserverManualPatch.Instance, Logger);
 
+                // Make the meta modifiers
+                var pollTimeModifier = new QuickerPollMetaModifier(twitchPollTrigger, Logger);
+                var durationModifier = new LongerDurationMetaModifier(twitchPollTrigger, Logger);
+                twitchPollTrigger.AddModifier(pollTimeModifier);
+                twitchPollTrigger.AddModifier(durationModifier);
+
                 var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings);
                 debugTrigger.EnableTrigger();
 

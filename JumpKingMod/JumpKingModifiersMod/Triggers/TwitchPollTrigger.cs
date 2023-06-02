@@ -59,11 +59,61 @@ namespace JumpKingModifiersMod.Triggers
         private float timeBetweenPollsCounter;
         private bool isEnabled;
 
+        internal const float DefaultPollTimeModifier = 1.0f;
+        internal const float DefaultActiveModifierDurationModifier = 1.0f;
         private const int NumberOfModifiersInPoll = 4;
-        private const float PollTimeInSeconds = 20.0f;
+        private const float BasePollTimeInSeconds = 20.0f;
         private const float PollClosedTimeInSeconds = 2.5f;
-        private const float ActiveModifierDurationInSeconds = 30f;
+        private const float BaseActiveModifierDurationInSeconds = 30f;
         private const float TimeBetweenPollsInSeconds = 2.5f;
+
+        /// <summary>
+        /// The Base Poll Time multiplied by the changeable modifier
+        /// </summary>
+        public float PollTimeInSeconds
+        {
+            get { return BasePollTimeInSeconds * PollTimeModifier; }
+        }
+
+        /// <summary>
+        /// The modifier to be applied to produce the <see cref="PollTimeInSeconds"/>
+        /// </summary>
+        public float PollTimeModifier
+        {
+            get
+            {
+                return pollTimeModifier;
+            }
+            set
+            {
+                pollTimeModifier = Math.Max(0, value);
+            }
+        }
+        private float pollTimeModifier;
+
+        /// <summary>
+        /// The Base Active Modifier Duration multiplied by the changeable modifier
+        /// </summary>
+        public float ActiveModifierDurationInSeconds
+        {
+            get { return BaseActiveModifierDurationInSeconds * ActiveModifierDurationModifier; }
+        }
+
+        /// <summary>
+        /// The modifier to be applied to produce the <see cref="ActiveModifierDurationInSeconds"/>
+        /// </summary>
+        public float ActiveModifierDurationModifier
+        {
+            get
+            {
+                return activeModifierDurationModifier;
+            }
+            set
+            {
+                activeModifierDurationModifier = Math.Max(0, value);
+            }
+        }
+        private float activeModifierDurationModifier;
 
         /// <summary>
         /// Ctor for creating a <see cref="TwitchPollTrigger"/>
@@ -85,6 +135,8 @@ namespace JumpKingModifiersMod.Triggers
             triggerState = TwitchPollTriggerState.CreatingPoll;
             currentPoll = null;
             isEnabled = false;
+            PollTimeModifier = DefaultPollTimeModifier;
+            ActiveModifierDurationModifier = DefaultActiveModifierDurationModifier;
 
             gameStateObserver.OnGameLoopRunning += OnGameLoopRunning;
             gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
@@ -104,6 +156,7 @@ namespace JumpKingModifiersMod.Triggers
             twitchClient.OnMessageReceived -= OnMessageReceived;
             twitchClient.Disconnect();
         }
+
         /// <summary>
         /// Called by <see cref="IGameStateObserver.OnGameLoopNotRunning"/> we cache all our known active modifiers and disable them
         /// </summary>
@@ -512,6 +565,14 @@ namespace JumpKingModifiersMod.Triggers
         public void Draw()
         {
             // Do nothing
+        }
+
+        /// <summary>
+        /// Adds a new modifier to the collection of modifiers
+        /// </summary>
+        public void AddModifier(IModifier modifier)
+        {
+            availableModifiers.Add(modifier);
         }
     }
 }

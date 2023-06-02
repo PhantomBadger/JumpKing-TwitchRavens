@@ -20,7 +20,7 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly IJumpTimeModifier jumpTimeModifierAccessor;
 
         private const float OriginalValue = 0.6f;
-        public const float DefaultModifier = 0.5f;
+        public const float DefaultModifier = 0.25f;
 
         /// <summary>
         /// Ctor for creating a <see cref="JumpTimeModifier"/>
