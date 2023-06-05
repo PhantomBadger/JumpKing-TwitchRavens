@@ -1,4 +1,5 @@
 ﻿using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which hides the foreground platforms
     /// </summary>
+    [ConfigurableModifier("Hide Platforms")]
     public class HidePlatformsModifier : IModifier
     {
         public string DisplayName => "Hide Platforms";

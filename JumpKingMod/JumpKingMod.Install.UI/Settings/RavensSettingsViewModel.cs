@@ -617,7 +617,7 @@ namespace JumpKingRavensMod.Install.UI
         /// <summary>
         /// Creates or loads the Raven mod settings from the given install directory
         /// </summary>
-        public bool LoadSettings(string gameDirectory, bool createIfDoesntExist)
+        public bool LoadSettings(string gameDirectory, string modFolder, bool createIfDoesntExist)
         {
             if (string.IsNullOrWhiteSpace(gameDirectory))
             {
@@ -734,7 +734,7 @@ namespace JumpKingRavensMod.Install.UI
             return true;
         }
 
-        public bool SaveSettings(string gameDirectory)
+        public bool SaveSettings(string gameDirectory, string modFolder)
         {
             if (RavenModSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
             {

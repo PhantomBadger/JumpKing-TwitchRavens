@@ -1,4 +1,5 @@
 ﻿using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> for overriding the Ice state of the player
     /// </summary>
+    [ConfigurableModifier("Enable Ice")]
     public class OnIceModifier : IModifier
     {
         public string DisplayName => "On Ice";

@@ -15,6 +15,8 @@ namespace JumpKingModifiersMod.Settings
         public const string SettingsFileName = "JumpKingModifiersMod.settings";
         public const char CommentCharacter = '#';
 
+        public const string EnabledModifiersKey = "EnabledModifiers";
+
         // Fall Damage
         public const string FallDamageBloodSplatterFilePath = "Content/Mods/BloodSplatters.txt";
         public const string FallDamageSubtextsFilePath = "Content/Mods/FallDamageSubtexts.txt";
@@ -37,6 +39,7 @@ namespace JumpKingModifiersMod.Settings
         public const string DebugTriggerLavaRisingToggleKeyKey = "DebugTriggerLavaRisingToggleKey";
         public const string RisingLavaEnabledKey = "RisingLavaEnabled";
         public const string RisingLavaSpeedKey = "RisingLavaSpeed";
+        public const string RisingLavaTestEnum = "RisingLavaTestEnum";
         public const string RisingLavaNiceSpawnsKey = "RisingLavaNiceSpawns";
         public const float DefaultRisingLavaSpeed = 5f;
 

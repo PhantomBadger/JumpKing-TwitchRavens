@@ -1,5 +1,6 @@
 ﻿using JumpKingMod.Install.UI.API;
 using JumpKingModifiersMod.Settings;
+using JumpKingModifiersMod.Settings.ViewModels;
 using JumpKingRavensMod.Install.UI;
 using Logging.API;
 using Microsoft.Xna.Framework.Input;
@@ -10,8 +11,12 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace JumpKingMod.Install.UI.Settings
 {
@@ -25,6 +30,10 @@ namespace JumpKingMod.Install.UI.Settings
         private readonly DelegateCommand updateSettingsCommand;
         private readonly DelegateCommand loadSettingsCommand;
         private readonly ILogger logger;
+        private readonly List<ConfigurableModifierViewModel> modifierViewModels;
+        private readonly StackPanel modifiersStackPanel;
+
+        #region Properties
 
         /// <summary>
         /// Returns whether the Fall Damage Mod should be enabled
@@ -380,27 +389,36 @@ namespace JumpKingMod.Install.UI.Settings
         }
         private UserSettings fallDamageModSettings;
 
+        #endregion
+
         /// <summary>
         /// Ctor for creating a <see cref="ModifiersSettingsViewModel"/>
         /// </summary>
         /// <param name="updateSettingsCommand">A <see cref="DelegateCommand"/> in the UI for handling the updating of settings</param>
         /// <param name="loadSettingsCommand">A <see cref="DelegateCommand"/> in the UI for handling the loading of settings</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ModifiersSettingsViewModel(DelegateCommand updateSettingsCommand, DelegateCommand loadSettingsCommand, ILogger logger)
+        public ModifiersSettingsViewModel(DelegateCommand updateSettingsCommand, DelegateCommand loadSettingsCommand, ILogger logger,
+            StackPanel modifiersStackPanel)
         {
             this.updateSettingsCommand = updateSettingsCommand ?? throw new ArgumentNullException(nameof(updateSettingsCommand));
             this.loadSettingsCommand = loadSettingsCommand ?? throw new ArgumentNullException(nameof(loadSettingsCommand));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.modifierViewModels = new List<ConfigurableModifierViewModel>();
+            this.modifiersStackPanel = modifiersStackPanel ?? throw new ArgumentNullException(nameof(modifiersStackPanel));
         }
 
         /// <inheritdoc/>
-        public bool LoadSettings(string gameDirectory, bool createIfDoesntExist)
+        public bool LoadSettings(string gameDirectory, string modFolder, bool createIfDoesntExist)
         {
             if (string.IsNullOrWhiteSpace(gameDirectory))
             {
                 logger.Error("Failed to load Modifier settings as provided Game Directory was empty!");
                 return false;
             }
+
+            // Create dynamic controls for modifiers
+            string modifiersDLLPath = Path.Combine(modFolder, "JumpKingModifiersMod.dll");
+            CreateModifiersUIControls(modifiersStackPanel, modifiersDLLPath);
 
             // Load in the settings
             string expectedSettingsFilePath = Path.Combine(gameDirectory, JumpKingModifiersModSettingsContext.SettingsFileName);
@@ -424,10 +442,37 @@ namespace JumpKingMod.Install.UI.Settings
                 ManualResizingGrowKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, Keys.Up);
                 ManualResizingShrinkKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, Keys.Down);
 
-                RisingLavaEnabled = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
-                RisingLavaToggleKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F7);
-                RisingLavaSpeed = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed.ToString(CultureInfo.InvariantCulture));
-                RisingLavaNiceSpawns = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, true);
+                string rawEnabledModifiers = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.EnabledModifiersKey, "");
+                HashSet<string> enabledModifiers = new HashSet<string>(rawEnabledModifiers.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < modifierViewModels.Count; i++)
+                {
+                    ConfigurableModifierViewModel configurableModifier = modifierViewModels[i];
+                    configurableModifier.ModifierEnabled = enabledModifiers.Contains(configurableModifier.ModifierType.ToString());
+
+                    for (int j = 0; j < configurableModifier.ModifierSettings.Count; j++)
+                    {
+                        ModifierSettingViewModel modifierSetting = configurableModifier.ModifierSettings[j];
+                        switch (modifierSetting.SettingType)
+                        {
+                            case ModifierSettingType.Bool:
+                                modifierSetting.BoolSettingValue = ModifiersModSettings.GetSettingOrDefault(modifierSetting.SettingKey, (bool)modifierSetting.DefaultSettingValue);
+                                break;
+                            case ModifierSettingType.String:
+                                modifierSetting.StringSettingValue = ModifiersModSettings.GetSettingOrDefault(modifierSetting.SettingKey, (string)modifierSetting.DefaultSettingValue);
+                                break;
+                            case ModifierSettingType.Float:
+                                modifierSetting.FloatSettingValue = ModifiersModSettings.GetSettingOrDefault(modifierSetting.SettingKey, ((float)modifierSetting.DefaultSettingValue).ToString());
+                                break;
+                            case ModifierSettingType.Int:
+                                modifierSetting.IntSettingValue = ModifiersModSettings.GetSettingOrDefault(modifierSetting.SettingKey, ((int)modifierSetting.DefaultSettingValue).ToString());
+                                break;
+                            case ModifierSettingType.Enum:
+                                modifierSetting.EnumSettingValue = ModifiersModSettings.GetSettingOrDefault(modifierSetting.SettingKey, (Enum)modifierSetting.DefaultSettingValue, modifierSetting.EnumType).ToString();
+                                break;
+                        }
+                    }
+                }
+
                 return true;
             }
             else
@@ -438,7 +483,7 @@ namespace JumpKingMod.Install.UI.Settings
         }
 
         /// <inheritdoc/>
-        public bool SaveSettings(string gameDirectory)
+        public bool SaveSettings(string gameDirectory, string modFolder)
         {
             if (ModifiersModSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
             {
@@ -462,6 +507,46 @@ namespace JumpKingMod.Install.UI.Settings
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, RisingLavaToggleKey.ToString());
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, RisingLavaSpeed.ToString());
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, RisingLavaNiceSpawns.ToString());
+
+            // Save all the modifier settings
+            StringBuilder enabledStringBuilder = new StringBuilder();
+            for (int i = 0; i < modifierViewModels.Count; i++)
+            {
+                ConfigurableModifierViewModel configurableModifier = modifierViewModels[i];
+                if (configurableModifier.ModifierEnabled)
+                {
+                    enabledStringBuilder.Append($"{configurableModifier.ModifierType.ToString()}");
+                    if (i < (modifierViewModels.Count - 1))
+                    {
+                        enabledStringBuilder.Append(",");
+                    }
+                }
+
+                for (int j = 0; j < configurableModifier.ModifierSettings.Count; j++)
+                {
+                    ModifierSettingViewModel modifierSetting = configurableModifier.ModifierSettings[j];
+                    switch (modifierSetting.SettingType)
+                    {
+                        case ModifierSettingType.Bool:
+                            ModifiersModSettings.SetOrCreateSetting(modifierSetting.SettingKey, modifierSetting.BoolSettingValue.ToString());
+                            break;
+                        case ModifierSettingType.String:
+                            ModifiersModSettings.SetOrCreateSetting(modifierSetting.SettingKey, modifierSetting.StringSettingValue.ToString());
+                            break;
+                        case ModifierSettingType.Float:
+                            ModifiersModSettings.SetOrCreateSetting(modifierSetting.SettingKey, modifierSetting.FloatSettingValue);
+                            break;
+                        case ModifierSettingType.Int:
+                            ModifiersModSettings.SetOrCreateSetting(modifierSetting.SettingKey, modifierSetting.IntSettingValue);
+                            break;
+                        case ModifierSettingType.Enum:
+                            ModifiersModSettings.SetOrCreateSetting(modifierSetting.SettingKey, modifierSetting.EnumSettingValue);
+                            break;
+                    }
+                }
+            }
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.EnabledModifiersKey, enabledStringBuilder.ToString());
+
             return true;
         }
 
@@ -477,6 +562,258 @@ namespace JumpKingMod.Install.UI.Settings
         public void RaisePropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// Loads all possible modifiers from the modifier DLL and creates UI controls for each,
+        /// which are then registered with the provided stack
+        /// </summary>
+        /// <remarks>This should really be user controls and data templates but I hate myself</remarks>
+        private void CreateModifiersUIControls(StackPanel modifiersStack, string modifierDLLPath)
+        {
+            modifiersStack.Children.Clear();
+
+            Assembly assembly = Assembly.LoadFrom(modifierDLLPath);
+            List<Tuple<Type, ConfigurableModifierAttribute>> modifiers = assembly.GetTypes().Select((Type t) =>
+            {
+                ConfigurableModifierAttribute attribute = t.GetCustomAttribute<ConfigurableModifierAttribute>();
+                if (attribute != null)
+                {
+                    return new Tuple<Type, ConfigurableModifierAttribute>(t, attribute);
+                }
+                return null;
+            })
+            .Where((Tuple<Type, ConfigurableModifierAttribute> tuple) => tuple != null)
+            .OrderBy((Tuple<Type, ConfigurableModifierAttribute> tuple) => tuple.Item2.ConfigurableModifierName)
+            .ToList();
+
+            // Go through all Modifiers
+            modifierViewModels.Clear();
+            for (int i = 0; i < modifiers.Count; i++)
+            {
+                // Collect any other settings for this modifier
+                List<ModifierSettingAttribute> modifierSettings = modifiers[i].Item1.GetFields()
+                    .Select((FieldInfo f) => f.GetCustomAttribute<ModifierSettingAttribute>()).Where((ModifierSettingAttribute a) => a != null).ToList();
+
+                // Make the grid to contain the modifier name & enabled toggle
+                Grid modifierActiveGrid = new Grid();
+                modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+                modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                modifierActiveGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+
+                // Make the modifier name
+                Label modifierName = new Label();
+                modifierName.Content = modifiers[i].Item2.ConfigurableModifierName;
+                modifierName.FontWeight = FontWeights.Bold;
+                modifierName.SetValue(Grid.ColumnProperty, 0);
+                modifierName.SetValue(Grid.RowProperty, 0);
+                modifierName.VerticalAlignment = VerticalAlignment.Center;
+
+                // Make the enabled toggle
+                CheckBox enabledBox = new CheckBox();
+                enabledBox.SetValue(Grid.ColumnProperty, 2);
+                enabledBox.SetValue(Grid.RowProperty, 0);
+                enabledBox.VerticalAlignment = VerticalAlignment.Center;
+                enabledBox.HorizontalAlignment = HorizontalAlignment.Right;
+
+                // Add to the grid & parent stack
+                modifierActiveGrid.Children.Add(modifierName);
+                modifierActiveGrid.Children.Add(enabledBox);
+                Expander modifierExpander = null;
+                StackPanel modifierExpanderStack = null;
+                if (modifierSettings.Count > 0)
+                {
+                    modifierExpander = new Expander();
+                    modifierExpanderStack = new StackPanel();
+                    modifierExpander.Header = modifierActiveGrid;
+                    modifierExpander.Content = modifierExpanderStack;
+                    modifiersStack.Children.Add(modifierExpander);
+                }
+                else
+                {
+                    modifiersStack.Children.Add(modifierActiveGrid);
+                }
+
+                ConfigurableModifierViewModel configurableModifierViewModel =
+                    new ConfigurableModifierViewModel(modifiers[i].Item1, modifiers[i].Item2.ConfigurableModifierName);
+
+                // Make the binding and assign the default value
+                Binding enabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                enabledBinding.Source = configurableModifierViewModel;
+                enabledBox.SetBinding(CheckBox.IsCheckedProperty, enabledBinding);
+                enabledBox.IsChecked = true;
+
+                modifierViewModels.Add(configurableModifierViewModel);
+
+                // Make options for every defined setting
+                for (int j = 0; j < modifierSettings.Count; j++)
+                {
+                    // Make the grid to contain this setting name and it's value
+                    Grid settingGrid = new Grid();
+                    settingGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+                    settingGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                    settingGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+
+                    // Make the setting name
+                    Label settingName = new Label();
+                    settingName.Content = modifierSettings[j].DisplayName;
+                    settingName.SetValue(Grid.ColumnProperty, 0);
+                    settingName.SetValue(Grid.RowProperty, 0);
+                    settingName.VerticalAlignment = VerticalAlignment.Center;
+                    settingGrid.Children.Add(settingName);
+
+                    // Make the value editor
+                    switch (modifierSettings[j].SettingType)
+                    {
+                        case ModifierSettingType.Bool:
+                            {
+                                CheckBox settingBox = new CheckBox();
+                                settingBox.SetValue(Grid.ColumnProperty, 1);
+                                settingBox.SetValue(Grid.RowProperty, 0);
+                                settingBox.VerticalAlignment = VerticalAlignment.Center;
+
+                                ModifierSettingViewModel modifierSettingViewModel =
+                                    new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
+
+                                // Make the binding and assign the default value
+                                Binding boolBinding = new Binding(nameof(modifierSettingViewModel.BoolSettingValue));
+                                boolBinding.Source = modifierSettingViewModel;
+                                settingBox.SetBinding(CheckBox.IsCheckedProperty, boolBinding);
+                                settingBox.IsChecked = (bool)modifierSettings[j].DefaultSetting;
+
+                                // Set the enabled binding
+                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingEnabledBinding.Source = configurableModifierViewModel;
+                                settingBox.SetBinding(CheckBox.IsEnabledProperty, settingEnabledBinding);
+
+                                configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
+
+                                settingGrid.Children.Add(settingBox);
+                                break;
+                            }
+                        case ModifierSettingType.String:
+                            {
+                                TextBox textBox = new TextBox();
+                                textBox.SetValue(Grid.ColumnProperty, 1);
+                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.MinWidth = 100;
+                                textBox.VerticalAlignment = VerticalAlignment.Center;
+
+                                ModifierSettingViewModel modifierSettingViewModel =
+                                    new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
+
+                                // Make the binding and assign the default value
+                                Binding stringBinding = new Binding(nameof(modifierSettingViewModel.StringSettingValue));
+                                stringBinding.Source = modifierSettingViewModel;
+                                textBox.SetBinding(TextBox.TextProperty, stringBinding);
+                                textBox.Text = (string)modifierSettings[j].DefaultSetting;
+
+                                // Set the enabled binding
+                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingEnabledBinding.Source = configurableModifierViewModel;
+                                textBox.SetBinding(TextBox.IsEnabledProperty, settingEnabledBinding);
+
+                                configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
+
+                                settingGrid.Children.Add(textBox);
+                                break;
+                            }
+                        case ModifierSettingType.Float:
+                            {
+                                TextBox textBox = new TextBox();
+                                textBox.SetValue(Grid.ColumnProperty, 1);
+                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.MinWidth = 100;
+                                textBox.VerticalAlignment = VerticalAlignment.Center;
+
+                                ModifierSettingViewModel modifierSettingViewModel =
+                                    new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
+
+                                // Make the binding and assign the default value
+                                Binding floatBinding = new Binding(nameof(modifierSettingViewModel.FloatSettingValue));
+                                floatBinding.Source = modifierSettingViewModel;
+                                floatBinding.UpdateSourceTrigger = UpdateSourceTrigger.Default;
+                                textBox.SetBinding(TextBox.TextProperty, floatBinding);
+                                textBox.Text = ((float)modifierSettings[j].DefaultSetting).ToString();
+
+                                // Set the enabled binding
+                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingEnabledBinding.Source = configurableModifierViewModel;
+                                textBox.SetBinding(TextBox.IsEnabledProperty, settingEnabledBinding);
+
+                                configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
+
+                                settingGrid.Children.Add(textBox);
+                                break;
+                            }
+                        case ModifierSettingType.Int:
+                            {
+                                TextBox textBox = new TextBox();
+                                textBox.SetValue(Grid.ColumnProperty, 1);
+                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.MinWidth = 100;
+                                textBox.VerticalAlignment = VerticalAlignment.Center;
+
+                                ModifierSettingViewModel modifierSettingViewModel =
+                                    new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
+
+                                // Make the binding and assign the default value
+                                Binding intBinding = new Binding(nameof(modifierSettingViewModel.IntSettingValue));
+                                intBinding.Source = modifierSettingViewModel;
+                                intBinding.UpdateSourceTrigger = UpdateSourceTrigger.Default;
+                                textBox.SetBinding(TextBox.TextProperty, intBinding);
+                                textBox.Text = ((int)modifierSettings[j].DefaultSetting).ToString();
+
+                                // Set the enabled binding
+                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingEnabledBinding.Source = configurableModifierViewModel;
+                                textBox.SetBinding(TextBox.IsEnabledProperty, settingEnabledBinding);
+
+                                configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
+
+                                settingGrid.Children.Add(textBox);
+                                break;
+                            }
+                        case ModifierSettingType.Enum:
+                            {
+                                ComboBox comboBox = new ComboBox();
+                                comboBox.SetValue(Grid.ColumnProperty, 1);
+                                comboBox.SetValue(Grid.RowProperty, 0);
+                                comboBox.ItemsSource = Enum.GetNames(modifierSettings[j].EnumType);
+                                comboBox.VerticalAlignment = VerticalAlignment.Center;
+
+                                ModifierSettingViewModel modifierSettingViewModel =
+                                    new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType, modifierSettings[j].EnumType);
+
+                                // Make the binding and assign the default value
+                                Binding enumBinding = new Binding(nameof(modifierSettingViewModel.EnumSettingValue));
+                                enumBinding.Source = modifierSettingViewModel;
+                                comboBox.SetBinding(ComboBox.SelectedValueProperty, enumBinding);
+                                comboBox.SelectedValue = modifierSettingViewModel.DefaultSettingValue.ToString();
+
+                                // Set the enabled binding
+                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingEnabledBinding.Source = configurableModifierViewModel;
+                                comboBox.SetBinding(ComboBox.IsEnabledProperty, settingEnabledBinding);
+
+                                configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
+
+                                settingGrid.Children.Add(comboBox);
+                                break;
+                            }
+                    }
+
+                    if (modifierExpanderStack != null)
+                    {
+                        modifierExpanderStack.Children.Add(settingGrid);
+                    }
+                    else
+                    {
+                        modifiersStack.Children.Add(settingGrid);
+                    }
+                }
+            }
         }
 
     }

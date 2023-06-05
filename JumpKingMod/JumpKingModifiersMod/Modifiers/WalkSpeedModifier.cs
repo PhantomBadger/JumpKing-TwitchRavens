@@ -1,5 +1,6 @@
 ﻿using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Patching;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> to modify the walk speed
     /// </summary>
+    [ConfigurableModifier("Increased Walk Speed")]
     public class WalkSpeedModifier : IModifier
     {
         public string DisplayName { get; } = "Increase Walk Speed";

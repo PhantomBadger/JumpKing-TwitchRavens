@@ -1,4 +1,5 @@
 ﻿using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> to modify the jump time
     /// </summary>
+    [ConfigurableModifier("Decrease Jump Charge Time")]
     public class JumpTimeModifier : IModifier
     {
         public string DisplayName => "Decrease Jump Charge Time";

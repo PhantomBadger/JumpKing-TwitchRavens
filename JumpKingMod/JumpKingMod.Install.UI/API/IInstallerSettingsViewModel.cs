@@ -19,11 +19,11 @@ namespace JumpKingMod.Install.UI.API
         /// <summary>
         /// Attempts to load the settings for this ViewModel
         /// </summary>
-        bool LoadSettings(string gameDirectory, bool createIfDoesntExist);
+        bool LoadSettings(string gameDirectory, string modFolder, bool createIfDoesntExist);
 
         /// <summary>
         /// Attempts to save the settings for this ViewModel
         /// </summary>
-        bool SaveSettings(string gameDirectory);
+        bool SaveSettings(string gameDirectory, string modFolder);
     }
 }

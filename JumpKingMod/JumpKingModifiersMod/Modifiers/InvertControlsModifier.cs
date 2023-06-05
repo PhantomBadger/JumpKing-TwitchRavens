@@ -1,4 +1,5 @@
 ﻿using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> and <see cref="IDisposable"/> which flips the player's controls
     /// </summary>
+    [ConfigurableModifier("Invert Controls")]
     public class InvertControlsModifier : IModifier, IDisposable
     {
         public string DisplayName { get; } = "Invert Controls";

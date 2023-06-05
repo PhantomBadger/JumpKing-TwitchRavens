@@ -1,6 +1,7 @@
 ﻿using JumpKing;
 using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Patching;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.Entities;
@@ -15,6 +16,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which displays a low visibility overlay over the screen
     /// </summary>
+    [ConfigurableModifier("Low Visibility")]
     public class LowVisibilityModifier : IModifier, IDisposable
     {
         public string DisplayName => "Low Visibility";

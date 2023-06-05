@@ -21,6 +21,7 @@ using PBJKModBase.Twitch.Settings;
 using PBJKModBase.YouTube.Settings;
 using JumpKingMod.Install.UI.Settings;
 using JumpKingMod.Install.UI.API;
+using System.Windows.Controls;
 
 namespace JumpKingRavensMod.Install.UI
 {
@@ -186,7 +187,7 @@ namespace JumpKingRavensMod.Install.UI
         /// <summary>
         /// Ctor for creating a <see cref="InstallerViewModel"/>
         /// </summary>
-        public InstallerViewModel()
+        public InstallerViewModel(StackPanel modifiersStackPanel)
         {
             logger = new ConsoleLogger();
             installerSettings = new UserSettings(JumpKingModInstallerSettingsContext.SettingsFileName, JumpKingModInstallerSettingsContext.GetDefaultSettings(), logger);
@@ -195,7 +196,7 @@ namespace JumpKingRavensMod.Install.UI
             InitialiseCommands();
 
             RavensSettings = new RavensSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
-            ModifiersSettings = new ModifiersSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+            ModifiersSettings = new ModifiersSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger, modifiersStackPanel);
             TwitchSettings = new TwitchSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
             YouTubeSettings = new YouTubeSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
             StreamingSettings = new StreamingSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
@@ -354,7 +355,7 @@ namespace JumpKingRavensMod.Install.UI
                 Installer installer = new Installer();
 
                 string frameworkDllPath = Path.Combine(GameDirectory, ExpectedFrameworkDllName);
-                string expectedModDllPath = Path.Combine(expectedRemoteModFolder, ExpectedModDllName);
+                string expectedModDllPath = Path.Combine(expectedRemoteModFolder, expectedRemoteModFolder, ExpectedModDllName);
                 ModEntrySettings modEntrySettings = new ModEntrySettings()
                 {
                     EntryClassTypeName = "JumpKingModLoader.Loader",
@@ -369,7 +370,7 @@ namespace JumpKingRavensMod.Install.UI
             {
                 for (int i = 0; i < registeredSettings.Count; i++)
                 {
-                    registeredSettings[i].LoadSettings(gameDirectory, createIfDoesntExist: true);
+                    registeredSettings[i].LoadSettings(gameDirectory, expectedRemoteModFolder, createIfDoesntExist: true);
                 }
             }
 
@@ -478,7 +479,7 @@ namespace JumpKingRavensMod.Install.UI
             bool success = true;
             for (int i = 0; i < registeredSettings.Count; i++)
             {
-                success &= registeredSettings[i].LoadSettings(gameDirectory, createIfDoesntExist: true);
+                success &= registeredSettings[i].LoadSettings(gameDirectory, ExpectedRemoteModDirectory, createIfDoesntExist: true);
             }
 
             if (!success)
@@ -504,7 +505,7 @@ namespace JumpKingRavensMod.Install.UI
             bool success = true;
             for (int i = 0; i < registeredSettings.Count; i++)
             {
-                success &= registeredSettings[i].SaveSettings(gameDirectory);
+                success &= registeredSettings[i].SaveSettings(gameDirectory, ExpectedRemoteModDirectory);
             }
 
             if (!success)

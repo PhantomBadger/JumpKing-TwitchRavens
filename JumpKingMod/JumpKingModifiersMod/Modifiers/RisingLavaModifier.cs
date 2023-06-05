@@ -21,9 +21,16 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> and <see cref="IDisposable"/> which has lava slowly rise from the bottom of the map. Touching the lava will mean death and a reset!
     /// </summary>
+    [ConfigurableModifier("Rising Lava")]
     public class RisingLavaModifier : IModifier, IDisposable
     {
         public string DisplayName => "Rising Lava";
+
+        [ModifierSetting(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, "Lava Speed", JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed)]
+        public readonly float LavaRisingSpeed;
+
+        [ModifierSetting(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, "Nice Spawns", true)]
+        public readonly bool NiceSpawns;
 
         private enum RisingLavaModifierState
         {
@@ -39,8 +46,6 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly IPlayerStateObserver playerStateObserver;
         private readonly IGameStateObserver gameStateObserver;
         private readonly ILogger logger;
-        private readonly float lavaRisingSpeed;
-        private readonly bool niceSpawns;
 
         private WorldspaceImageEntity lavaEntity;
         private UIImageEntity deathPlayerEntity;
@@ -80,8 +85,8 @@ namespace JumpKingModifiersMod.Modifiers
             lavaModifierState = RisingLavaModifierState.Rising;
             lavaEntity = null;
 
-            lavaRisingSpeed = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed);
-            niceSpawns = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, true);
+            LavaRisingSpeed = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed);
+            NiceSpawns = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, true);
 
             // Set up the animation components
             cutoutShrinkAnimationComponent = new AnimationComponent(
@@ -235,7 +240,7 @@ namespace JumpKingModifiersMod.Modifiers
                         // Make the Lava move up & wiggle
                         float xOscillation = ((float)Math.Sin(oscillationCounter += p_delta) / 30f);
                         oscillationCounter %= (float)(2 * Math.PI);
-                        lavaEntity.WorldSpacePosition -= new Vector2(xOscillation, p_delta * lavaRisingSpeed);
+                        lavaEntity.WorldSpacePosition -= new Vector2(xOscillation, p_delta * LavaRisingSpeed);
 
                         // Check to see if the player is intersecting with it
                         Rectangle playerHitbox = playerStateObserver.GetPlayerHitbox();
@@ -294,7 +299,7 @@ namespace JumpKingModifiersMod.Modifiers
                             playerStateObserver.DisablePlayerWalking(isWalkingDisabled: false, isXVelocityDisabled: false);
                             playerStateObserver.DisablePlayerDrawing(isDrawDisabled: false);
                             playerStateObserver.DisablePlayerBodyComp(isBodyCompDisabled: false);
-                            playerStateObserver.RestartPlayerPosition(niceSpawns);
+                            playerStateObserver.RestartPlayerPosition(NiceSpawns);
                             
                             cutoutPauseCounter = 0;
 

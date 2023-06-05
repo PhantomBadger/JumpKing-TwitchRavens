@@ -125,7 +125,7 @@ namespace JumpKingMod.Install.UI.Settings
         }
 
         /// <inheritdoc/>
-        public bool LoadSettings(string gameDirectory, bool createIfDoesntExist)
+        public bool LoadSettings(string gameDirectory, string modFolder, bool createIfDoesntExist)
         {
             if (string.IsNullOrWhiteSpace(gameDirectory))
             {
@@ -154,7 +154,7 @@ namespace JumpKingMod.Install.UI.Settings
         }
 
         /// <inheritdoc/>
-        public bool SaveSettings(string gameDirectory)
+        public bool SaveSettings(string gameDirectory, string modFolder)
         {
             if (StreamingSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
             {

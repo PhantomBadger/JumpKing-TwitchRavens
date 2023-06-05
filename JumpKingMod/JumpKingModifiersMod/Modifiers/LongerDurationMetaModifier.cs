@@ -1,4 +1,5 @@
 ﻿using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Settings;
 using JumpKingModifiersMod.Triggers;
 using Logging.API;
 using System;
@@ -12,6 +13,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which increases the duration of activated modifiers by the <see cref="TwitchPollTrigger"/>
     /// </summary>
+    [ConfigurableModifier("(Meta) Longer Modifier Duration")]
     public class LongerDurationMetaModifier : IModifier
     {
         public string DisplayName => "Longer Modifier Duration";

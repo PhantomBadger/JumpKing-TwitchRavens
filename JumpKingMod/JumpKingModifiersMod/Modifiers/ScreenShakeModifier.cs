@@ -1,6 +1,7 @@
 ﻿using JumpKing;
 using JumpKing.MiscSystems;
 using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which causes screen shake
     /// </summary>
+    [ConfigurableModifier("Screen Shake")]
     public class ScreenShakeModifier : IModifier
     {
         public string DisplayName => "Screen Shake";

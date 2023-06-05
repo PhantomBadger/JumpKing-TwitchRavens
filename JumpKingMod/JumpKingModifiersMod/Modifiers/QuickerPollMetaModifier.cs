@@ -1,4 +1,5 @@
 ﻿using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Settings;
 using JumpKingModifiersMod.Triggers;
 using Logging.API;
 using System;
@@ -12,6 +13,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which speeds up the poll time for the <see cref="TwitchPollTrigger"/>
     /// </summary>
+    [ConfigurableModifier("(Meta) Quicker Poll Time")]
     public class QuickerPollMetaModifier : IModifier
     {
         public string DisplayName => "Quicker Poll Time";

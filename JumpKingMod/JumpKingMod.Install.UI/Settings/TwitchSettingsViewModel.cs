@@ -110,7 +110,7 @@ namespace JumpKingRavensMod.Install.UI
         /// <summary>
         /// Loads the twitch settings from disk, optionally creating the file if it doesnt exist
         /// </summary>
-        public bool LoadSettings(string gameDirectory, bool createIfDoesntExist)
+        public bool LoadSettings(string gameDirectory, string modFolder, bool createIfDoesntExist)
         {
             if (string.IsNullOrWhiteSpace(gameDirectory))
             {
@@ -143,7 +143,7 @@ namespace JumpKingRavensMod.Install.UI
         /// Saves the twitch settings back to disk
         /// </summary>
         /// <param name="gameDirectory"></param>
-        public bool SaveSettings(string gameDirectory)
+        public bool SaveSettings(string gameDirectory, string modFolder)
         {
             if (TwitchBaseSettings == null || string.IsNullOrWhiteSpace(gameDirectory))
             {
