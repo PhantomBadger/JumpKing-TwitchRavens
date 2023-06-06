@@ -6,7 +6,8 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:Input="clr-namespace:Microsoft.Xna.Framework.Input;assembly=MonoGame.Framework"
         xmlns:local="clr-namespace:JumpKingRavensMod.Install.UI"
-        xmlns:settings="clr-namespace:JumpKingRavensMod.Settings;assembly=JumpKingRavensMod.Settings"
+        xmlns:ravenSettings="clr-namespace:JumpKingRavensMod.Settings;assembly=JumpKingRavensMod.Settings"
+        xmlns:modifierSettings="clr-namespace:JumpKingModifiersMod.Settings;assembly=JumpKingModifiersMod.Settings"
         mc:Ignorable="d"
         Title="Jump King Chat Ravens Mod Installer" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
    
@@ -253,12 +254,12 @@
                             <Grid.Resources>
                                 <ObjectDataProvider x:Key="twitchRavenTriggerTypeEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
                                     <ObjectDataProvider.MethodParameters>
-                                        <x:Type TypeName="settings:TwitchRavenTriggerTypes"/>
+                                        <x:Type TypeName="ravenSettings:TwitchRavenTriggerTypes"/>
                                     </ObjectDataProvider.MethodParameters>
                                 </ObjectDataProvider>
                                 <ObjectDataProvider x:Key="youTubeRavenTriggerTypeEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
                                     <ObjectDataProvider.MethodParameters>
-                                        <x:Type TypeName="settings:YouTubeRavenTriggerTypes"/>
+                                        <x:Type TypeName="ravenSettings:YouTubeRavenTriggerTypes"/>
                                     </ObjectDataProvider.MethodParameters>
                                 </ObjectDataProvider>
                                 <ToolTip x:Key="enabledRavenTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
@@ -398,7 +399,7 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
-                            <ComboBox Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource youTubeRavenTriggerTooltip}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}"  ItemsSource="{Binding Source={StaticResource youTubeRavenTriggerTypeEnumValues}}" SelectedItem="{Binding RavensSettings.YouTubeRavenTriggerType, Mode=TwoWay}">
+                            <ComboBox Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource youTubeRavenTriggerTooltip}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ItemsSource="{Binding Source={StaticResource youTubeRavenTriggerTypeEnumValues}}" SelectedItem="{Binding RavensSettings.YouTubeRavenTriggerType, Mode=TwoWay}">
                                 <ComboBox.Style>
                                     <Style TargetType="{x:Type ComboBox}">
                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -576,6 +577,8 @@
                             <ComboBox Grid.Row="20" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource gunKeyTooltip}" Visibility="{Binding RavensSettings.GunSettingsVisible, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavensSettings.GunToggleKey, Mode=TwoWay}"/>
                         </Grid>
                     </TabItem>
+                    
+    <!-- Fall Damage now handled by dynamic setting creation of Modifiers
                     <TabItem x:Name="tabFallDamage" Header="Fall Damage">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -625,7 +628,6 @@
                                     </TextBlock>
                                 </ToolTip>
                             </Grid.Resources>
-                            <!-- Fall Damage Enabled -->
                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageTooltip}" Text="Enabled: " />
                             <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource fallDamageTooltip}" IsChecked="{Binding ModifiersSettings.FallDamageEnabled, Mode=TwoWay}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" FontSize="9" TextWrapping="Wrap">
@@ -635,25 +637,20 @@
                                     Use the below Toggle Key to activate it once you start playing!
                                 </Italic>
                             </TextBlock>
-                            <!-- Seperator -->
                             <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
-                            <!-- Toggle Button -->
                             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageTooltip}" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Key:" />
                             <ComboBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource fallDamageTooltip}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding ModifiersSettings.FallDamageToggleKey, Mode=TwoWay}"/>
-                            <!-- Damage Modifier -->
                             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageModifierTooltip}" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Fall Damage Modifier:" />
                             <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource fallDamageModifierTooltip}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding ModifiersSettings.FallDamageModifier, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            <!-- Nice Spawns -->
                             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageNiceSpawnsTooltip}" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Nice Spawns: " />
                             <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource fallDamageNiceSpawnsTooltip}" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding ModifiersSettings.FallDamageNiceSpawns, Mode=TwoWay}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}"/>
-                            <!-- Blood Enabled -->
                             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageBloodTooltip}" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Blood Splat Enabled: " />
                             <CheckBox Grid.Row="8" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource fallDamageBloodTooltip}" Visibility="{Binding ModifiersSettings.FallDamageEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding ModifiersSettings.FallDamageBloodSplatEnabled, Mode=TwoWay}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}"/>
-                            <!-- Clear Blood Button -->
                             <TextBlock Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource fallDamageClearBloodTooltip}" Visibility="{Binding ModifiersSettings.FallDamageBloodSplatVisibility, Converter={StaticResource boolToVisibilityConverter}}" Text="Clear Blood Key:" />
                             <ComboBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource fallDamageClearBloodTooltip}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}" Visibility="{Binding ModifiersSettings.FallDamageBloodSplatVisibility, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding ModifiersSettings.FallDamageClearBloodKey, Mode=TwoWay}"/>
                         </Grid>
                     </TabItem>
+-->
 
                     <TabItem x:Name="tabItemResizing" Header="Resizing">
                         <Grid>
@@ -703,6 +700,7 @@
                         </Grid>
                     </TabItem>
 
+    <!-- Rising Lava replaced by dynamic setting creation for Modifiers
                     <TabItem x:Name="tabRisingLava" Header="Rising Lava">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -734,7 +732,6 @@
                                     </TextBlock>
                                 </ToolTip>
                             </Grid.Resources>
-                            <!-- Rising Lava Enabled  -->
                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource risingLavaTooltip}" Text="Enabled: "/>
                             <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource risingLavaTooltip}" IsChecked="{Binding ModifiersSettings.RisingLavaEnabled, Mode=TwoWay}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" FontSize="9" TextWrapping="Wrap">
@@ -744,21 +741,18 @@
                                     Use the below Toggle Key to activate it once you start playing!
                                 </Italic>
                             </TextBlock>
-                            <!-- Seperator -->
                             <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding ModifiersSettings.RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
-                            <!-- Toggle Button -->
                             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource risingLavaTooltip}" Visibility="{Binding ModifiersSettings.RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Key:" />
                             <ComboBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource risingLavaTooltip}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}" Visibility="{Binding ModifiersSettings.RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding ModifiersSettings.RisingLavaToggleKey, Mode=TwoWay}"/>
-                            <!-- Damage Modifier -->
                             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource risingLavaTooltip}" Visibility="{Binding ModifiersSettings.RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Rising Lava Speed:" />
                             <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource risingLavaTooltip}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}" Visibility="{Binding ModifiersSettings.RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding ModifiersSettings.RisingLavaSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            <!-- Nice Spawns -->
                             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource risingLavaNiceSpawnsTooltip}" Visibility="{Binding ModifiersSettings.RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Nice Spawns: " />
                             <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource risingLavaNiceSpawnsTooltip}" Visibility="{Binding ModifiersSettings.RisingLavaEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding ModifiersSettings.RisingLavaNiceSpawns, Mode=TwoWay}" IsEnabled="{Binding ModifiersSettings.AreFallDamageModSettingsLoaded}"/>
                         </Grid>
                     </TabItem>
-
-                    <!--
+-->
+                    
+    <!-- Chat Relay deprecated
                     <TabItem x:Name="tabItemChatDisplay" Header="Chat Display">
                         <TabItem.Style>
                             <Style TargetType="{x:Type TabItem}">
@@ -783,6 +777,7 @@
                         </Grid>
                     </TabItem>
                     -->
+                    
                     <TabItem x:Name="tabItemFly" Header="Fly">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -816,6 +811,35 @@
                             <!-- Debug Button -->
                             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource freeFlyTooltip}" Visibility="{Binding RavensSettings.FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Key:" />
                             <ComboBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource freeFlyTooltip}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Visibility="{Binding RavensSettings.FreeFlyingEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavensSettings.FreeFlyToggleKey, Mode=TwoWay}"/>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem x:Name="tabItemModifiers" Header="Modifiers">
+                        <Grid x:Name="tabItemModifiersGrid">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.Resources>
+                                    <ObjectDataProvider x:Key="triggerTypesEnumValues" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+                                        <ObjectDataProvider.MethodParameters>
+                                            <x:Type TypeName="modifierSettings:ModifierTriggerTypes"/>
+                                        </ObjectDataProvider.MethodParameters>
+                                    </ObjectDataProvider>
+                                </Grid.Resources>
+                                
+                                <Label Grid.Column="0" Margin="5,2,10,2" Content="Modifier Trigger Type:"/>
+                                <ComboBox Grid.Column="1" Margin="5,2,10,2" SelectedItem="{Binding ModifiersSettings.TriggerType}" ItemsSource="{Binding Source={StaticResource triggerTypesEnumValues}}"/>
+                            </Grid>
+
+                            <Separator Grid.Row="1"/>
                         </Grid>
                     </TabItem>
                 </TabControl>

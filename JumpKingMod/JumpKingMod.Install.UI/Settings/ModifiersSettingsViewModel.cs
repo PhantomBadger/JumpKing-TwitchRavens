@@ -34,155 +34,6 @@ namespace JumpKingMod.Install.UI.Settings
         private readonly StackPanel modifiersStackPanel;
 
         #region Properties
-
-        /// <summary>
-        /// Returns whether the Fall Damage Mod should be enabled
-        /// </summary>
-        public bool FallDamageEnabled
-        {
-            get
-            {
-                return fallDamageEnabled;
-            }
-            set
-            {
-                if (fallDamageEnabled != value)
-                {
-                    fallDamageEnabled = value;
-                    RaisePropertyChanged(nameof(FallDamageEnabled));
-                    RaisePropertyChanged(nameof(FallDamageBloodSplatVisibility));
-                }
-            }
-        }
-        private bool fallDamageEnabled;
-
-        /// <summary>
-        /// Returns the key which toggles the fall damage modifier
-        /// </summary>
-        public Keys FallDamageToggleKey
-        {
-            get
-            {
-                return fallDamageToggleKey;
-            }
-            set
-            {
-                if (fallDamageToggleKey != value)
-                {
-                    fallDamageToggleKey = value;
-                    RaisePropertyChanged(nameof(FallDamageToggleKey));
-                }
-            }
-        }
-        private Keys fallDamageToggleKey;
-
-        /// <summary>
-        /// The modifier to apply to the fall distance to produce damage
-        /// </summary>
-        public string FallDamageModifier
-        {
-            get
-            {
-                return fallDamageModifier.ToString(CultureInfo.InvariantCulture);
-            }
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    fallDamageModifier = JumpKingModifiersModSettingsContext.DefaultFallDamageModifier;
-                }
-                else
-                {
-                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
-                    {
-                        if (newVal < 0)
-                        {
-                            newVal = Math.Abs(newVal);
-                        }
-                        if (newVal > 1000)
-                        {
-                            newVal = 1000;
-                        }
-                        fallDamageModifier = newVal;
-                    }
-                }
-                RaisePropertyChanged(nameof(FallDamageModifier));
-            }
-        }
-        private float fallDamageModifier;
-
-        /// <summary>
-        /// Returns whether the Blood Splat on Fall should be enabled
-        /// </summary>
-        public bool FallDamageBloodSplatEnabled
-        {
-            get
-            {
-                return fallDamageBloodSplatEnabled;
-            }
-            set
-            {
-                if (fallDamageBloodSplatEnabled != value)
-                {
-                    fallDamageBloodSplatEnabled = value;
-                    RaisePropertyChanged(nameof(FallDamageBloodSplatEnabled));
-                    RaisePropertyChanged(nameof(FallDamageBloodSplatVisibility));
-                }
-            }
-        }
-        private bool fallDamageBloodSplatEnabled;
-
-        /// <summary>
-        /// Aggregate field for visibility control
-        /// </summary>
-        public bool FallDamageBloodSplatVisibility
-        {
-            get
-            {
-                return FallDamageBloodSplatEnabled && FallDamageEnabled;
-            }
-        }
-
-        /// <summary>
-        /// The key to press to clear Blood Splats
-        /// </summary>
-        public Keys FallDamageClearBloodKey
-        {
-            get
-            {
-                return fallDamageClearBloodKey;
-            }
-            set
-            {
-                if (fallDamageClearBloodKey != value)
-                {
-                    fallDamageClearBloodKey = value;
-                    RaisePropertyChanged(nameof(FallDamageClearBloodKey));
-                }
-            }
-        }
-        private Keys fallDamageClearBloodKey;
-
-        /// <summary>
-        /// Whether we will use nice spawns for DLC maps for Fall Damage
-        /// </summary>
-        public bool FallDamageNiceSpawns
-        {
-            get
-            {
-                return fallDamageNiceSpawns;
-            }
-            set
-            {
-                if (fallDamageNiceSpawns != value)
-                {
-                    fallDamageNiceSpawns = value;
-                    RaisePropertyChanged(nameof(FallDamageNiceSpawns));
-                }
-            }
-        }
-        private bool fallDamageNiceSpawns;
-
         /// <summary>
         /// Whether the Resizing mod will be enabled or not
         /// </summary>
@@ -264,99 +115,36 @@ namespace JumpKingMod.Install.UI.Settings
         private Keys manualResizingShrinkKey;
 
         /// <summary>
-        /// Whether the Rising Lava mod is enabled
+        /// The type of trigger to use
         /// </summary>
-        public bool RisingLavaEnabled
+        public ModifierTriggerTypes TriggerType
         {
             get
             {
-                return risingLavaEnabled;
+                return triggerType;
             }
             set
             {
-                if (risingLavaEnabled != value)
+                if (triggerType != value)
                 {
-                    risingLavaEnabled = value;
-                    RaisePropertyChanged(nameof(RisingLavaEnabled));
+                    triggerType = value;
+                    RaisePropertyChanged(nameof(TriggerType));
+                    RaisePropertyChanged(nameof(ShouldShowToggleKeys));
                 }
             }
         }
-        private bool risingLavaEnabled;
+        private ModifierTriggerTypes triggerType;
 
         /// <summary>
-        /// The button to press to toggle rising lava in game
+        /// Whether we should show the configurable toggle keys
         /// </summary>
-        public Keys RisingLavaToggleKey
+        public bool ShouldShowToggleKeys
         {
             get
             {
-                return risingLavaToggleKey;
-            }
-            set
-            {
-                if (risingLavaToggleKey != value)
-                {
-                    risingLavaToggleKey = value;
-                    RaisePropertyChanged(nameof(RisingLavaToggleKey));
-                }
+                return triggerType == ModifierTriggerTypes.Toggle;
             }
         }
-        private Keys risingLavaToggleKey;
-
-        /// <summary>
-        /// The speed the lava will raise
-        /// </summary>
-        public string RisingLavaSpeed
-        {
-            get
-            {
-                return risingLavaSpeed.ToString(CultureInfo.InvariantCulture);
-            }
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    risingLavaSpeed = JumpKingModifiersModSettingsContext.DefaultRisingLavaSpeed;
-                }
-                else
-                {
-                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
-                    {
-                        if (newVal < 0)
-                        {
-                            newVal = Math.Abs(newVal);
-                        }
-                        if (newVal > 1000)
-                        {
-                            newVal = 1000;
-                        }
-                        risingLavaSpeed = newVal;
-                    }
-                }
-                RaisePropertyChanged(nameof(RisingLavaSpeed));
-            }
-        }
-        private float risingLavaSpeed;
-
-        /// <summary>
-        /// Whether or not we use nice spawns for DLC maps for Rising Lava
-        /// </summary>
-        public bool RisingLavaNiceSpawns
-        {
-            get
-            {
-                return risingLavaNiceSpawns;
-            }
-            set
-            {
-                if (risingLavaNiceSpawns != value)
-                {
-                    risingLavaNiceSpawns = value;
-                    RaisePropertyChanged(nameof(RisingLavaNiceSpawns));
-                }
-            }
-        }
-        private bool risingLavaNiceSpawns;
 
         /// <summary>
         /// Returns whether the fall damage mod settings are currently populated
@@ -430,24 +218,38 @@ namespace JumpKingMod.Install.UI.Settings
                 }
 
                 // Load the initial data
-                FallDamageEnabled = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
-                FallDamageToggleKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, Keys.F11);
-                FallDamageModifier = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, JumpKingModifiersModSettingsContext.DefaultFallDamageModifier).ToString(CultureInfo.InvariantCulture);
-                FallDamageBloodSplatEnabled = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
-                FallDamageClearBloodKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
-                FallDamageNiceSpawns = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, true);
+                TriggerType = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.TriggerTypeKey, ModifierTriggerTypes.Toggle);
 
                 ManualResizingEnabled = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
                 ManualResizingToggleKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
                 ManualResizingGrowKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, Keys.Up);
                 ManualResizingShrinkKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, Keys.Down);
 
+                // Parse the enabled setting
                 string rawEnabledModifiers = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.EnabledModifiersKey, "");
                 HashSet<string> enabledModifiers = new HashSet<string>(rawEnabledModifiers.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+
+                // Parse the toggle key setting
+                // TODO: Error check here and in the loop below! Move into a utility function in the settings so we can reuse it in the mod
+                string rawModifierToggleKeys = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ModifierToggleKeysKey, "");
+                string[] splitModifierToggleKeys = rawModifierToggleKeys.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                Dictionary<string, Keys> toggleKeys = new Dictionary<string, Keys>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < splitModifierToggleKeys.Length; i++)
+                {
+                    string[] toggleSetting = splitModifierToggleKeys[i].Split(':');
+                    toggleKeys.Add(toggleSetting[0], (Keys)Enum.Parse(typeof(Keys), toggleSetting[1]));
+                }
+
+                // Go through all our known modifiers and populate them from our settings
                 for (int i = 0; i < modifierViewModels.Count; i++)
                 {
                     ConfigurableModifierViewModel configurableModifier = modifierViewModels[i];
                     configurableModifier.ModifierEnabled = enabledModifiers.Contains(configurableModifier.ModifierType.ToString());
+
+                    if (toggleKeys.ContainsKey(configurableModifier.ModifierType.ToString()))
+                    {
+                        configurableModifier.ToggleKey = toggleKeys[configurableModifier.ModifierType.ToString()];
+                    }
 
                     for (int j = 0; j < configurableModifier.ModifierSettings.Count; j++)
                     {
@@ -491,28 +293,21 @@ namespace JumpKingMod.Install.UI.Settings
                 return false;
             }
 
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, FallDamageEnabled.ToString());
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, FallDamageToggleKey.ToString());
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, FallDamageModifier);
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, FallDamageBloodSplatEnabled.ToString());
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, FallDamageClearBloodKey.ToString());
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, FallDamageNiceSpawns.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.TriggerTypeKey, TriggerType.ToString());
 
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, ManualResizingEnabled.ToString());
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, ManualResizingToggleKey.ToString());
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeGrowKeyKey, ManualResizingGrowKey.ToString());
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeShrinkKeyKey, manualResizingShrinkKey.ToString());
 
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, RisingLavaEnabled.ToString());
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, RisingLavaToggleKey.ToString());
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaSpeedKey, RisingLavaSpeed.ToString());
-            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.RisingLavaNiceSpawnsKey, RisingLavaNiceSpawns.ToString());
-
             // Save all the modifier settings
             StringBuilder enabledStringBuilder = new StringBuilder();
+            StringBuilder toggleKeyStringBuilder = new StringBuilder();
             for (int i = 0; i < modifierViewModels.Count; i++)
             {
                 ConfigurableModifierViewModel configurableModifier = modifierViewModels[i];
+
+                // Build up the enabled setting
                 if (configurableModifier.ModifierEnabled)
                 {
                     enabledStringBuilder.Append($"{configurableModifier.ModifierType.ToString()}");
@@ -522,6 +317,14 @@ namespace JumpKingMod.Install.UI.Settings
                     }
                 }
 
+                // Build up the toggle key setting
+                toggleKeyStringBuilder.Append($"{configurableModifier.ModifierType.ToString()}:{configurableModifier.ToggleKey.ToString()}");
+                if (i < (modifierViewModels.Count - 1))
+                {
+                    toggleKeyStringBuilder.Append(",");
+                }
+
+                // Save each setting within the modifier
                 for (int j = 0; j < configurableModifier.ModifierSettings.Count; j++)
                 {
                     ModifierSettingViewModel modifierSetting = configurableModifier.ModifierSettings[j];
@@ -546,6 +349,7 @@ namespace JumpKingMod.Install.UI.Settings
                 }
             }
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.EnabledModifiersKey, enabledStringBuilder.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ModifierToggleKeysKey, toggleKeyStringBuilder.ToString());
 
             return true;
         }
@@ -595,10 +399,14 @@ namespace JumpKingMod.Install.UI.Settings
                 List<ModifierSettingAttribute> modifierSettings = modifiers[i].Item1.GetFields()
                     .Select((FieldInfo f) => f.GetCustomAttribute<ModifierSettingAttribute>()).Where((ModifierSettingAttribute a) => a != null).ToList();
 
+                ConfigurableModifierViewModel configurableModifierViewModel =
+                    new ConfigurableModifierViewModel(modifiers[i].Item1, modifiers[i].Item2.ConfigurableModifierName, modifiers[i].Item2.DefaultToggleKey);
+
                 // Make the grid to contain the modifier name & enabled toggle
                 Grid modifierActiveGrid = new Grid();
                 modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
                 modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+                modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
                 modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
                 modifierActiveGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
 
@@ -606,37 +414,42 @@ namespace JumpKingMod.Install.UI.Settings
                 Label modifierName = new Label();
                 modifierName.Content = modifiers[i].Item2.ConfigurableModifierName;
                 modifierName.FontWeight = FontWeights.Bold;
+                modifierName.Margin = new Thickness(5, 0, 10, 0);
+                modifierName.VerticalAlignment = VerticalAlignment.Center;
                 modifierName.SetValue(Grid.ColumnProperty, 0);
                 modifierName.SetValue(Grid.RowProperty, 0);
-                modifierName.VerticalAlignment = VerticalAlignment.Center;
+
+                // Make the ComboBox for toggle keys
+                ComboBox toggleKeyComboBox = new ComboBox();
+                toggleKeyComboBox.ItemsSource = Enum.GetValues(typeof(Keys));
+                toggleKeyComboBox.VerticalAlignment = VerticalAlignment.Center;
+                toggleKeyComboBox.SetValue(Grid.ColumnProperty, 2);
+                toggleKeyComboBox.SetValue(Grid.RowProperty, 0);
+
+                Binding toggleKeyBinding = new Binding(nameof(configurableModifierViewModel.ToggleKey));
+                toggleKeyBinding.Source = configurableModifierViewModel;
+                toggleKeyComboBox.SetBinding(ComboBox.SelectedItemProperty, toggleKeyBinding);
+
+                Binding toggleKeyVisibilityBinding = new Binding(nameof(ShouldShowToggleKeys));
+                toggleKeyVisibilityBinding.Source = this;
+                toggleKeyVisibilityBinding.Converter = new BooleanToVisibilityConverter();
+                toggleKeyVisibilityBinding.Mode = BindingMode.OneWay;
+                toggleKeyComboBox.SetBinding(ComboBox.VisibilityProperty, toggleKeyVisibilityBinding);
 
                 // Make the enabled toggle
                 CheckBox enabledBox = new CheckBox();
-                enabledBox.SetValue(Grid.ColumnProperty, 2);
-                enabledBox.SetValue(Grid.RowProperty, 0);
+                enabledBox.Margin = new Thickness(5, 0, 10, 0);
                 enabledBox.VerticalAlignment = VerticalAlignment.Center;
                 enabledBox.HorizontalAlignment = HorizontalAlignment.Right;
+                enabledBox.SetValue(Grid.ColumnProperty, 3);
+                enabledBox.SetValue(Grid.RowProperty, 0);
 
                 // Add to the grid & parent stack
                 modifierActiveGrid.Children.Add(modifierName);
+                modifierActiveGrid.Children.Add(toggleKeyComboBox);
                 modifierActiveGrid.Children.Add(enabledBox);
-                Expander modifierExpander = null;
-                StackPanel modifierExpanderStack = null;
-                if (modifierSettings.Count > 0)
-                {
-                    modifierExpander = new Expander();
-                    modifierExpanderStack = new StackPanel();
-                    modifierExpander.Header = modifierActiveGrid;
-                    modifierExpander.Content = modifierExpanderStack;
-                    modifiersStack.Children.Add(modifierExpander);
-                }
-                else
-                {
-                    modifiersStack.Children.Add(modifierActiveGrid);
-                }
+                modifiersStack.Children.Add(modifierActiveGrid);
 
-                ConfigurableModifierViewModel configurableModifierViewModel =
-                    new ConfigurableModifierViewModel(modifiers[i].Item1, modifiers[i].Item2.ConfigurableModifierName);
 
                 // Make the binding and assign the default value
                 Binding enabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
@@ -658,10 +471,17 @@ namespace JumpKingMod.Install.UI.Settings
                     // Make the setting name
                     Label settingName = new Label();
                     settingName.Content = modifierSettings[j].DisplayName;
+                    settingName.Margin = new Thickness(32, 0, 10, 0);
+                    settingName.VerticalAlignment = VerticalAlignment.Center;
                     settingName.SetValue(Grid.ColumnProperty, 0);
                     settingName.SetValue(Grid.RowProperty, 0);
-                    settingName.VerticalAlignment = VerticalAlignment.Center;
                     settingGrid.Children.Add(settingName);
+
+                    // Set the visibility binding
+                    Binding settingNameVisibleBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                    settingNameVisibleBinding.Source = configurableModifierViewModel;
+                    settingNameVisibleBinding.Converter = new BooleanToVisibilityConverter();
+                    settingName.SetBinding(Label.VisibilityProperty, settingNameVisibleBinding);
 
                     // Make the value editor
                     switch (modifierSettings[j].SettingType)
@@ -669,9 +489,10 @@ namespace JumpKingMod.Install.UI.Settings
                         case ModifierSettingType.Bool:
                             {
                                 CheckBox settingBox = new CheckBox();
+                                settingBox.Margin = new Thickness(5, 0, 10, 0);
+                                settingBox.VerticalAlignment = VerticalAlignment.Center;
                                 settingBox.SetValue(Grid.ColumnProperty, 1);
                                 settingBox.SetValue(Grid.RowProperty, 0);
-                                settingBox.VerticalAlignment = VerticalAlignment.Center;
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
@@ -682,10 +503,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 settingBox.SetBinding(CheckBox.IsCheckedProperty, boolBinding);
                                 settingBox.IsChecked = (bool)modifierSettings[j].DefaultSetting;
 
-                                // Set the enabled binding
-                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
-                                settingEnabledBinding.Source = configurableModifierViewModel;
-                                settingBox.SetBinding(CheckBox.IsEnabledProperty, settingEnabledBinding);
+                                // Set the visibility binding
+                                Binding settingVisibleBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingVisibleBinding.Source = configurableModifierViewModel;
+                                settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
+                                settingBox.SetBinding(CheckBox.VisibilityProperty, settingVisibleBinding);
 
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
@@ -695,10 +517,11 @@ namespace JumpKingMod.Install.UI.Settings
                         case ModifierSettingType.String:
                             {
                                 TextBox textBox = new TextBox();
-                                textBox.SetValue(Grid.ColumnProperty, 1);
-                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.Margin = new Thickness(5, 0, 10, 0);
                                 textBox.MinWidth = 100;
                                 textBox.VerticalAlignment = VerticalAlignment.Center;
+                                textBox.SetValue(Grid.ColumnProperty, 1);
+                                textBox.SetValue(Grid.RowProperty, 0);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
@@ -709,10 +532,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 textBox.SetBinding(TextBox.TextProperty, stringBinding);
                                 textBox.Text = (string)modifierSettings[j].DefaultSetting;
 
-                                // Set the enabled binding
-                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
-                                settingEnabledBinding.Source = configurableModifierViewModel;
-                                textBox.SetBinding(TextBox.IsEnabledProperty, settingEnabledBinding);
+                                // Set the visibility binding
+                                Binding settingVisibleBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingVisibleBinding.Source = configurableModifierViewModel;
+                                settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
+                                textBox.SetBinding(TextBox.VisibilityProperty, settingVisibleBinding);
 
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
@@ -722,10 +546,11 @@ namespace JumpKingMod.Install.UI.Settings
                         case ModifierSettingType.Float:
                             {
                                 TextBox textBox = new TextBox();
-                                textBox.SetValue(Grid.ColumnProperty, 1);
-                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.Margin = new Thickness(5, 0, 10, 0);
                                 textBox.MinWidth = 100;
                                 textBox.VerticalAlignment = VerticalAlignment.Center;
+                                textBox.SetValue(Grid.ColumnProperty, 1);
+                                textBox.SetValue(Grid.RowProperty, 0);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
@@ -737,10 +562,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 textBox.SetBinding(TextBox.TextProperty, floatBinding);
                                 textBox.Text = ((float)modifierSettings[j].DefaultSetting).ToString();
 
-                                // Set the enabled binding
-                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
-                                settingEnabledBinding.Source = configurableModifierViewModel;
-                                textBox.SetBinding(TextBox.IsEnabledProperty, settingEnabledBinding);
+                                // Set the visibility binding
+                                Binding settingVisibleBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingVisibleBinding.Source = configurableModifierViewModel;
+                                settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
+                                textBox.SetBinding(TextBox.VisibilityProperty, settingVisibleBinding);
 
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
@@ -750,10 +576,11 @@ namespace JumpKingMod.Install.UI.Settings
                         case ModifierSettingType.Int:
                             {
                                 TextBox textBox = new TextBox();
-                                textBox.SetValue(Grid.ColumnProperty, 1);
-                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.Margin = new Thickness(5, 0, 10, 0);
                                 textBox.MinWidth = 100;
                                 textBox.VerticalAlignment = VerticalAlignment.Center;
+                                textBox.SetValue(Grid.ColumnProperty, 1);
+                                textBox.SetValue(Grid.RowProperty, 0);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
@@ -765,10 +592,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 textBox.SetBinding(TextBox.TextProperty, intBinding);
                                 textBox.Text = ((int)modifierSettings[j].DefaultSetting).ToString();
 
-                                // Set the enabled binding
-                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
-                                settingEnabledBinding.Source = configurableModifierViewModel;
-                                textBox.SetBinding(TextBox.IsEnabledProperty, settingEnabledBinding);
+                                // Set the visibility binding
+                                Binding settingVisibleBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingVisibleBinding.Source = configurableModifierViewModel;
+                                settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
+                                textBox.SetBinding(TextBox.VisibilityProperty, settingVisibleBinding);
 
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
@@ -778,10 +606,11 @@ namespace JumpKingMod.Install.UI.Settings
                         case ModifierSettingType.Enum:
                             {
                                 ComboBox comboBox = new ComboBox();
-                                comboBox.SetValue(Grid.ColumnProperty, 1);
-                                comboBox.SetValue(Grid.RowProperty, 0);
+                                comboBox.Margin = new Thickness(5, 0, 10, 0);
                                 comboBox.ItemsSource = Enum.GetNames(modifierSettings[j].EnumType);
                                 comboBox.VerticalAlignment = VerticalAlignment.Center;
+                                comboBox.SetValue(Grid.ColumnProperty, 1);
+                                comboBox.SetValue(Grid.RowProperty, 0);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType, modifierSettings[j].EnumType);
@@ -792,10 +621,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 comboBox.SetBinding(ComboBox.SelectedValueProperty, enumBinding);
                                 comboBox.SelectedValue = modifierSettingViewModel.DefaultSettingValue.ToString();
 
-                                // Set the enabled binding
-                                Binding settingEnabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
-                                settingEnabledBinding.Source = configurableModifierViewModel;
-                                comboBox.SetBinding(ComboBox.IsEnabledProperty, settingEnabledBinding);
+                                // Set the visibility binding
+                                Binding settingVisibleBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
+                                settingVisibleBinding.Source = configurableModifierViewModel;
+                                settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
+                                comboBox.SetBinding(ComboBox.VisibilityProperty, settingVisibleBinding);
 
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
@@ -804,14 +634,7 @@ namespace JumpKingMod.Install.UI.Settings
                             }
                     }
 
-                    if (modifierExpanderStack != null)
-                    {
-                        modifierExpanderStack.Children.Add(settingGrid);
-                    }
-                    else
-                    {
-                        modifiersStack.Children.Add(settingGrid);
-                    }
+                    modifiersStack.Children.Add(settingGrid);
                 }
             }
         }

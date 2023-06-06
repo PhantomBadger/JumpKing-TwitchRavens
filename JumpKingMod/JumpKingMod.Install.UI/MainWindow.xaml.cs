@@ -34,20 +34,15 @@ namespace JumpKingRavensMod.Install.UI
             ToolTipService.BetweenShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(0));
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(10000));
 
-            // Create the Modifier Tab and Stack Panel programmatically
-            TabItem tabItemModifiers = new TabItem();
-            tabItemModifiers.Name = "tabItemModifiers";
-            tabItemModifiers.Header = "Modifiers";
-            tabItemModifiers.VerticalAlignment = VerticalAlignment.Top;
-
+            // Create the Modifier Tab Stack Panel programmatically
             ScrollViewer scrollViewer = new ScrollViewer();
             scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            scrollViewer.SetValue(Grid.RowProperty, 2);
 
             StackPanel modifiersStack = new StackPanel();
 
             scrollViewer.Content = modifiersStack;
-            tabItemModifiers.Content = scrollViewer;
-            tabControl.Items.Add(tabItemModifiers);
+            tabItemModifiersGrid.Children.Add(scrollViewer);
 
             // Create the data context and pass it the modifiers stack
             installerViewModel = new InstallerViewModel(modifiersStack);

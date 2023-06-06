@@ -15,7 +15,10 @@ namespace JumpKingModifiersMod.Settings
         public const string SettingsFileName = "JumpKingModifiersMod.settings";
         public const char CommentCharacter = '#';
 
+        // Modifiers
         public const string EnabledModifiersKey = "EnabledModifiers";
+        public const string TriggerTypeKey = "TriggerType";
+        public const string ModifierToggleKeysKey = "ModifierToggleKeys";
 
         // Fall Damage
         public const string FallDamageBloodSplatterFilePath = "Content/Mods/BloodSplatters.txt";

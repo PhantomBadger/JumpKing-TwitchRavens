@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,13 +12,20 @@ namespace JumpKingModifiersMod.Settings
     {
         public string ConfigurableModifierName { get; private set; }
 
-        public ConfigurableModifierAttribute(string modifierName)
+        public Keys DefaultToggleKey { get; private set; }
+
+        public ConfigurableModifierAttribute(string modifierName, Keys defaultToggleKey)
         {
             if (string.IsNullOrWhiteSpace(modifierName))
             {
                 throw new ArgumentNullException(nameof(modifierName));
             }
             ConfigurableModifierName = modifierName;
+            DefaultToggleKey = defaultToggleKey;
+        }
+
+        public ConfigurableModifierAttribute(string modifierName) : this(modifierName, Keys.NumPad1)
+        {
         }
     }
 }

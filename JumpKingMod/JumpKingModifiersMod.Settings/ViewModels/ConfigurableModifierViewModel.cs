@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -17,6 +18,23 @@ namespace JumpKingModifiersMod.Settings.ViewModels
 
         public List<ModifierSettingViewModel> ModifierSettings { get; private set; }
 
+        public Keys ToggleKey
+        {
+            get
+            {
+                return toggleKey;
+            }
+            set
+            {
+                if (toggleKey != value)
+                {
+                    toggleKey = value;
+                    RaisePropertyChanged(nameof(ToggleKey));
+                }
+            }
+        }
+        private Keys toggleKey;
+
         public bool ModifierEnabled
         {
             get
@@ -34,10 +52,11 @@ namespace JumpKingModifiersMod.Settings.ViewModels
         }
         private bool modifierEnabled;
 
-        public ConfigurableModifierViewModel(Type modifierType, string modifierName)
+        public ConfigurableModifierViewModel(Type modifierType, string modifierName, Keys toggleKey)
         {
             ModifierType = modifierType;
             ModifierName = modifierName;
+            ToggleKey = toggleKey;
             ModifierSettings = new List<ModifierSettingViewModel>();
         }
 
