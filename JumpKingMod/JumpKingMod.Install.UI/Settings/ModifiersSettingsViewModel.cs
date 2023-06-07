@@ -130,6 +130,7 @@ namespace JumpKingMod.Install.UI.Settings
                     triggerType = value;
                     RaisePropertyChanged(nameof(TriggerType));
                     RaisePropertyChanged(nameof(ShouldShowToggleKeys));
+                    RaisePropertyChanged(nameof(ShowAllModifierSettings));
                 }
             }
         }
@@ -143,6 +144,17 @@ namespace JumpKingMod.Install.UI.Settings
             get
             {
                 return triggerType == ModifierTriggerTypes.Toggle;
+            }
+        }
+
+        /// <summary>
+        /// Whether we should hide all modifier settings
+        /// </summary>
+        public bool ShowAllModifierSettings
+        {
+            get
+            {
+                return triggerType != ModifierTriggerTypes.None;
             }
         }
 
@@ -227,18 +239,11 @@ namespace JumpKingMod.Install.UI.Settings
 
                 // Parse the enabled setting
                 string rawEnabledModifiers = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.EnabledModifiersKey, "");
-                HashSet<string> enabledModifiers = new HashSet<string>(rawEnabledModifiers.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+                HashSet<string> enabledModifiers = JumpKingModifiersModSettingsContext.ParseEnabledModifiers(rawEnabledModifiers);
 
                 // Parse the toggle key setting
-                // TODO: Error check here and in the loop below! Move into a utility function in the settings so we can reuse it in the mod
                 string rawModifierToggleKeys = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ModifierToggleKeysKey, "");
-                string[] splitModifierToggleKeys = rawModifierToggleKeys.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                Dictionary<string, Keys> toggleKeys = new Dictionary<string, Keys>(StringComparer.OrdinalIgnoreCase);
-                for (int i = 0; i < splitModifierToggleKeys.Length; i++)
-                {
-                    string[] toggleSetting = splitModifierToggleKeys[i].Split(':');
-                    toggleKeys.Add(toggleSetting[0], (Keys)Enum.Parse(typeof(Keys), toggleSetting[1]));
-                }
+                Dictionary<string, Keys> toggleKeys = JumpKingModifiersModSettingsContext.ParseToggleKeys(rawModifierToggleKeys);
 
                 // Go through all our known modifiers and populate them from our settings
                 for (int i = 0; i < modifierViewModels.Count; i++)
@@ -377,6 +382,13 @@ namespace JumpKingMod.Install.UI.Settings
         {
             modifiersStack.Children.Clear();
 
+            // Modifiers stack visibility
+            Binding modifierStackVisibilityBinding = new Binding(nameof(ShowAllModifierSettings));
+            modifierStackVisibilityBinding.Source = this;
+            modifierStackVisibilityBinding.Converter = new BooleanToVisibilityConverter();
+            modifierStackVisibilityBinding.Mode = BindingMode.OneWay;
+            modifiersStack.SetBinding(StackPanel.VisibilityProperty, modifierStackVisibilityBinding);
+
             Assembly assembly = Assembly.LoadFrom(modifierDLLPath);
             List<Tuple<Type, ConfigurableModifierAttribute>> modifiers = assembly.GetTypes().Select((Type t) =>
             {
@@ -390,6 +402,49 @@ namespace JumpKingMod.Install.UI.Settings
             .Where((Tuple<Type, ConfigurableModifierAttribute> tuple) => tuple != null)
             .OrderBy((Tuple<Type, ConfigurableModifierAttribute> tuple) => tuple.Item2.ConfigurableModifierName)
             .ToList();
+
+            // Make some headers to explain what the presented options are
+            Grid headerGrid = new Grid();
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            headerGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+
+            Label modifierNameHeader = new Label();
+            modifierNameHeader.Content = "Modifier Name";
+            modifierNameHeader.FontWeight = FontWeights.Bold;
+            modifierNameHeader.Margin = new Thickness(5, 0, 10, 0);
+            modifierNameHeader.VerticalAlignment = VerticalAlignment.Center;
+            modifierNameHeader.SetValue(Grid.ColumnProperty, 0);
+            modifierNameHeader.SetValue(Grid.RowProperty, 0);
+
+            Label toggleHeader = new Label();
+            toggleHeader.Content = "Toggle Key";
+            toggleHeader.FontWeight = FontWeights.Bold;
+            toggleHeader.Margin = new Thickness(5, 0, 10, 0);
+            toggleHeader.VerticalAlignment = VerticalAlignment.Center;
+            toggleHeader.SetValue(Grid.ColumnProperty, 2);
+            toggleHeader.SetValue(Grid.RowProperty, 0);
+
+            Binding toggleHeaderVisibilityBinding = new Binding(nameof(ShouldShowToggleKeys));
+            toggleHeaderVisibilityBinding.Source = this;
+            toggleHeaderVisibilityBinding.Converter = new BooleanToVisibilityConverter();
+            toggleHeaderVisibilityBinding.Mode = BindingMode.OneWay;
+            toggleHeader.SetBinding(Label.VisibilityProperty, toggleHeaderVisibilityBinding);
+
+            Label enabledHeader = new Label();
+            enabledHeader.Content = "Enabled";
+            enabledHeader.FontWeight = FontWeights.Bold;
+            enabledHeader.Margin = new Thickness(5, 0, 10, 0);
+            enabledHeader.VerticalAlignment = VerticalAlignment.Center;
+            enabledHeader.SetValue(Grid.ColumnProperty, 3);
+            enabledHeader.SetValue(Grid.RowProperty, 0);
+
+            headerGrid.Children.Add(modifierNameHeader);
+            headerGrid.Children.Add(toggleHeader);
+            headerGrid.Children.Add(enabledHeader);
+            modifiersStack.Children.Add(headerGrid);
 
             // Go through all Modifiers
             modifierViewModels.Clear();
@@ -413,7 +468,7 @@ namespace JumpKingMod.Install.UI.Settings
                 // Make the modifier name
                 Label modifierName = new Label();
                 modifierName.Content = modifiers[i].Item2.ConfigurableModifierName;
-                modifierName.FontWeight = FontWeights.Bold;
+                modifierName.FontWeight = FontWeights.Medium;
                 modifierName.Margin = new Thickness(5, 0, 10, 0);
                 modifierName.VerticalAlignment = VerticalAlignment.Center;
                 modifierName.SetValue(Grid.ColumnProperty, 0);
@@ -449,7 +504,6 @@ namespace JumpKingMod.Install.UI.Settings
                 modifierActiveGrid.Children.Add(toggleKeyComboBox);
                 modifierActiveGrid.Children.Add(enabledBox);
                 modifiersStack.Children.Add(modifierActiveGrid);
-
 
                 // Make the binding and assign the default value
                 Binding enabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));

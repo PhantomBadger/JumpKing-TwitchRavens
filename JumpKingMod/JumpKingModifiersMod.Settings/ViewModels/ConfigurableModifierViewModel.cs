@@ -8,16 +8,31 @@ using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.Settings.ViewModels
 {
+    /// <summary>
+    /// A ViewModel to represent the setting of a single configurable Modifier
+    /// </summary>
     public class ConfigurableModifierViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// The type of the Modifier
+        /// </summary>
         public Type ModifierType { get; private set; }
 
+        /// <summary>
+        /// The name of the Modifier
+        /// </summary>
         public string ModifierName { get; private set; }
 
+        /// <summary>
+        /// A collection of ViewModels for the settings of this Modifier
+        /// </summary>
         public List<ModifierSettingViewModel> ModifierSettings { get; private set; }
 
+        /// <summary>
+        /// The key to be used to toggle this modifier when used in a debug trigger
+        /// </summary>
         public Keys ToggleKey
         {
             get
@@ -35,6 +50,9 @@ namespace JumpKingModifiersMod.Settings.ViewModels
         }
         private Keys toggleKey;
 
+        /// <summary>
+        /// Whether this modifier is selected to be used or not
+        /// </summary>
         public bool ModifierEnabled
         {
             get
@@ -52,6 +70,12 @@ namespace JumpKingModifiersMod.Settings.ViewModels
         }
         private bool modifierEnabled;
 
+        /// <summary>
+        /// Ctor for creating a <see cref="ConfigurableModifierViewModel"/>
+        /// </summary>
+        /// <param name="modifierType">The type of the modifier</param>
+        /// <param name="modifierName">The name of the modifier</param>
+        /// <param name="toggleKey">The key to be used to toggle this modifier when used in a debug trigger</param>
         public ConfigurableModifierViewModel(Type modifierType, string modifierName, Keys toggleKey)
         {
             ModifierType = modifierType;

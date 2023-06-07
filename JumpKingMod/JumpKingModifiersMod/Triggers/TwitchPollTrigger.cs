@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -137,6 +138,11 @@ namespace JumpKingModifiersMod.Triggers
             isEnabled = false;
             PollTimeModifier = DefaultPollTimeModifier;
             ActiveModifierDurationModifier = DefaultActiveModifierDurationModifier;
+
+            for (int i = 0; i < availableModifiers.Count; i++)
+            {
+                this.logger.Information($"[Twitch Poll Trigger] '{availableModifiers[i].DisplayName}' registered as a poll option");
+            }
 
             gameStateObserver.OnGameLoopRunning += OnGameLoopRunning;
             gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;

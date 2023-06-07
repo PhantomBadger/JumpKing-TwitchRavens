@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.Settings
 {
+    /// <summary>
+    /// A ViewModel representing a single setting of a Modifier
+    /// </summary>
     public class ModifierSettingViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -17,8 +20,19 @@ namespace JumpKingModifiersMod.Settings
         /// </summary>
         public string SettingKey { get; private set; }
 
+        /// <summary>
+        /// The <see cref="ModifierSettingType"/> for this setting
+        /// </summary>
         public ModifierSettingType SettingType { get; private set; }
+
+        /// <summary>
+        /// When the setting is a <see cref="ModifierSettingType.Enum"/> this represents the type of that enum
+        /// </summary>
         public Type EnumType { get; private set; }
+
+        /// <summary>
+        /// The default value of this setting boxed into an object
+        /// </summary>
         public object DefaultSettingValue { get; private set; }
 
         /// <summary>
@@ -135,12 +149,26 @@ namespace JumpKingModifiersMod.Settings
         }
         private Enum enumSettingValue;
 
+        /// <summary>
+        /// Ctor for creating a <see cref="ModifierSettingViewModel"/> for non-Enum types
+        /// </summary>
+        /// <param name="settingKey">The key for the setting</param>
+        /// <param name="defaultSettingValue">The default value for the setting</param>
+        /// <param name="settingType">The type for the setting</param>
         public ModifierSettingViewModel(string settingKey, object defaultSettingValue, ModifierSettingType settingType)
         {
             SettingKey = settingKey;
             SettingType = settingType;
             DefaultSettingValue = defaultSettingValue;
         }
+
+        /// <summary>
+        /// Ctor for creating a <see cref="ModifierSettingViewModel"/> for Enum types
+        /// </summary>
+        /// <param name="settingKey">The key for the setting</param>
+        /// <param name="defaultSettingValue">The default value for the setting</param>
+        /// <param name="settingType">The type for the setting</param>
+        /// <param name="enumType">The type of the enum used in the setting</param>
         public ModifierSettingViewModel(string settingKey, object defaultSettingValue, ModifierSettingType settingType, Type enumType) : this(settingKey, defaultSettingValue, settingType)
         {
             EnumType = enumType;

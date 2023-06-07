@@ -68,6 +68,7 @@
     <Compile Include="API\IDrawPlatformObserver.cs" />
     <Compile Include="API\IJumpTimeModifier.cs" />
     <Compile Include="API\ILowGravityObserver.cs" />
+    <Compile Include="API\IMetaModifier.cs" />
     <Compile Include="API\IModifier.cs" />
     <Compile Include="API\IModifierTrigger.cs" />
     <Compile Include="API\IOnIceObserver.cs" />

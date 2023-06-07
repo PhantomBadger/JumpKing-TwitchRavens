@@ -58,8 +58,6 @@ namespace JumpKingModifiersMod
                 drawRenderTargetPatch.SetUpManualPatch(harmony);
                 var windPatch = new WindObserverManualPatch(Logger);
                 windPatch.SetUpManualPatch(harmony);
-                var gravityPatch = new LowGravityObserverManualPatch(Logger);
-                gravityPatch.SetUpManualPatch(harmony);
                 var icePatch = new OnIceObserverManualPatch(Logger);
                 icePatch.SetUpManualPatch(harmony);
                 var drawForegroundPatch = new DrawPlatformsObserverManualPatch(Logger);
@@ -68,119 +66,152 @@ namespace JumpKingModifiersMod
                 // Make the Modifier Updating Entity
                 var modifierUpdatingEntity = new ModifierUpdatingEntity(ModEntityManager.Instance, Logger);
 
-                // Set up modifiers and trigger
-                List<IModifier> availableModifiers = new List<IModifier>();
+                // Load the settings for the modifiers and triggers
+                string rawEnabledModifiers = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.EnabledModifiersKey, "");
+                HashSet<string> enabledModifierTypes = JumpKingModifiersModSettingsContext.ParseEnabledModifiers(rawEnabledModifiers);
+
+                string rawModifierToggles = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ModifierToggleKeysKey, "");
+                Dictionary<string, Keys> modifierToggles = JumpKingModifiersModSettingsContext.ParseToggleKeys(rawModifierToggles);
+
+                ModifierTriggerTypes triggerType = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.TriggerTypeKey, ModifierTriggerTypes.Toggle);
+
+                // Make all the modifiers
+                List<IModifier> allModifiers = new List<IModifier>();
+                var subtextGetter = new YouDiedSubtextFileGetter(Logger);
+                var fallDamageModifier = new FallDamageModifier(
+                    modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance,
+                    subtextGetter, userSettings, Logger);
                 var walkSpeedModifier = new WalkSpeedModifier(WalkSpeedModifier.DefaultModifier, playerValues, Logger);
                 var bouncyFloorModifier = new BouncyFloorModifier(modifierUpdatingEntity, playerStatePatch, jumpStatePatch, Logger);
                 var flipScreenModifier = new FlipScreenModifier(drawRenderTargetPatch, Logger);
                 var invertControlsModifier = new InvertControlsModifier(playerStatePatch, Logger);
                 var windModifier = new WindToggleModifier(windPatch, Logger);
                 var lowVisibilityModifier = new LowVisibilityModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, Logger);
-                var lowGravityModifier = new LowGravityModifier(gravityPatch, Logger);
                 var iceModifier = new OnIceModifier(icePatch, Logger);
                 var hideForegroundModifier = new HidePlatformsModifier(drawForegroundPatch, Logger);
                 var screenShakeModifier = new ScreenShakeModifier(Logger);
                 var jumpTimeModifier = new JumpTimeModifier(JumpTimeModifier.DefaultModifier, playerValues, Logger);
+                var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance, userSettings, Logger);
+                var pollTimeModifier = new QuickerPollMetaModifier(Logger);
+                var durationModifier = new LongerDurationMetaModifier(Logger);
 
-                availableModifiers.Add(walkSpeedModifier);
-                availableModifiers.Add(bouncyFloorModifier);
-                availableModifiers.Add(flipScreenModifier);
-                availableModifiers.Add(invertControlsModifier);
-                availableModifiers.Add(windModifier);
-                availableModifiers.Add(lowVisibilityModifier);
-                availableModifiers.Add(lowGravityModifier);
-                availableModifiers.Add(iceModifier);
-                availableModifiers.Add(hideForegroundModifier);
-                availableModifiers.Add(screenShakeModifier);
-                availableModifiers.Add(jumpTimeModifier);
+                // Add the modifiers to a master list
+                allModifiers.Add(walkSpeedModifier);
+                allModifiers.Add(bouncyFloorModifier);
+                allModifiers.Add(flipScreenModifier);
+                allModifiers.Add(invertControlsModifier);
+                allModifiers.Add(windModifier);
+                allModifiers.Add(lowVisibilityModifier);
+                allModifiers.Add(iceModifier);
+                allModifiers.Add(hideForegroundModifier);
+                allModifiers.Add(screenShakeModifier);
+                allModifiers.Add(jumpTimeModifier);
+                allModifiers.Add(fallDamageModifier);
+                allModifiers.Add(risingLavaModifier);
+                allModifiers.Add(pollTimeModifier);
+                allModifiers.Add(durationModifier);
 
-                List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
-                //debugToggles.Add(new DebugTogglePair(risingLavaModifier, Keys.OemPeriod));
-
-                // Fall Damage
-                bool isFallDamageEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageEnabledKey, false);
-                if (isFallDamageEnabled)
+                // Low gravity requires some JK+ stuff, so if we deal with it seperately
+                // We attempt to patch it, if we fail then the JK+ methods dont exist and we can't use it
+                try
                 {
-                    var subtextGetter = new YouDiedSubtextFileGetter(Logger);
-                    var fallDamageModifier = new FallDamageModifier(
-                        modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance,
-                        subtextGetter, userSettings, Logger);
-                    Keys fallDamageToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerFallDamageToggleKeyKey, Keys.F11);
+                    var gravityPatch = new LowGravityObserverManualPatch(Logger);
+                    gravityPatch.SetUpManualPatch(harmony);
 
-                    var togglePair = new DebugTogglePair(fallDamageModifier, fallDamageToggleKey);
-                    debugToggles.Add(togglePair);
-
-                    Logger.Information($"Fall Damage Mod is Enabled! Press the Toggle Key ({fallDamageToggleKey.ToString()}) to activate once in game!");
+                    var lowGravityModifier = new LowGravityModifier(gravityPatch, Logger);
+                    allModifiers.Add(lowGravityModifier);
                 }
-                else
+                catch (Exception e)
                 {
-                    Logger.Error($"Fall Damage Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
-                }
-
-                // Manual Resizing
-                bool isShrinkingEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
-                if (isShrinkingEnabled)
-                {
-                    var manualResizeModifier = new ManualScreenResizeModifier(modifierUpdatingEntity, userSettings, Logger);
-                    Keys manualResizeToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
-
-                    var togglePair = new DebugTogglePair(manualResizeModifier, manualResizeToggleKey);
-                    debugToggles.Add(togglePair);
-                    Logger.Information($"Manual Resize Mod is Enabled! Press the Toggle Key ({manualResizeToggleKey.ToString()}) to activate once in game!");
-                }
-                else
-                {
-                    Logger.Error($"Manual Resize Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
+                    Logger.Warning($"The 'Low Gravity' Modifier requires JK+! It will not be used!");
                 }
 
-                // Rising Lava
-                bool isRisingLavaEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.RisingLavaEnabledKey, false);
-                if (isRisingLavaEnabled)
+                // Find which modifiers have been enabled in the settings
+                List<IModifier> triggerableModifiers = allModifiers.Where((IModifier modifier) => 
+                enabledModifierTypes.Contains(modifier.GetType().ToString())).ToList();
+
+                // Based on the selected trigger type initialise the trigger and add the triggerable modifiers
+                IModifierTrigger modifierTrigger = null;
+                switch (triggerType)
                 {
-                    var risingLavaModifier = new RisingLavaModifier(modifierUpdatingEntity, ModEntityManager.Instance, playerStatePatch, GameStateObserverManualPatch.Instance, userSettings, Logger);
-                    Keys risingLavaToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerLavaRisingToggleKeyKey, Keys.F7);
+                    case ModifierTriggerTypes.Toggle:
+                        {
+                            List<DebugTogglePair> debugToggles = new List<DebugTogglePair>();
+                            for (int i = 0; i < triggerableModifiers.Count; i++)
+                            {
+                                string typeName = triggerableModifiers[i].GetType().ToString();
+                                if (modifierToggles.ContainsKey(typeName))
+                                {
+                                    debugToggles.Add(new DebugTogglePair(triggerableModifiers[i], modifierToggles[typeName]));
+                                }
+                            }
+                            modifierTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings, Logger);
+                            break;
+                        }
+                    case ModifierTriggerTypes.TwitchPoll:
+                        {
+                            // Make twitch client factory
+                            var twitchSettings = new UserSettings(PBJKModBaseTwitchSettingsContext.SettingsFileName, PBJKModBaseTwitchSettingsContext.GetDefaultSettings(), Logger);
+                            var clientFactory = new TwitchClientFactory(twitchSettings, Logger);
 
-                    var togglePair = new DebugTogglePair(risingLavaModifier, risingLavaToggleKey);
-                    debugToggles.Add(togglePair);
+                            TwitchPollTrigger twitchPollTrigger = new TwitchPollTrigger(clientFactory.GetTwitchClient(), triggerableModifiers,
+                                ModEntityManager.Instance, GameStateObserverManualPatch.Instance, Logger);
 
-                    Logger.Information($"Rising Lava Mod is Enabled! Press the Toggle Key ({risingLavaToggleKey.ToString()}) to activate once in game!");
+                            TwitchPollVisual twitchPollVisual = new TwitchPollVisual(ModEntityManager.Instance, twitchPollTrigger,
+                                GameStateObserverManualPatch.Instance, Logger);
+
+                            // Add a reference to the meta modifiers - a bit jank doing it this way but heyo
+                            pollTimeModifier.TwitchPollTrigger = twitchPollTrigger;
+                            durationModifier.TwitchPollTrigger = twitchPollTrigger;
+
+                            modifierTrigger = twitchPollTrigger;
+                            break;
+                        }
+                    case ModifierTriggerTypes.None:
+                        {
+                            // No trigger
+                            modifierTrigger = null;
+                            break;
+                        }
+                    default:
+                        {
+                            throw new NotImplementedException($"No implementation for '{triggerType.ToString()}' Trigger Type");
+                        }
                 }
-                else
+
+                // Manual Resizing - Disabled, only used by Rainhoe for a one-off
+                //bool isShrinkingEnabled = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
+                //if (isShrinkingEnabled)
+                //{
+                //    var manualResizeModifier = new ManualScreenResizeModifier(modifierUpdatingEntity, userSettings, Logger);
+                //    Keys manualResizeToggleKey = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
+
+                //    var togglePair = new DebugTogglePair(manualResizeModifier, manualResizeToggleKey);
+                //    debugToggles.Add(togglePair);
+                //    Logger.Information($"Manual Resize Mod is Enabled! Press the Toggle Key ({manualResizeToggleKey.ToString()}) to activate once in game!");
+                //}
+                //else
+                //{
+                //    Logger.Error($"Manual Resize Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
+                //}
+
+                // Once the gameeis running then enable the twitch poll trigger
+                if (modifierTrigger != null)
                 {
-                    Logger.Error($"Rising Lava Mod is disabled in the settings! Run the Installer.UI.exe and click 'Load Settings' to enable");
-                }
-
-                // Make twitch client factory
-                var twitchSettings = new UserSettings(PBJKModBaseTwitchSettingsContext.SettingsFileName, PBJKModBaseTwitchSettingsContext.GetDefaultSettings(), Logger);
-                var clientFactory = new TwitchClientFactory(twitchSettings, Logger);
-
-                // Make the toggle trigger
-                var twitchPollTrigger = new TwitchPollTrigger(clientFactory.GetTwitchClient(), availableModifiers, 
-                    ModEntityManager.Instance, GameStateObserverManualPatch.Instance, Logger);
-                var pollVisual = new TwitchPollVisual(ModEntityManager.Instance, twitchPollTrigger, GameStateObserverManualPatch.Instance, Logger);
-
-                // Make the meta modifiers
-                var pollTimeModifier = new QuickerPollMetaModifier(twitchPollTrigger, Logger);
-                var durationModifier = new LongerDurationMetaModifier(twitchPollTrigger, Logger);
-                twitchPollTrigger.AddModifier(pollTimeModifier);
-                twitchPollTrigger.AddModifier(durationModifier);
-
-                var debugTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings);
-                debugTrigger.EnableTrigger();
-
-                // Once the gamee is running then enable the twitch poll trigger
-                Task.Run(() =>
-                {
-                    while (!GameStateObserverManualPatch.Instance.IsGameLoopRunning())
+                    Task.Run(() =>
                     {
-                        Task.Delay(500).Wait();
-                    }
+                        while (!GameStateObserverManualPatch.Instance.IsGameLoopRunning())
+                        {
+                            Task.Delay(500).Wait();
+                        }
 
-                    twitchPollTrigger.EnableTrigger();
-                });
+                        modifierTrigger.EnableTrigger();
+                    });
 
-                // Make the modifier notification
-                var modifierNotification = new ModifierToggleNotifications(ModEntityManager.Instance, new List<API.IModifierTrigger>() { debugTrigger, twitchPollTrigger }, Logger);
+                    // Make the modifier notification visual
+                    // this will display when a modifier is enabled or disabled
+                    var modifierNotification = new ModifierToggleNotifications(ModEntityManager.Instance, new List<API.IModifierTrigger>() { modifierTrigger }, Logger);
+                }
             }
             catch (Exception e)
             {
