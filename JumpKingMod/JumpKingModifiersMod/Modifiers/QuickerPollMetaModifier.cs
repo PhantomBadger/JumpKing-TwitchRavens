@@ -13,7 +13,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IMetaModifier"/> which speeds up the poll time for the <see cref="TwitchPollTrigger"/>
     /// </summary>
-    [ConfigurableModifier("(Meta) Quicker Poll Time")]
+    [ConfigurableModifier("(Meta) Quicker Poll Time", "The Polls created by the Twitch Poll trigger end quicker")]
     public class QuickerPollMetaModifier : IMetaModifier
     {
         public string DisplayName => "Quicker Poll Time";

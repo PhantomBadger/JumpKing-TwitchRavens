@@ -12,7 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> for overriding the Ice state of the player
     /// </summary>
-    [ConfigurableModifier("Enable Ice")]
+    [ConfigurableModifier("Enable Ice", "The player slides as if on Ice")]
     public class OnIceModifier : IModifier
     {
         public string DisplayName => "On Ice";

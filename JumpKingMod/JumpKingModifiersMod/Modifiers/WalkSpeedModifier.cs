@@ -13,7 +13,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> to modify the walk speed
     /// </summary>
-    [ConfigurableModifier("Increased Walk Speed")]
+    [ConfigurableModifier("Increased Walk Speed", "The player walks at a faster rate than normal")]
     public class WalkSpeedModifier : IModifier
     {
         public string DisplayName { get; } = "Increase Walk Speed";

@@ -21,7 +21,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> and <see cref="IDisposable"/> which has lava slowly rise from the bottom of the map. Touching the lava will mean death and a reset!
     /// </summary>
-    [ConfigurableModifier("Rising Lava")]
+    [ConfigurableModifier("Rising Lava", "Lava rises up the map, if you touch it you die and must restart the map")]
     public class RisingLavaModifier : IModifier, IDisposable
     {
         public string DisplayName => "Rising Lava";

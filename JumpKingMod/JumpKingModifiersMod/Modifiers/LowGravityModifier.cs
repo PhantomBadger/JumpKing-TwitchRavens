@@ -12,7 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which turns on low gravity when enabled
     /// </summary>
-    [ConfigurableModifier("Low Gravity")]
+    [ConfigurableModifier("Low Gravity", "Gravity is lowered, requires JK+ to be installed to work")]
     public class LowGravityModifier : IModifier
     {
         public string DisplayName => "Low Gravity";

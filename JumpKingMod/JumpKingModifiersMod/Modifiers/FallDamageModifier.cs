@@ -22,7 +22,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// An implementation of <see cref="IModifier"/> and <see cref="IDisposable"/> which gives a health bar to the player
     /// and loses health whenever they fall
     /// </summary>
-    [ConfigurableModifier("Fall Damage")]
+    [ConfigurableModifier("Fall Damage", "The player has a health bar, a long fall will deal damage to it, when you hit zero you die and the map restarts")]
     public class FallDamageModifier : IModifier, IDisposable
     {
         public string DisplayName { get; } = "Fall Damage";

@@ -12,7 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> to modify the jump time
     /// </summary>
-    [ConfigurableModifier("Decrease Jump Charge Time")]
+    [ConfigurableModifier("Decrease Jump Charge Time", "It takes less time to charge a full jump")]
     public class JumpTimeModifier : IModifier
     {
         public string DisplayName => "Decrease Jump Charge Time";

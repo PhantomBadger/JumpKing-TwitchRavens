@@ -12,7 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which turns on the wind when enabled
     /// </summary>
-    [ConfigurableModifier("Enable Wind")]
+    [ConfigurableModifier("Enable Wind", "Wind is enabled which will push the player left and right")]
     public class WindToggleModifier : IModifier
     {
         public string DisplayName { get; } = "Wind";

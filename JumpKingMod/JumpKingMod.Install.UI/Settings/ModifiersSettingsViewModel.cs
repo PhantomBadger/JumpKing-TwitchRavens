@@ -403,29 +403,34 @@ namespace JumpKingMod.Install.UI.Settings
             .OrderBy((Tuple<Type, ConfigurableModifierAttribute> tuple) => tuple.Item2.ConfigurableModifierName)
             .ToList();
 
-            // Make some headers to explain what the presented options are
-            Grid headerGrid = new Grid();
-            headerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-            headerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-            headerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-            headerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-            headerGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            // A Master grid enforces column spacing between all options
+            // we will dynamically create all the row definitions as we need them
+            Grid modifierSettingGrid = new Grid();
+            modifierSettingGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            modifierSettingGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            modifierSettingGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            modifierSettingGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            modifiersStack.Children.Add(modifierSettingGrid);
+            int numberOfRowsNeeded = 0;
 
+            // Make some headers to explain what the presented options are
             Label modifierNameHeader = new Label();
             modifierNameHeader.Content = "Modifier Name";
             modifierNameHeader.FontWeight = FontWeights.Bold;
             modifierNameHeader.Margin = new Thickness(5, 0, 10, 0);
             modifierNameHeader.VerticalAlignment = VerticalAlignment.Center;
+            modifierNameHeader.HorizontalAlignment = HorizontalAlignment.Left;
             modifierNameHeader.SetValue(Grid.ColumnProperty, 0);
-            modifierNameHeader.SetValue(Grid.RowProperty, 0);
+            modifierNameHeader.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
             Label toggleHeader = new Label();
             toggleHeader.Content = "Toggle Key";
             toggleHeader.FontWeight = FontWeights.Bold;
             toggleHeader.Margin = new Thickness(5, 0, 10, 0);
             toggleHeader.VerticalAlignment = VerticalAlignment.Center;
+            toggleHeader.HorizontalAlignment = HorizontalAlignment.Right;
             toggleHeader.SetValue(Grid.ColumnProperty, 2);
-            toggleHeader.SetValue(Grid.RowProperty, 0);
+            toggleHeader.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
             Binding toggleHeaderVisibilityBinding = new Binding(nameof(ShouldShowToggleKeys));
             toggleHeaderVisibilityBinding.Source = this;
@@ -438,13 +443,18 @@ namespace JumpKingMod.Install.UI.Settings
             enabledHeader.FontWeight = FontWeights.Bold;
             enabledHeader.Margin = new Thickness(5, 0, 10, 0);
             enabledHeader.VerticalAlignment = VerticalAlignment.Center;
+            enabledHeader.HorizontalAlignment = HorizontalAlignment.Right;
             enabledHeader.SetValue(Grid.ColumnProperty, 3);
-            enabledHeader.SetValue(Grid.RowProperty, 0);
+            enabledHeader.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
-            headerGrid.Children.Add(modifierNameHeader);
-            headerGrid.Children.Add(toggleHeader);
-            headerGrid.Children.Add(enabledHeader);
-            modifiersStack.Children.Add(headerGrid);
+            // Add to the grid
+            modifierSettingGrid.Children.Add(modifierNameHeader);
+            modifierSettingGrid.Children.Add(toggleHeader);
+            modifierSettingGrid.Children.Add(enabledHeader);
+
+            // Create the row needed to support this
+            modifierSettingGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            numberOfRowsNeeded++;
 
             // Go through all Modifiers
             modifierViewModels.Clear();
@@ -457,14 +467,6 @@ namespace JumpKingMod.Install.UI.Settings
                 ConfigurableModifierViewModel configurableModifierViewModel =
                     new ConfigurableModifierViewModel(modifiers[i].Item1, modifiers[i].Item2.ConfigurableModifierName, modifiers[i].Item2.DefaultToggleKey);
 
-                // Make the grid to contain the modifier name & enabled toggle
-                Grid modifierActiveGrid = new Grid();
-                modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-                modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-                modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-                modifierActiveGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-                modifierActiveGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-
                 // Make the modifier name
                 Label modifierName = new Label();
                 modifierName.Content = modifiers[i].Item2.ConfigurableModifierName;
@@ -472,14 +474,20 @@ namespace JumpKingMod.Install.UI.Settings
                 modifierName.Margin = new Thickness(5, 0, 10, 0);
                 modifierName.VerticalAlignment = VerticalAlignment.Center;
                 modifierName.SetValue(Grid.ColumnProperty, 0);
-                modifierName.SetValue(Grid.RowProperty, 0);
+                modifierName.SetValue(Grid.RowProperty, numberOfRowsNeeded);
+                if (!string.IsNullOrWhiteSpace(modifiers[i].Item2.ModifierDescription))
+                {
+                    ToolTip tooltip = new ToolTip();
+                    tooltip.Content = modifiers[i].Item2.ModifierDescription;
+                    modifierName.ToolTip = tooltip;
+                }
 
                 // Make the ComboBox for toggle keys
                 ComboBox toggleKeyComboBox = new ComboBox();
                 toggleKeyComboBox.ItemsSource = Enum.GetValues(typeof(Keys));
                 toggleKeyComboBox.VerticalAlignment = VerticalAlignment.Center;
                 toggleKeyComboBox.SetValue(Grid.ColumnProperty, 2);
-                toggleKeyComboBox.SetValue(Grid.RowProperty, 0);
+                toggleKeyComboBox.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
                 Binding toggleKeyBinding = new Binding(nameof(configurableModifierViewModel.ToggleKey));
                 toggleKeyBinding.Source = configurableModifierViewModel;
@@ -497,13 +505,7 @@ namespace JumpKingMod.Install.UI.Settings
                 enabledBox.VerticalAlignment = VerticalAlignment.Center;
                 enabledBox.HorizontalAlignment = HorizontalAlignment.Right;
                 enabledBox.SetValue(Grid.ColumnProperty, 3);
-                enabledBox.SetValue(Grid.RowProperty, 0);
-
-                // Add to the grid & parent stack
-                modifierActiveGrid.Children.Add(modifierName);
-                modifierActiveGrid.Children.Add(toggleKeyComboBox);
-                modifierActiveGrid.Children.Add(enabledBox);
-                modifiersStack.Children.Add(modifierActiveGrid);
+                enabledBox.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
                 // Make the binding and assign the default value
                 Binding enabledBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
@@ -511,25 +513,29 @@ namespace JumpKingMod.Install.UI.Settings
                 enabledBox.SetBinding(CheckBox.IsCheckedProperty, enabledBinding);
                 enabledBox.IsChecked = true;
 
+                // Add to the grid
+                modifierSettingGrid.Children.Add(modifierName);
+                modifierSettingGrid.Children.Add(toggleKeyComboBox);
+                modifierSettingGrid.Children.Add(enabledBox);
+
+                // Create the grid row needed to support this entry
+                modifierSettingGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+                numberOfRowsNeeded++;
+
+                // Cache the ViewModel
                 modifierViewModels.Add(configurableModifierViewModel);
 
                 // Make options for every defined setting
                 for (int j = 0; j < modifierSettings.Count; j++)
                 {
-                    // Make the grid to contain this setting name and it's value
-                    Grid settingGrid = new Grid();
-                    settingGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-                    settingGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-                    settingGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-
                     // Make the setting name
                     Label settingName = new Label();
                     settingName.Content = modifierSettings[j].DisplayName;
                     settingName.Margin = new Thickness(32, 0, 10, 0);
                     settingName.VerticalAlignment = VerticalAlignment.Center;
                     settingName.SetValue(Grid.ColumnProperty, 0);
-                    settingName.SetValue(Grid.RowProperty, 0);
-                    settingGrid.Children.Add(settingName);
+                    settingName.SetValue(Grid.RowProperty, numberOfRowsNeeded);
+                    modifierSettingGrid.Children.Add(settingName);
 
                     // Set the visibility binding
                     Binding settingNameVisibleBinding = new Binding(nameof(configurableModifierViewModel.ModifierEnabled));
@@ -545,8 +551,10 @@ namespace JumpKingMod.Install.UI.Settings
                                 CheckBox settingBox = new CheckBox();
                                 settingBox.Margin = new Thickness(5, 0, 10, 0);
                                 settingBox.VerticalAlignment = VerticalAlignment.Center;
-                                settingBox.SetValue(Grid.ColumnProperty, 1);
-                                settingBox.SetValue(Grid.RowProperty, 0);
+                                settingBox.HorizontalAlignment = HorizontalAlignment.Right;
+                                settingBox.SetValue(Grid.ColumnProperty, 2);
+                                settingBox.SetValue(Grid.ColumnSpanProperty, 2);
+                                settingBox.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
@@ -563,9 +571,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
                                 settingBox.SetBinding(CheckBox.VisibilityProperty, settingVisibleBinding);
 
+                                // Cache the ViewModel
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
-                                settingGrid.Children.Add(settingBox);
+                                // Add to the grid
+                                modifierSettingGrid.Children.Add(settingBox);
                                 break;
                             }
                         case ModifierSettingType.String:
@@ -574,8 +584,10 @@ namespace JumpKingMod.Install.UI.Settings
                                 textBox.Margin = new Thickness(5, 0, 10, 0);
                                 textBox.MinWidth = 100;
                                 textBox.VerticalAlignment = VerticalAlignment.Center;
-                                textBox.SetValue(Grid.ColumnProperty, 1);
-                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.HorizontalAlignment = HorizontalAlignment.Right;
+                                textBox.SetValue(Grid.ColumnProperty, 2);
+                                textBox.SetValue(Grid.ColumnSpanProperty, 2);
+                                textBox.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
@@ -592,9 +604,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
                                 textBox.SetBinding(TextBox.VisibilityProperty, settingVisibleBinding);
 
+                                // Cache the ViewModel
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
-                                settingGrid.Children.Add(textBox);
+                                // Add to the grid
+                                modifierSettingGrid.Children.Add(textBox);
                                 break;
                             }
                         case ModifierSettingType.Float:
@@ -603,8 +617,10 @@ namespace JumpKingMod.Install.UI.Settings
                                 textBox.Margin = new Thickness(5, 0, 10, 0);
                                 textBox.MinWidth = 100;
                                 textBox.VerticalAlignment = VerticalAlignment.Center;
-                                textBox.SetValue(Grid.ColumnProperty, 1);
-                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.HorizontalAlignment = HorizontalAlignment.Right;
+                                textBox.SetValue(Grid.ColumnProperty, 2);
+                                textBox.SetValue(Grid.ColumnSpanProperty, 2);
+                                textBox.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
@@ -622,9 +638,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
                                 textBox.SetBinding(TextBox.VisibilityProperty, settingVisibleBinding);
 
+                                // Cache the ViewModel
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
-                                settingGrid.Children.Add(textBox);
+                                // Add to the grid
+                                modifierSettingGrid.Children.Add(textBox);
                                 break;
                             }
                         case ModifierSettingType.Int:
@@ -633,8 +651,10 @@ namespace JumpKingMod.Install.UI.Settings
                                 textBox.Margin = new Thickness(5, 0, 10, 0);
                                 textBox.MinWidth = 100;
                                 textBox.VerticalAlignment = VerticalAlignment.Center;
-                                textBox.SetValue(Grid.ColumnProperty, 1);
-                                textBox.SetValue(Grid.RowProperty, 0);
+                                textBox.HorizontalAlignment = HorizontalAlignment.Right;
+                                textBox.SetValue(Grid.ColumnProperty, 2);
+                                textBox.SetValue(Grid.ColumnSpanProperty, 2);
+                                textBox.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType);
@@ -652,9 +672,11 @@ namespace JumpKingMod.Install.UI.Settings
                                 settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
                                 textBox.SetBinding(TextBox.VisibilityProperty, settingVisibleBinding);
 
+                                // Cache the ViewModel
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
-                                settingGrid.Children.Add(textBox);
+                                // Add to the grid
+                                modifierSettingGrid.Children.Add(textBox);
                                 break;
                             }
                         case ModifierSettingType.Enum:
@@ -663,8 +685,10 @@ namespace JumpKingMod.Install.UI.Settings
                                 comboBox.Margin = new Thickness(5, 0, 10, 0);
                                 comboBox.ItemsSource = Enum.GetNames(modifierSettings[j].EnumType);
                                 comboBox.VerticalAlignment = VerticalAlignment.Center;
-                                comboBox.SetValue(Grid.ColumnProperty, 1);
-                                comboBox.SetValue(Grid.RowProperty, 0);
+                                comboBox.HorizontalAlignment = HorizontalAlignment.Right;
+                                comboBox.SetValue(Grid.ColumnProperty, 2);
+                                comboBox.SetValue(Grid.ColumnSpanProperty, 2);
+                                comboBox.SetValue(Grid.RowProperty, numberOfRowsNeeded);
 
                                 ModifierSettingViewModel modifierSettingViewModel =
                                     new ModifierSettingViewModel(modifierSettings[j].SettingKey, modifierSettings[j].DefaultSetting, modifierSettings[j].SettingType, modifierSettings[j].EnumType);
@@ -681,14 +705,18 @@ namespace JumpKingMod.Install.UI.Settings
                                 settingVisibleBinding.Converter = new BooleanToVisibilityConverter();
                                 comboBox.SetBinding(ComboBox.VisibilityProperty, settingVisibleBinding);
 
+                                // Cache the ViewModel
                                 configurableModifierViewModel.ModifierSettings.Add(modifierSettingViewModel);
 
-                                settingGrid.Children.Add(comboBox);
+                                // Add to the grid
+                                modifierSettingGrid.Children.Add(comboBox);
                                 break;
                             }
                     }
 
-                    modifiersStack.Children.Add(settingGrid);
+                    // Create the row needed to support this
+                    modifierSettingGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+                    numberOfRowsNeeded++;
                 }
             }
         }

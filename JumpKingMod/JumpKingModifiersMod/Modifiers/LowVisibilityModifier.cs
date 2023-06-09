@@ -16,7 +16,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which displays a low visibility overlay over the screen
     /// </summary>
-    [ConfigurableModifier("Low Visibility")]
+    [ConfigurableModifier("Low Visibility", "The screen is dark except for a small circle around the player")]
     public class LowVisibilityModifier : IModifier, IDisposable
     {
         public string DisplayName => "Low Visibility";

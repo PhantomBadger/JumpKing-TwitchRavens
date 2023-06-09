@@ -12,7 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> and <see cref="IDisposable"/> which flips the player's controls
     /// </summary>
-    [ConfigurableModifier("Invert Controls")]
+    [ConfigurableModifier("Invert Controls", "Left and Right controls are inverted")]
     public class InvertControlsModifier : IModifier, IDisposable
     {
         public string DisplayName { get; } = "Invert Controls";

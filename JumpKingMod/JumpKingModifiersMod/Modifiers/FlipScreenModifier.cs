@@ -14,7 +14,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// An implementation of <see cref="IModifier"/> and <see cref="IDisposable"/> which flips
     /// the screen vertically and horizontally
     /// </summary>
-    [ConfigurableModifier("Flip Screen")]
+    [ConfigurableModifier("Flip Screen", "The screen is flipped horizontally and vertically")]
     public class FlipScreenModifier : IModifier, IDisposable
     {
         public string DisplayName { get; } = "Flip Screen";

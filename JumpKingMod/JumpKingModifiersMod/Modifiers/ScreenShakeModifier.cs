@@ -14,7 +14,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which causes screen shake
     /// </summary>
-    [ConfigurableModifier("Screen Shake")]
+    [ConfigurableModifier("Screen Shake", "The screen shakes left to right")]
     public class ScreenShakeModifier : IModifier
     {
         public string DisplayName => "Screen Shake";

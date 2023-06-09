@@ -12,7 +12,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> which hides the foreground platforms
     /// </summary>
-    [ConfigurableModifier("Hide Platforms")]
+    [ConfigurableModifier("Hide Platforms", "All platforms are made invisible, background and foreground dressing is still visible")]
     public class HidePlatformsModifier : IModifier
     {
         public string DisplayName => "Hide Platforms";

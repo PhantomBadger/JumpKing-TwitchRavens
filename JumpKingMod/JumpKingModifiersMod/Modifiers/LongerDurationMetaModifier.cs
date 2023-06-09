@@ -13,7 +13,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IMetaModifier"/> which increases the duration of activated modifiers by the <see cref="TwitchPollTrigger"/>
     /// </summary>
-    [ConfigurableModifier("(Meta) Longer Modifier Duration")]
+    [ConfigurableModifier("(Meta) Longer Modifier Duration", "Modifiers triggered by the Twitch Poll last longer")]
     public class LongerDurationMetaModifier : IMetaModifier
     {
         public string DisplayName => "Longer Modifier Duration";
