@@ -131,10 +131,135 @@ namespace JumpKingMod.Install.UI.Settings
                     RaisePropertyChanged(nameof(TriggerType));
                     RaisePropertyChanged(nameof(ShouldShowToggleKeys));
                     RaisePropertyChanged(nameof(ShowAllModifierSettings));
+                    RaisePropertyChanged(nameof(IsTwitchPoll));
                 }
             }
         }
         private ModifierTriggerTypes triggerType;
+
+        /// <summary>
+        /// The duration of the poll in seconds
+        /// </summary>
+        public string PollDurationInSeconds
+        {
+            get
+            {
+                return pollDurationInSeconds.ToString(CultureInfo.InvariantCulture);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    pollDurationInSeconds = JumpKingModifiersModSettingsContext.DefaultBasePollTimeInSeconds;
+                }
+                else
+                {
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        pollDurationInSeconds = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(PollDurationInSeconds));
+            }
+        }
+        private float pollDurationInSeconds;
+
+        /// <summary>
+        /// The time the poll is closed in seconds
+        /// </summary>
+        public string PollClosedDurationInSeconds
+        {
+            get
+            {
+                return pollClosedDurationInSeconds.ToString(CultureInfo.InvariantCulture);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    pollClosedDurationInSeconds = JumpKingModifiersModSettingsContext.DefaultPollClosedTimeInSeconds;
+                }
+                else
+                {
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        pollClosedDurationInSeconds = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(PollClosedDurationInSeconds));
+            }
+        }
+        private float pollClosedDurationInSeconds;
+
+        /// <summary>
+        /// The time between polls in seconds
+        /// </summary>
+        public string TimeBetweenPollsInSeconds
+        {
+            get
+            {
+                return timeBetweenPollsInSeconds.ToString(CultureInfo.InvariantCulture);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    timeBetweenPollsInSeconds = JumpKingModifiersModSettingsContext.DefaultTimeBetweenPollsInSeconds;
+                }
+                else
+                {
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        timeBetweenPollsInSeconds = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(TimeBetweenPollsInSeconds));
+            }
+        }
+        private float timeBetweenPollsInSeconds;
+
+        /// <summary>
+        /// The time between polls in seconds
+        /// </summary>
+        public string ModifierDurationInSeconds
+        {
+            get
+            {
+                return modifierDurationInSeconds.ToString(CultureInfo.InvariantCulture);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    modifierDurationInSeconds = JumpKingModifiersModSettingsContext.DefaultBaseActiveModifierDurationInSeconds;
+                }
+                else
+                {
+                    if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float newVal))
+                    {
+                        if (newVal < 0)
+                        {
+                            newVal = Math.Abs(newVal);
+                        }
+                        modifierDurationInSeconds = newVal;
+                    }
+                }
+                RaisePropertyChanged(nameof(ModifierDurationInSeconds));
+            }
+        }
+        private float modifierDurationInSeconds;
 
         /// <summary>
         /// Whether we should show the configurable toggle keys
@@ -155,6 +280,17 @@ namespace JumpKingMod.Install.UI.Settings
             get
             {
                 return triggerType != ModifierTriggerTypes.None;
+            }
+        }
+
+        /// <summary>
+        /// Whether the current trigger is a twitch pol
+        /// </summary>
+        public bool IsTwitchPoll
+        {
+            get
+            {
+                return triggerType == ModifierTriggerTypes.TwitchPoll;
             }
         }
 
@@ -231,6 +367,10 @@ namespace JumpKingMod.Install.UI.Settings
 
                 // Load the initial data
                 TriggerType = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.TriggerTypeKey, ModifierTriggerTypes.Toggle);
+                PollDurationInSeconds = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.PollDurationInSecondsKey, JumpKingModifiersModSettingsContext.DefaultBasePollTimeInSeconds.ToString(CultureInfo.InvariantCulture));
+                PollClosedDurationInSeconds = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.PollClosedDurationInSecondsKey, JumpKingModifiersModSettingsContext.DefaultPollClosedTimeInSeconds.ToString(CultureInfo.InvariantCulture));
+                TimeBetweenPollsInSeconds = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.TimeBetweenPollsInSecondsKey, JumpKingModifiersModSettingsContext.DefaultTimeBetweenPollsInSeconds.ToString(CultureInfo.InvariantCulture));
+                ModifierDurationInSeconds = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ModifierDurationInSecondsKey, JumpKingModifiersModSettingsContext.DefaultBaseActiveModifierDurationInSeconds.ToString(CultureInfo.InvariantCulture));
 
                 ManualResizingEnabled = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, false);
                 ManualResizingToggleKey = ModifiersModSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, Keys.F9);
@@ -299,6 +439,10 @@ namespace JumpKingMod.Install.UI.Settings
             }
 
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.TriggerTypeKey, TriggerType.ToString());
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.PollDurationInSecondsKey, PollDurationInSeconds.ToString(CultureInfo.InvariantCulture));
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.PollClosedDurationInSecondsKey, PollClosedDurationInSeconds.ToString(CultureInfo.InvariantCulture));
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.TimeBetweenPollsInSecondsKey, TimeBetweenPollsInSeconds.ToString(CultureInfo.InvariantCulture));
+            ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ModifierDurationInSecondsKey, ModifierDurationInSeconds.ToString(CultureInfo.InvariantCulture));
 
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.ManualResizeEnabledKey, ManualResizingEnabled.ToString());
             ModifiersModSettings.SetOrCreateSetting(JumpKingModifiersModSettingsContext.DebugTriggerManualResizeToggleKey, ManualResizingToggleKey.ToString());

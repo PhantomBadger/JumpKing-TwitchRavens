@@ -155,7 +155,7 @@ namespace JumpKingModifiersMod
                             var clientFactory = new TwitchClientFactory(twitchSettings, Logger);
 
                             TwitchPollTrigger twitchPollTrigger = new TwitchPollTrigger(clientFactory.GetTwitchClient(), triggerableModifiers,
-                                ModEntityManager.Instance, GameStateObserverManualPatch.Instance, Logger);
+                                ModEntityManager.Instance, GameStateObserverManualPatch.Instance, userSettings, Logger);
 
                             TwitchPollVisual twitchPollVisual = new TwitchPollVisual(ModEntityManager.Instance, twitchPollTrigger,
                                 GameStateObserverManualPatch.Instance, Logger);

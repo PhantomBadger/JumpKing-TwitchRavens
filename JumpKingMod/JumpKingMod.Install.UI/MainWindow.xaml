@@ -820,6 +820,13 @@
                             </Grid.RowDefinitions>
                             
                             <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -830,10 +837,47 @@
                                             <x:Type TypeName="modifierSettings:ModifierTriggerTypes"/>
                                         </ObjectDataProvider.MethodParameters>
                                     </ObjectDataProvider>
+                                    <ToolTip x:Key="pollDurationTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                        The duration the poll is active in seconds
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="pollClosedTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                        The duration that the poll displays the winning choice before enabling it in seconds
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="pollCooldownTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                        The time after a poll is closed before a new one is started in seconds
+                                        </TextBlock>
+                                    </ToolTip>
+                                    <ToolTip x:Key="modifierDurationTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                        <TextBlock>
+                                        The time a modifier is active for after being enabled in seconds
+                                        </TextBlock>
+                                    </ToolTip>
                                 </Grid.Resources>
                                 
-                                <Label Grid.Column="0" Margin="5,2,10,2" Content="Modifier Trigger Type:"/>
-                                <ComboBox Grid.Column="1" Margin="5,2,10,2" SelectedItem="{Binding ModifiersSettings.TriggerType}" ItemsSource="{Binding Source={StaticResource triggerTypesEnumValues}}"/>
+                                <!-- Modifier Trigger -->
+                                <Label Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" Content="Modifier Trigger Type:"/>
+                                <ComboBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="5,2,10,2" SelectedItem="{Binding ModifiersSettings.TriggerType}" ItemsSource="{Binding Source={StaticResource triggerTypesEnumValues}}"/>
+
+                                <!-- Poll Duration -->
+                                <Label Grid.Row="1" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource pollDurationTooltip}" Visibility="{Binding ModifiersSettings.IsTwitchPoll, Converter={StaticResource boolToVisibilityConverter}}" Content="Poll Duration:"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5,2,10,2" ToolTip="{StaticResource pollDurationTooltip}" Visibility="{Binding ModifiersSettings.IsTwitchPoll, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding ModifiersSettings.PollDurationInSeconds, Mode=TwoWay, UpdateSourceTrigger=Default}"/>
+
+                                <!-- Poll Closed Duration -->
+                                <Label Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource pollClosedTooltip}" Visibility="{Binding ModifiersSettings.IsTwitchPoll, Converter={StaticResource boolToVisibilityConverter}}" Content="Poll Closed:"/>
+                                <TextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5,2,10,2" ToolTip="{StaticResource pollClosedTooltip}" Visibility="{Binding ModifiersSettings.IsTwitchPoll, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding ModifiersSettings.PollClosedDurationInSeconds, Mode=TwoWay, UpdateSourceTrigger=Default}"/>
+
+                                <!-- Poll Cooldown Duration -->
+                                <Label Grid.Row="3" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource pollCooldownTooltip}" Visibility="{Binding ModifiersSettings.IsTwitchPoll, Converter={StaticResource boolToVisibilityConverter}}" Content="Poll Cooldown:"/>
+                                <TextBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="5,2,10,2" ToolTip="{StaticResource pollCooldownTooltip}" Visibility="{Binding ModifiersSettings.IsTwitchPoll, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding ModifiersSettings.TimeBetweenPollsInSeconds, Mode=TwoWay, UpdateSourceTrigger=Default}"/>
+                                
+                                <!-- Modifier Duration -->
+                                <Label Grid.Row="4" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource modifierDurationTooltip}" Visibility="{Binding ModifiersSettings.IsTwitchPoll, Converter={StaticResource boolToVisibilityConverter}}" Content="Modifier Duration:"/>
+                                <TextBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="5,2,10,2" ToolTip="{StaticResource modifierDurationTooltip}" Visibility="{Binding ModifiersSettings.IsTwitchPoll, Converter={StaticResource boolToVisibilityConverter}}" Text="{Binding ModifiersSettings.ModifierDurationInSeconds, Mode=TwoWay, UpdateSourceTrigger=Default}"/>
                             </Grid>
 
                             <Separator Grid.Row="1"/>

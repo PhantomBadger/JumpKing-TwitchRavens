@@ -1,8 +1,10 @@
 ﻿using JumpKingModifiersMod.API;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
+using Settings;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -52,6 +54,7 @@ namespace JumpKingModifiersMod.Triggers
         private readonly Random random;
         private readonly Thread processingThread;
         private readonly ConcurrentDictionary<string, byte> alreadyVotedChatters;
+        private readonly UserSettings userSettings;
 
         private TwitchPollTriggerState triggerState;
         private ModifierTwitchPoll currentPoll;
@@ -60,13 +63,14 @@ namespace JumpKingModifiersMod.Triggers
         private float timeBetweenPollsCounter;
         private bool isEnabled;
 
+        private float BasePollTimeInSeconds;
+        private float PollClosedTimeInSeconds;
+        private float BaseActiveModifierDurationInSeconds;
+        private float TimeBetweenPollsInSeconds;
+
+        private const int NumberOfModifiersInPoll = 4;
         internal const float DefaultPollTimeModifier = 1.0f;
         internal const float DefaultActiveModifierDurationModifier = 1.0f;
-        private const int NumberOfModifiersInPoll = 4;
-        private const float BasePollTimeInSeconds = 20.0f;
-        private const float PollClosedTimeInSeconds = 2.5f;
-        private const float BaseActiveModifierDurationInSeconds = 30f;
-        private const float TimeBetweenPollsInSeconds = 2.5f;
 
         /// <summary>
         /// The Base Poll Time multiplied by the changeable modifier
@@ -119,13 +123,14 @@ namespace JumpKingModifiersMod.Triggers
         /// <summary>
         /// Ctor for creating a <see cref="TwitchPollTrigger"/>
         /// </summary>
-        public TwitchPollTrigger(TwitchClient twitchClient, List<IModifier> availableModifiers, ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, ILogger logger)
+        public TwitchPollTrigger(TwitchClient twitchClient, List<IModifier> availableModifiers, ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, UserSettings userSettings, ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
             this.twitchClient = twitchClient ?? throw new ArgumentNullException(nameof(twitchClient));
             this.availableModifiers = availableModifiers ?? throw new ArgumentNullException(nameof(availableModifiers));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.random = new Random(DateTime.Now.Second + DateTime.Now.Millisecond);
 
             alreadyVotedChatters = new ConcurrentDictionary<string, byte>();
@@ -136,6 +141,12 @@ namespace JumpKingModifiersMod.Triggers
             triggerState = TwitchPollTriggerState.CreatingPoll;
             currentPoll = null;
             isEnabled = false;
+
+            BasePollTimeInSeconds = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.PollDurationInSecondsKey, JumpKingModifiersModSettingsContext.DefaultBasePollTimeInSeconds);
+            PollClosedTimeInSeconds = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.PollClosedDurationInSecondsKey, JumpKingModifiersModSettingsContext.DefaultPollClosedTimeInSeconds);
+            BaseActiveModifierDurationInSeconds = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.ModifierDurationInSecondsKey, JumpKingModifiersModSettingsContext.DefaultBaseActiveModifierDurationInSeconds);
+            TimeBetweenPollsInSeconds = userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.TimeBetweenPollsInSecondsKey, JumpKingModifiersModSettingsContext.DefaultTimeBetweenPollsInSeconds);
+
             PollTimeModifier = DefaultPollTimeModifier;
             ActiveModifierDurationModifier = DefaultActiveModifierDurationModifier;
 
