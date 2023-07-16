@@ -1,5 +1,6 @@
 ﻿using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Settings;
+using JumpKingModifiersMod.Triggers.Poll;
 using Logging.API;
 using Microsoft.Xna.Framework;
 using PBJKModBase.API;
@@ -22,42 +23,29 @@ namespace JumpKingModifiersMod.Triggers
     /// An implementation of <see cref="IModifierTrigger"/> which triggers the effects based on a twitch poll.
     /// Will select a random subst of modifiers, ask the users to vote on it, then enables it for a set amount of time
     /// </summary>
-    public class TwitchPollTrigger : IModifierTrigger, IModEntity, IDisposable
+    public class TwitchPollTrigger : IModifierPollTrigger, IModEntity, IDisposable
     {
-        public delegate void TwitchPollStartedDelegate(ModifierTwitchPoll poll);
-        public delegate void TwitchPollClosedDelegate(ModifierTwitchPoll poll);
-        public delegate void TwitchPollEndedDelegate(ModifierTwitchPoll poll);
-
-        private enum TwitchPollTriggerState
-        {
-            CreatingPoll,
-            CollectingVotes,
-            ClosingPoll,
-            ExecutingWinningOption,
-            DownTimeBetweenPolls,
-        }
-
         public event ModifierEnabledDelegate OnModifierEnabled;
         public event ModifierDisabledDelegate OnModifierDisabled;
-        public event TwitchPollStartedDelegate OnTwitchPollStarted;
-        public event TwitchPollClosedDelegate OnTwitchPollClosed;
-        public event TwitchPollEndedDelegate OnTwitchPollEnded;
+        public event PollStartedDelegate OnPollStarted;
+        public event PollClosedDelegate OnPollClosed;
+        public event PollEndedDelegate OnPollEnded;
 
         private readonly ILogger logger;
         private readonly IGameStateObserver gameStateObserver;
         private readonly List<IModifier> availableModifiers;
         private readonly List<ActiveModifierCountdown> activeModifiers;
         private readonly List<ActiveModifierCountdown> previouslyActiveModifiers;
-        private readonly BlockingCollection<OnMessageReceivedArgs> relayRequestQueue;
-        private readonly TwitchClient twitchClient;
+        private readonly BlockingCollection<Tuple<string, int>> relayRequestQueue;
         private readonly ModEntityManager modEntityManager;
         private readonly Random random;
         private readonly Thread processingThread;
         private readonly ConcurrentDictionary<string, byte> alreadyVotedChatters;
         private readonly UserSettings userSettings;
+        private readonly IPollChatProvider chatProvider;
 
-        private TwitchPollTriggerState triggerState;
-        private ModifierTwitchPoll currentPoll;
+        private PollTriggerState triggerState;
+        private ModifierPoll currentPoll;
         private float pollTimeCounter;
         private float closingPollTimeCounter;
         private float timeBetweenPollsCounter;
@@ -123,11 +111,11 @@ namespace JumpKingModifiersMod.Triggers
         /// <summary>
         /// Ctor for creating a <see cref="TwitchPollTrigger"/>
         /// </summary>
-        public TwitchPollTrigger(TwitchClient twitchClient, List<IModifier> availableModifiers, ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, UserSettings userSettings, ILogger logger)
+        public TwitchPollTrigger(IPollChatProvider chatProvider, List<IModifier> availableModifiers, ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, UserSettings userSettings, ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
-            this.twitchClient = twitchClient ?? throw new ArgumentNullException(nameof(twitchClient));
+            this.chatProvider = chatProvider ?? throw new ArgumentNullException(nameof(chatProvider));
             this.availableModifiers = availableModifiers ?? throw new ArgumentNullException(nameof(availableModifiers));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
@@ -136,9 +124,9 @@ namespace JumpKingModifiersMod.Triggers
             alreadyVotedChatters = new ConcurrentDictionary<string, byte>();
             activeModifiers = new List<ActiveModifierCountdown>();
             previouslyActiveModifiers = new List<ActiveModifierCountdown>();
-            relayRequestQueue = new BlockingCollection<OnMessageReceivedArgs>();
-            this.twitchClient.OnMessageReceived += OnMessageReceived;
-            triggerState = TwitchPollTriggerState.CreatingPoll;
+            relayRequestQueue = new BlockingCollection<Tuple<string, int>>();
+            this.chatProvider.OnChatVote += OnMessageReceived;
+            triggerState = PollTriggerState.CreatingPoll;
             currentPoll = null;
             isEnabled = false;
 
@@ -170,8 +158,8 @@ namespace JumpKingModifiersMod.Triggers
         {
             gameStateObserver.OnGameLoopRunning -= OnGameLoopRunning;
             gameStateObserver.OnGameLoopNotRunning -= OnGameLoopNotRunning;
-            twitchClient.OnMessageReceived -= OnMessageReceived;
-            twitchClient.Disconnect();
+            chatProvider.OnChatVote -= OnMessageReceived;
+            chatProvider.Dispose();
         }
 
         /// <summary>
@@ -253,10 +241,10 @@ namespace JumpKingModifiersMod.Triggers
 
             isEnabled = true;
             currentPoll = null;
-            alreadyVotedChatters.Clear();
+            chatProvider.EnableChatProvider();
             previouslyActiveModifiers.Clear();
             activeModifiers.Clear();
-            triggerState = TwitchPollTriggerState.CreatingPoll;
+            triggerState = PollTriggerState.CreatingPoll;
 
             logger.Information($"Enabled '{this.GetType().Name}' Modifier Trigger");
             return true;
@@ -274,7 +262,7 @@ namespace JumpKingModifiersMod.Triggers
             // End the poll prematurely if we had one active
             if (currentPoll != null)
             {
-                OnTwitchPollEnded?.Invoke(currentPoll);
+                OnPollEnded?.Invoke(currentPoll);
                 currentPoll = null;
             }
 
@@ -287,7 +275,7 @@ namespace JumpKingModifiersMod.Triggers
             }
 
             isEnabled = true;
-            alreadyVotedChatters.Clear();
+            chatProvider.DisableChatProvider();
             previouslyActiveModifiers.Clear();
             activeModifiers.Clear();
             logger.Information($"Disabled '{this.GetType().Name}' Modifier Trigger");
@@ -301,21 +289,21 @@ namespace JumpKingModifiersMod.Triggers
         }
 
         /// <summary>
-        /// Called by the underlying Twitch Client when a message is received, updates the UI Entity
+        /// Called by the underlying Chat Provider when a message is received, updates the UI Entity
         /// </summary>
-        private void OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
+        private void OnMessageReceived(string chatName, int pollOption)
         {
             try
             {
-                if (!isEnabled || e == null || e.ChatMessage == null || string.IsNullOrWhiteSpace(e.ChatMessage.Message))
+                if (!isEnabled)
                 {
                     return;
                 }
 
                 // Queue up the request
-                if (triggerState == TwitchPollTriggerState.CollectingVotes)
+                if (triggerState == PollTriggerState.CollectingVotes)
                 {
-                    relayRequestQueue.Add(e);
+                    relayRequestQueue.Add(new Tuple<string, int>(chatName, pollOption));
                 }
             }
             catch (Exception ex)
@@ -334,7 +322,9 @@ namespace JumpKingModifiersMod.Triggers
                 try
                 {
                     // Pop off a request
-                    OnMessageReceivedArgs e = relayRequestQueue.Take();
+                    Tuple<string, int> e = relayRequestQueue.Take();
+                    string chatName = e.Item1;
+                    int choiceNumber = e.Item2;
 
                     // If the trigger isn't active then dip
                     if (!isEnabled)
@@ -351,21 +341,8 @@ namespace JumpKingModifiersMod.Triggers
                     // Get the current poll, if it's null then we drop the message and continue
                     // Since we have a local copy we dont need to worry about it turning null whilst
                     // we work
-                    ModifierTwitchPoll currentPoll = this.currentPoll;
+                    ModifierPoll currentPoll = this.currentPoll;
                     if (currentPoll == null)
-                    {
-                        continue;
-                    }
-
-                    // If they have already voted, then dip (unless it's me because im special hehe)
-                    if (alreadyVotedChatters.ContainsKey(e.ChatMessage.UserId) && 
-                        !e.ChatMessage.DisplayName.Equals("PhantomBadger", StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    // Get the choice number from the message
-                    if (!TryGetPollChoiceNumberFromMessage(e.ChatMessage.Message, out int choiceNumber))
                     {
                         continue;
                     }
@@ -377,9 +354,8 @@ namespace JumpKingModifiersMod.Triggers
                     }
 
                     // Increment that value in the poll
-                    ModifierTwitchPollOption option = currentPoll.Choices[choiceNumber];
+                    ModifierPollOption option = currentPoll.Choices[choiceNumber];
                     option.IncrementCount();
-                    alreadyVotedChatters.TryAdd(e.ChatMessage.UserId, 0);
                 }
                 catch (Exception ex)
                 {
@@ -451,7 +427,7 @@ namespace JumpKingModifiersMod.Triggers
                 // Process our current state
                 switch (triggerState)
                 {
-                    case TwitchPollTriggerState.CreatingPoll:
+                    case PollTriggerState.CreatingPoll:
                         {
                             // Identify what four modifiers we want to choose from and start the query
                             List<IModifier> possibleModifiers = availableModifiers.Where(modifier => !modifier.IsModifierEnabled()).ToList();
@@ -478,8 +454,8 @@ namespace JumpKingModifiersMod.Triggers
                             }
 
                             // Set the active poll object
-                            currentPoll = new ModifierTwitchPoll(modifiersToChooseBetween);
-                            alreadyVotedChatters.Clear();
+                            currentPoll = new ModifierPoll(modifiersToChooseBetween);
+                            chatProvider.ClearPerPollData();
 
                             StringBuilder logBuilder = new StringBuilder();
                             logBuilder.Append($"Creating a Twitch Poll with '{modifiersToChooseBetween.Count}' choices for '{PollTimeInSeconds.ToString()}' seconds: ");
@@ -489,19 +465,19 @@ namespace JumpKingModifiersMod.Triggers
                             }
                             logger.Information(logBuilder.ToString().Trim().TrimEnd(','));
 
-                            triggerState = TwitchPollTriggerState.CollectingVotes;
+                            triggerState = PollTriggerState.CollectingVotes;
                             pollTimeCounter = 0;
 
-                            OnTwitchPollStarted?.Invoke(currentPoll);
+                            OnPollStarted?.Invoke(currentPoll);
                             logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             break;
                         }
-                    case TwitchPollTriggerState.CollectingVotes:
+                    case PollTriggerState.CollectingVotes:
                         {
                             if (currentPoll == null)
                             {
-                                logger.Warning($"Current Poll is null, but we're in the '{triggerState.ToString()}' state, moving back to '{TwitchPollTriggerState.CreatingPoll.ToString()}'");
-                                triggerState = TwitchPollTriggerState.CreatingPoll;
+                                logger.Warning($"Current Poll is null, but we're in the '{triggerState.ToString()}' state, moving back to '{PollTriggerState.CreatingPoll.ToString()}'");
+                                triggerState = PollTriggerState.CreatingPoll;
                                 return;
                             }
 
@@ -511,37 +487,37 @@ namespace JumpKingModifiersMod.Triggers
                             if (pollTimeCounter > PollTimeInSeconds)
                             {
                                 closingPollTimeCounter = 0;
-                                triggerState = TwitchPollTriggerState.ClosingPoll;
-                                OnTwitchPollClosed?.Invoke(currentPoll);
-                                alreadyVotedChatters.Clear();
+                                triggerState = PollTriggerState.ClosingPoll;
+                                OnPollClosed?.Invoke(currentPoll);
+                                chatProvider.ClearPerPollData();
                                 logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             }
                             break;
                         }
-                    case TwitchPollTriggerState.ClosingPoll:
+                    case PollTriggerState.ClosingPoll:
                         {
                             if ((closingPollTimeCounter += p_delta) > PollClosedTimeInSeconds)
                             {
-                                triggerState = TwitchPollTriggerState.ExecutingWinningOption;
+                                triggerState = PollTriggerState.ExecutingWinningOption;
                                 logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             }
                             break;
                         }
-                    case TwitchPollTriggerState.ExecutingWinningOption:
+                    case PollTriggerState.ExecutingWinningOption:
                         {
                             if (currentPoll == null)
                             {
-                                logger.Warning($"Current Poll is null, but we're in the '{triggerState.ToString()}' state, moving back to '{TwitchPollTriggerState.CreatingPoll.ToString()}'");
-                                triggerState = TwitchPollTriggerState.CreatingPoll;
+                                logger.Warning($"Current Poll is null, but we're in the '{triggerState.ToString()}' state, moving back to '{PollTriggerState.CreatingPoll.ToString()}'");
+                                triggerState = PollTriggerState.CreatingPoll;
                                 return;
                             }
 
                             // Get the winning trigger
-                            ModifierTwitchPollOption winningModifier = currentPoll.FindWinningModifier();
+                            ModifierPollOption winningModifier = currentPoll.FindWinningModifier();
                             if (winningModifier == null)
                             {
-                                logger.Warning($"No winning modifier was found, but we're in the '{triggerState.ToString()}' state, moving back to '{TwitchPollTriggerState.CreatingPoll.ToString()}'");
-                                triggerState = TwitchPollTriggerState.CreatingPoll;
+                                logger.Warning($"No winning modifier was found, but we're in the '{triggerState.ToString()}' state, moving back to '{PollTriggerState.CreatingPoll.ToString()}'");
+                                triggerState = PollTriggerState.CreatingPoll;
                                 return;
                             }
                             logger.Information($"Poll won by '{winningModifier.Modifier.DisplayName}' with '{winningModifier.Count}' votes");
@@ -553,18 +529,18 @@ namespace JumpKingModifiersMod.Triggers
                             activeModifiers.Add(new ActiveModifierCountdown(winningModifier.Modifier, ActiveModifierDurationInSeconds));
 
                             // Clear the current poll and queue up a next one
-                            OnTwitchPollEnded?.Invoke(currentPoll);
-                            triggerState = TwitchPollTriggerState.DownTimeBetweenPolls;
+                            OnPollEnded?.Invoke(currentPoll);
+                            triggerState = PollTriggerState.DownTimeBetweenPolls;
                             currentPoll = null;
                             timeBetweenPollsCounter = 0;
                             logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             break;
                         }
-                    case TwitchPollTriggerState.DownTimeBetweenPolls:
+                    case PollTriggerState.DownTimeBetweenPolls:
                         {
                             if ((timeBetweenPollsCounter += p_delta) > TimeBetweenPollsInSeconds)
                             {
-                                triggerState = TwitchPollTriggerState.CreatingPoll;
+                                triggerState = PollTriggerState.CreatingPoll;
                                 logger.Information($"Changing Twitch Poll State to '{triggerState.ToString()}'");
                             }
                             break;

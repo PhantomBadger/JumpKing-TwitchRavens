@@ -74,6 +74,8 @@
     <Compile Include="API\IOnIceObserver.cs" />
     <Compile Include="API\IPlayerJumper.cs" />
     <Compile Include="API\IPlayerStateObserver.cs" />
+    <Compile Include="API\IModifierPollTrigger.cs" />
+    <Compile Include="API\IPollChatProvider.cs" />
     <Compile Include="API\IWalkSpeedModifier.cs" />
     <Compile Include="API\IWindObserver.cs" />
     <Compile Include="API\IYouDiedSubtextGetter.cs" />
@@ -116,11 +118,14 @@
     <Compile Include="Triggers\ActiveModifierCountdown.cs" />
     <Compile Include="Triggers\DebugModifierTrigger.cs" />
     <Compile Include="Triggers\DebugTogglePair.cs" />
-    <Compile Include="Triggers\TwitchPoll\ModifierTwitchPoll.cs" />
-    <Compile Include="Triggers\TwitchPoll\ModifierTwitchPollOption.cs" />
+    <Compile Include="Triggers\Poll\ModifierPoll.cs" />
+    <Compile Include="Triggers\Poll\ModifierPollOption.cs" />
+    <Compile Include="Triggers\Poll\PollTriggerState.cs" />
+    <Compile Include="Triggers\Poll\TwitchPollChatProvider.cs" />
+    <Compile Include="Triggers\Poll\YouTubePollChatProvider.cs" />
     <Compile Include="Triggers\TwitchPollTrigger.cs" />
     <Compile Include="Visuals\ModifierToggleNotifications.cs" />
-    <Compile Include="Visuals\TwitchPollVisual.cs" />
+    <Compile Include="Visuals\PollVisual.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj">

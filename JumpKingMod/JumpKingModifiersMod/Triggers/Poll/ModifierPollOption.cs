@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace JumpKingModifiersMod.Triggers
 {
     /// <summary>
-    /// A class representing a single option in a <see cref="ModifierTwitchPoll"/>
+    /// A class representing a single option in a <see cref="ModifierPoll"/>
     /// </summary>
-    public class ModifierTwitchPollOption
+    public class ModifierPollOption
     {
         /// <summary>
         /// The number of this option in the poll
@@ -36,11 +36,11 @@ namespace JumpKingModifiersMod.Triggers
         private int count;
 
         /// <summary>
-        /// Ctor for creating a <see cref="ModifierTwitchPollOption"/>
+        /// Ctor for creating a <see cref="ModifierPollOption"/>
         /// </summary>
         /// <param name="choiceNumber">The number of this choice in the poll</param>
         /// <param name="modifier">An implementation of <see cref="IModifier"/></param>
-        public ModifierTwitchPollOption(int choiceNumber, IModifier modifier)
+        public ModifierPollOption(int choiceNumber, IModifier modifier)
         {
             this.ChoiceNumber = choiceNumber;
             this.Modifier = modifier ?? throw new ArgumentNullException(nameof(modifier));

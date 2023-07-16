@@ -1,4 +1,5 @@
 ﻿using JumpKing;
+using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Triggers;
 using Logging.API;
 using Microsoft.Xna.Framework;
@@ -16,17 +17,17 @@ namespace JumpKingModifiersMod.Visuals
     /// An implementation of <see cref="IModEntity"/> which acts as the visual component to a provided
     /// <see cref="TwitchPollTrigger"/>, creating and managing UI texts to display the poll state to the chat
     /// </summary>
-    public class TwitchPollVisual : IModEntity, IDisposable
+    public class PollVisual : IModEntity, IDisposable
     {
         private readonly ModEntityManager modEntityManager;
-        private readonly TwitchPollTrigger trigger;
+        private readonly IModifierPollTrigger trigger;
         private readonly IGameStateObserver gameStateObserver;
         private readonly ILogger logger;
 
-        private ModifierTwitchPoll currentPoll;
+        private ModifierPoll currentPoll;
         private UITextEntity pollDescriptionEntity;
         private UITextEntity pollCountdownEntity;
-        private List<Tuple<ModifierTwitchPollOption, UITextEntity>> pollOptionEntities;
+        private List<Tuple<ModifierPollOption, UITextEntity>> pollOptionEntities;
         private List<UITextEntity> activeModifierEntitiesPool;
         private float bottomOfOptionsYValue;
 
@@ -37,26 +38,26 @@ namespace JumpKingModifiersMod.Visuals
         private const float ActiveModifierYPadding = 5;
 
         /// <summary>
-        /// Ctor for creating a <see cref="TwitchPollVisual"/>
+        /// Ctor for creating a <see cref="PollVisual"/>
         /// </summary>
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register to</param>
         /// <param name="trigger">The <see cref="TwitchPollTrigger"/> to act as a visual for</param>
         /// <param name="gameStateObserver">An implementation of <see cref="IGameStateObserver"/> to determine when we should draw</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to use for logging</param>
-        public TwitchPollVisual(ModEntityManager modEntityManager, TwitchPollTrigger trigger, IGameStateObserver gameStateObserver, ILogger logger)
+        public PollVisual(ModEntityManager modEntityManager, IModifierPollTrigger trigger, IGameStateObserver gameStateObserver, ILogger logger)
         {
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.trigger = trigger ?? throw new ArgumentNullException(nameof(trigger));
             this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            pollOptionEntities = new List<Tuple<ModifierTwitchPollOption, UITextEntity>>();
+            pollOptionEntities = new List<Tuple<ModifierPollOption, UITextEntity>>();
 
             this.gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
             this.gameStateObserver.OnGameLoopRunning += OnGameLoopRunning;
-            this.trigger.OnTwitchPollStarted += OnTwitchPollStarted;
-            this.trigger.OnTwitchPollClosed += OnTwitchPollClosed;
-            this.trigger.OnTwitchPollEnded += OnTwitchPollEnded;
+            this.trigger.OnPollStarted += OnTwitchPollStarted;
+            this.trigger.OnPollClosed += OnTwitchPollClosed;
+            this.trigger.OnPollEnded += OnTwitchPollEnded;
             this.modEntityManager.AddEntity(this, zOrder: 0);
         }
 
@@ -67,9 +68,9 @@ namespace JumpKingModifiersMod.Visuals
         {
             gameStateObserver.OnGameLoopNotRunning -= OnGameLoopNotRunning;
             gameStateObserver.OnGameLoopRunning -= OnGameLoopRunning;
-            trigger.OnTwitchPollStarted -= OnTwitchPollStarted;
-            trigger.OnTwitchPollClosed -= OnTwitchPollClosed;
-            trigger.OnTwitchPollEnded -= OnTwitchPollEnded;
+            trigger.OnPollStarted -= OnTwitchPollStarted;
+            trigger.OnPollClosed -= OnTwitchPollClosed;
+            trigger.OnPollEnded -= OnTwitchPollEnded;
             modEntityManager.RemoveEntity(this);
             CleanUpUIEntities();
         }
@@ -157,9 +158,9 @@ namespace JumpKingModifiersMod.Visuals
         }
 
         /// <summary>
-        /// Called by <see cref="TwitchPollTrigger.OnTwitchPollStarted"/>
+        /// Called by <see cref="TwitchPollTrigger.OnPollStarted"/>
         /// </summary>
-        private void OnTwitchPollStarted(ModifierTwitchPoll poll)
+        private void OnTwitchPollStarted(ModifierPoll poll)
         {
             logger.Information($"Received OnTwitchPollStarted Event");
             if (poll == null)
@@ -199,19 +200,19 @@ namespace JumpKingModifiersMod.Visuals
                 pollOptionPosition.X -= InitialPositionXPadding;
                 var pollOptionEntity = new UITextEntity(modEntityManager, pollOptionPosition, pollOptionText,
                     Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
-                pollOptionEntities.Add(new Tuple<ModifierTwitchPollOption, UITextEntity>(choicesList[i], pollOptionEntity));
+                pollOptionEntities.Add(new Tuple<ModifierPollOption, UITextEntity>(choicesList[i], pollOptionEntity));
 
                 bottomOfOptionsYValue += (YPadding + pollOptionEntity.TextFont.MeasureString(pollOptionText).Y);
             }
         }
 
         /// <summary>
-        /// Called by <see cref="TwitchPollTrigger.OnTwitchPollClosed"/>
+        /// Called by <see cref="TwitchPollTrigger.OnPollClosed"/>
         /// </summary>
-        private void OnTwitchPollClosed(ModifierTwitchPoll poll)
+        private void OnTwitchPollClosed(ModifierPoll poll)
         {
             // Get the winner
-            ModifierTwitchPollOption winningOption = poll.FindWinningModifier();
+            ModifierPollOption winningOption = poll.FindWinningModifier();
 
             // Set the winning item to the right colour
             for (int i = 0; i < pollOptionEntities.Count; i++)
@@ -228,9 +229,9 @@ namespace JumpKingModifiersMod.Visuals
         }
 
         /// <summary>
-        /// Called by <see cref="TwitchPollTrigger.OnTwitchPollEnded"/>
+        /// Called by <see cref="TwitchPollTrigger.OnPollEnded"/>
         /// </summary>
-        private void OnTwitchPollEnded(ModifierTwitchPoll poll)
+        private void OnTwitchPollEnded(ModifierPoll poll)
         {
             // Clean up the poll
             logger.Information($"Received OnTwitchPollEnded Event");
@@ -241,7 +242,7 @@ namespace JumpKingModifiersMod.Visuals
         /// <summary>
         /// Returns a string representing a poll option and it's current count
         /// </summary>
-        private string GetPollOptionText(ModifierTwitchPollOption pollOption)
+        private string GetPollOptionText(ModifierPollOption pollOption)
         {
             return $"{pollOption.ChoiceNumber}. {pollOption.Modifier.DisplayName} - {pollOption.Count}";
         }
@@ -298,7 +299,7 @@ namespace JumpKingModifiersMod.Visuals
                 // Update the current options
                 for (int i = 0; i < pollOptionEntities.Count; i++)
                 {
-                    ModifierTwitchPollOption option = pollOptionEntities[i].Item1;
+                    ModifierPollOption option = pollOptionEntities[i].Item1;
                     UITextEntity optionEntity = pollOptionEntities[i].Item2;
                     optionEntity.TextValue = GetPollOptionText(option);
                 }

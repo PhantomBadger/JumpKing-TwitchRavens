@@ -11,19 +11,19 @@ namespace JumpKingModifiersMod.Triggers
     /// A class representing a poll of modifiers to be voted on by twitch chat.
     /// Represents a Snapshot of the data, and is often updated by other classes
     /// </summary>
-    public class ModifierTwitchPoll
+    public class ModifierPoll
     {
         /// <summary>
         /// A read-only list of Twitch choices
         /// </summary>
-        public IReadOnlyDictionary<int, ModifierTwitchPollOption> Choices
+        public IReadOnlyDictionary<int, ModifierPollOption> Choices
         {
             get
             {
                 return choices;
             }
         }
-        private Dictionary<int, ModifierTwitchPollOption> choices;
+        private Dictionary<int, ModifierPollOption> choices;
 
         /// <summary>
         /// How long is left on th poll in seconds
@@ -33,20 +33,20 @@ namespace JumpKingModifiersMod.Triggers
             get; set;
         }
 
-        private ModifierTwitchPollOption winningOption;
+        private ModifierPollOption winningOption;
         private readonly Random random;
 
         /// <summary>
-        /// Ctor for creating a <see cref="ModifierTwitchPoll"/>
+        /// Ctor for creating a <see cref="ModifierPoll"/>
         /// </summary>
         /// <param name="choices">A list of <see cref="IModifier"/> implementations to feed into the poll</param>
-        public ModifierTwitchPoll(List<IModifier> choices)
+        public ModifierPoll(List<IModifier> choices)
         {
-            this.choices = new Dictionary<int, ModifierTwitchPollOption>();
+            this.choices = new Dictionary<int, ModifierPollOption>();
             winningOption = null;
             for (int i = 0; i < choices.Count; i++)
             {
-                var option = new ModifierTwitchPollOption((i + 1), choices[i]);
+                var option = new ModifierPollOption((i + 1), choices[i]);
                 this.choices.Add(option.ChoiceNumber, option);
             }
 
@@ -54,9 +54,9 @@ namespace JumpKingModifiersMod.Triggers
         }
 
         /// <summary>
-        /// Return the <see cref="ModifierTwitchPollOption"/> with the most votes. Null if there are no choices.
+        /// Return the <see cref="ModifierPollOption"/> with the most votes. Null if there are no choices.
         /// </summary>
-        public ModifierTwitchPollOption FindWinningModifier()
+        public ModifierPollOption FindWinningModifier()
         {
             if (choices.Count == 0)
             {
@@ -68,10 +68,10 @@ namespace JumpKingModifiersMod.Triggers
                 return this.winningOption;
             }
 
-            Dictionary<int, ModifierTwitchPollOption> choicesCopy = new Dictionary<int, ModifierTwitchPollOption>(choices);
+            Dictionary<int, ModifierPollOption> choicesCopy = new Dictionary<int, ModifierPollOption>(choices);
             int index = random.Next(choicesCopy.Count);
 
-            ModifierTwitchPollOption winningOption = choicesCopy.ElementAt(index).Value;
+            ModifierPollOption winningOption = choicesCopy.ElementAt(index).Value;
             foreach (var choice in choicesCopy)
             {
                 if (choice.Value.Count > winningOption.Count)

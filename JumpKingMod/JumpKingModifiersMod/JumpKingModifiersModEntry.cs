@@ -4,6 +4,7 @@ using JumpKingModifiersMod.Modifiers;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Settings;
 using JumpKingModifiersMod.Triggers;
+using JumpKingModifiersMod.Triggers.Poll;
 using JumpKingModifiersMod.Visuals;
 using Logging;
 using Logging.API;
@@ -154,10 +155,11 @@ namespace JumpKingModifiersMod
                             var twitchSettings = new UserSettings(PBJKModBaseTwitchSettingsContext.SettingsFileName, PBJKModBaseTwitchSettingsContext.GetDefaultSettings(), Logger);
                             var clientFactory = new TwitchClientFactory(twitchSettings, Logger);
 
-                            TwitchPollTrigger twitchPollTrigger = new TwitchPollTrigger(clientFactory.GetTwitchClient(), triggerableModifiers,
+                            var chatProvider = new TwitchPollChatProvider(clientFactory.GetTwitchClient(), Logger);
+                            TwitchPollTrigger twitchPollTrigger = new TwitchPollTrigger(chatProvider, triggerableModifiers,
                                 ModEntityManager.Instance, GameStateObserverManualPatch.Instance, userSettings, Logger);
 
-                            TwitchPollVisual twitchPollVisual = new TwitchPollVisual(ModEntityManager.Instance, twitchPollTrigger,
+                            PollVisual twitchPollVisual = new PollVisual(ModEntityManager.Instance, twitchPollTrigger,
                                 GameStateObserverManualPatch.Instance, Logger);
 
                             // Add a reference to the meta modifiers - a bit jank doing it this way but heyo
