@@ -169,7 +169,7 @@ namespace JumpKingModifiersMod
 
                                     chatProvider = new TwitchPollChatProvider(twitchClientFactory.GetTwitchClient(), Logger);
                                     break;
-                                case AvailableStreamingPlatforms.YouTube;
+                                case AvailableStreamingPlatforms.YouTube:
                                     var youTubeSettings = new UserSettings(PBJKModBaseYouTubeSettingsContext.SettingsFileName, PBJKModBaseYouTubeSettingsContext.GetDefaultSettings(), Logger);
                                     var youTubeClientFactory = new YouTubeChatClientFactory(youTubeSettings, Logger);
                                     YouTubeChatClient youTubeClient = youTubeClientFactory.GetYouTubeClient();
@@ -182,10 +182,10 @@ namespace JumpKingModifiersMod
                                     IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youTubeClient, ModEntityManager.Instance, youTubeSettings, Logger);
                                     clientController.StartAttemptingConnection();
 
-                                    chatProvider = new YouTubePollChatProvider(youTubeClient, Logger));
+                                    chatProvider = new YouTubePollChatProvider(youTubeClient, Logger);
                                     break;
                                 default:
-                                    throw new NotImplementedException($"Unknown Streaming Platform Provided! Modifiers Mod does not know how to hanle {selectedPlatform.ToString()}")
+                                    throw new NotImplementedException($"Unknown Streaming Platform Provided! Modifiers Mod does not know how to hanle {selectedPlatform.ToString()}");
                             }
                             
                             // Make the poll trigger and visual
