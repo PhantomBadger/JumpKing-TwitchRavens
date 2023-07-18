@@ -15,7 +15,7 @@ namespace JumpKingModifiersMod.Visuals
 {
     /// <summary>
     /// An implementation of <see cref="IModEntity"/> which acts as the visual component to a provided
-    /// <see cref="TwitchPollTrigger"/>, creating and managing UI texts to display the poll state to the chat
+    /// <see cref="PollTrigger"/>, creating and managing UI texts to display the poll state to the chat
     /// </summary>
     public class PollVisual : IModEntity, IDisposable
     {
@@ -41,7 +41,7 @@ namespace JumpKingModifiersMod.Visuals
         /// Ctor for creating a <see cref="PollVisual"/>
         /// </summary>
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register to</param>
-        /// <param name="trigger">The <see cref="TwitchPollTrigger"/> to act as a visual for</param>
+        /// <param name="trigger">The <see cref="PollTrigger"/> to act as a visual for</param>
         /// <param name="gameStateObserver">An implementation of <see cref="IGameStateObserver"/> to determine when we should draw</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to use for logging</param>
         public PollVisual(ModEntityManager modEntityManager, IModifierPollTrigger trigger, IGameStateObserver gameStateObserver, ILogger logger)
@@ -158,7 +158,7 @@ namespace JumpKingModifiersMod.Visuals
         }
 
         /// <summary>
-        /// Called by <see cref="TwitchPollTrigger.OnPollStarted"/>
+        /// Called by <see cref="PollTrigger.OnPollStarted"/>
         /// </summary>
         private void OnTwitchPollStarted(ModifierPoll poll)
         {
@@ -207,7 +207,7 @@ namespace JumpKingModifiersMod.Visuals
         }
 
         /// <summary>
-        /// Called by <see cref="TwitchPollTrigger.OnPollClosed"/>
+        /// Called by <see cref="PollTrigger.OnPollClosed"/>
         /// </summary>
         private void OnTwitchPollClosed(ModifierPoll poll)
         {
@@ -229,7 +229,7 @@ namespace JumpKingModifiersMod.Visuals
         }
 
         /// <summary>
-        /// Called by <see cref="TwitchPollTrigger.OnPollEnded"/>
+        /// Called by <see cref="PollTrigger.OnPollEnded"/>
         /// </summary>
         private void OnTwitchPollEnded(ModifierPoll poll)
         {

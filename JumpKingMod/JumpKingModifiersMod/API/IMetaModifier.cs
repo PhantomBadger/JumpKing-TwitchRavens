@@ -9,6 +9,6 @@ namespace JumpKingModifiersMod.API
 {
     public interface IMetaModifier : IModifier
     {
-        TwitchPollTrigger TwitchPollTrigger { get; set; }
+        PollTrigger PollTrigger { get; set; }
     }
 }

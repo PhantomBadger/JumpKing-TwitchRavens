@@ -131,7 +131,7 @@ namespace JumpKingMod.Install.UI.Settings
                     RaisePropertyChanged(nameof(TriggerType));
                     RaisePropertyChanged(nameof(ShouldShowToggleKeys));
                     RaisePropertyChanged(nameof(ShowAllModifierSettings));
-                    RaisePropertyChanged(nameof(IsTwitchPoll));
+                    RaisePropertyChanged(nameof(IsChatPoll));
                 }
             }
         }
@@ -286,11 +286,11 @@ namespace JumpKingMod.Install.UI.Settings
         /// <summary>
         /// Whether the current trigger is a twitch pol
         /// </summary>
-        public bool IsTwitchPoll
+        public bool IsChatPoll
         {
             get
             {
-                return triggerType == ModifierTriggerTypes.TwitchPoll;
+                return triggerType == ModifierTriggerTypes.ChatPoll;
             }
         }
 

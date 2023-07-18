@@ -24,7 +24,7 @@ namespace JumpKingModifiersMod.Triggers.Poll
         private bool isEnabled;
 
         /// <summary>
-        /// Ctor for creating a <see cref="TwitchPollTrigger"/>
+        /// Ctor for creating a <see cref="PollTrigger"/>
         /// </summary>
         /// <param name="twitchClient">The Twitch Client to use</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> for logging</param>
@@ -33,7 +33,7 @@ namespace JumpKingModifiersMod.Triggers.Poll
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.twitchClient = twitchClient ?? throw new ArgumentNullException(nameof(twitchClient));
 
-            alreadyVotedChatters = new ConcurrentDictionary<string, byte>();
+            alreadyVotedChatters = new ConcurrentDictionary<string, byte>(StringComparer.OrdinalIgnoreCase); ;
             isEnabled = false;
 
             twitchClient.OnMessageReceived += OnMessageReceived;

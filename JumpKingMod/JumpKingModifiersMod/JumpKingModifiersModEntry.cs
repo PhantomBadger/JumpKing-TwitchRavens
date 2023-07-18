@@ -13,8 +13,12 @@ using PBJKModBase;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
 using PBJKModBase.Patching;
+using PBJKModBase.Streaming.Settings;
 using PBJKModBase.Twitch;
 using PBJKModBase.Twitch.Settings;
+using PBJKModBase.YouTube;
+using PBJKModBase.YouTube.API;
+using PBJKModBase.YouTube.Settings;
 using Settings;
 using System;
 using System.Collections.Generic;
@@ -149,24 +153,53 @@ namespace JumpKingModifiersMod
                             modifierTrigger = new DebugModifierTrigger(ModEntityManager.Instance, debugToggles, userSettings, Logger);
                             break;
                         }
-                    case ModifierTriggerTypes.TwitchPoll:
+                    case ModifierTriggerTypes.ChatPoll:
                         {
-                            // Make twitch client factory
-                            var twitchSettings = new UserSettings(PBJKModBaseTwitchSettingsContext.SettingsFileName, PBJKModBaseTwitchSettingsContext.GetDefaultSettings(), Logger);
-                            var clientFactory = new TwitchClientFactory(twitchSettings, Logger);
+                            IPollChatProvider chatProvider = null;
 
-                            var chatProvider = new TwitchPollChatProvider(clientFactory.GetTwitchClient(), Logger);
-                            TwitchPollTrigger twitchPollTrigger = new TwitchPollTrigger(chatProvider, triggerableModifiers,
+                            // Make twitch client factory
+                            var streamSettings = new UserSettings(PBJKModBaseStreamingSettingsContext.SettingsFileName, PBJKModBaseStreamingSettingsContext.GetDefaultSettings(), Logger);
+                            AvailableStreamingPlatforms selectedPlatform = streamSettings.GetSettingOrDefault(PBJKModBaseStreamingSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
+                            
+                            switch (selectedPlatform)
+                            {
+                                case AvailableStreamingPlatforms.Twitch:
+                                    var twitchSettings = new UserSettings(PBJKModBaseTwitchSettingsContext.SettingsFileName, PBJKModBaseTwitchSettingsContext.GetDefaultSettings(), Logger);
+                                    var twitchClientFactory = new TwitchClientFactory(twitchSettings, Logger);
+
+                                    chatProvider = new TwitchPollChatProvider(twitchClientFactory.GetTwitchClient(), Logger);
+                                    break;
+                                case AvailableStreamingPlatforms.YouTube;
+                                    var youTubeSettings = new UserSettings(PBJKModBaseYouTubeSettingsContext.SettingsFileName, PBJKModBaseYouTubeSettingsContext.GetDefaultSettings(), Logger);
+                                    var youTubeClientFactory = new YouTubeChatClientFactory(youTubeSettings, Logger);
+                                    YouTubeChatClient youTubeClient = youTubeClientFactory.GetYouTubeClient();
+
+                                    // YouTube Clients require us to prompt the user to connect due to the budget limits
+                                    // present in the API (A connection request costs X 'tokens' and there's a limit to how
+                                    // many tokens we have in a given period, making it difficult for us to automatically poll)
+                                    
+                                    // TODO: Deal with the YouTube connect text overlapping with the poll text
+                                    IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youTubeClient, ModEntityManager.Instance, youTubeSettings, Logger);
+                                    clientController.StartAttemptingConnection();
+
+                                    chatProvider = new YouTubePollChatProvider(youTubeClient, Logger));
+                                    break;
+                                default:
+                                    throw new NotImplementedException($"Unknown Streaming Platform Provided! Modifiers Mod does not know how to hanle {selectedPlatform.ToString()}")
+                            }
+                            
+                            // Make the poll trigger and visual
+                            PollTrigger pollTrigger = new PollTrigger(chatProvider, triggerableModifiers,
                                 ModEntityManager.Instance, GameStateObserverManualPatch.Instance, userSettings, Logger);
 
-                            PollVisual twitchPollVisual = new PollVisual(ModEntityManager.Instance, twitchPollTrigger,
+                            PollVisual pollVisual = new PollVisual(ModEntityManager.Instance, pollTrigger,
                                 GameStateObserverManualPatch.Instance, Logger);
 
                             // Add a reference to the meta modifiers - a bit jank doing it this way but heyo
-                            pollTimeModifier.TwitchPollTrigger = twitchPollTrigger;
-                            durationModifier.TwitchPollTrigger = twitchPollTrigger;
+                            pollTimeModifier.PollTrigger = pollTrigger;
+                            durationModifier.PollTrigger = pollTrigger;
 
-                            modifierTrigger = twitchPollTrigger;
+                            modifierTrigger = pollTrigger;
                             break;
                         }
                     case ModifierTriggerTypes.None:

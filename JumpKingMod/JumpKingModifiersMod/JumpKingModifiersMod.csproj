@@ -141,7 +141,7 @@
     <Compile Include="Triggers\Poll\PollTriggerState.cs" />
     <Compile Include="Triggers\Poll\TwitchPollChatProvider.cs" />
     <Compile Include="Triggers\Poll\YouTubePollChatProvider.cs" />
-    <Compile Include="Triggers\TwitchPollTrigger.cs" />
+    <Compile Include="Triggers\PollTrigger.cs" />
     <Compile Include="Visuals\ModifierToggleNotifications.cs" />
     <Compile Include="Visuals\PollVisual.cs" />
   </ItemGroup>
@@ -154,6 +154,10 @@
       <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
       <Name>Logging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.Streaming.Settings\PBJKModBase.Streaming.Settings.csproj">
+      <Project>{04A526F8-568E-417A-8C4E-C0F2418292CB}</Project>
+      <Name>PBJKModBase.Streaming.Settings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PBJKModBase.Twitch.Settings\PBJKModBase.Twitch.Settings.csproj">
       <Project>{16F1CFD5-9EC2-4A45-8EDA-801310C3A866}</Project>
       <Name>PBJKModBase.Twitch.Settings</Name>
@@ -161,6 +165,10 @@
     <ProjectReference Include="..\PBJKModBase.Twitch\PBJKModBase.Twitch.csproj">
       <Project>{450e7ceb-0885-4f44-a452-d351656edfac}</Project>
       <Name>PBJKModBase.Twitch</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.YouTube.Settings\PBJKModBase.YouTube.Settings.csproj">
+      <Project>{14F4D0DA-85C9-48F0-921C-4304ACF656A7}</Project>
+      <Name>PBJKModBase.YouTube.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="..\PBJKModBase.YouTube\PBJKModBase.YouTube.csproj">
       <Project>{5BF5AB1D-1EDB-40C0-98C8-ADD0914E9DC9}</Project>

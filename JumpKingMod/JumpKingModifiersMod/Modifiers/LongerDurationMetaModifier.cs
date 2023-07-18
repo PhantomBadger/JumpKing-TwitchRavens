@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 namespace JumpKingModifiersMod.Modifiers
 {
     /// <summary>
-    /// An implementation of <see cref="IMetaModifier"/> which increases the duration of activated modifiers by the <see cref="TwitchPollTrigger"/>
+    /// An implementation of <see cref="IMetaModifier"/> which increases the duration of activated modifiers by the <see cref="PollTrigger"/>
     /// </summary>
     [ConfigurableModifier("(Meta) Longer Modifier Duration", "Modifiers triggered by the Twitch Poll last longer")]
     public class LongerDurationMetaModifier : IMetaModifier
     {
         public string DisplayName => "Longer Modifier Duration";
 
-        public TwitchPollTrigger TwitchPollTrigger { get; set; }
+        public PollTrigger PollTrigger { get; set; }
 
         private readonly ILogger logger;
 
@@ -42,13 +42,13 @@ namespace JumpKingModifiersMod.Modifiers
                 return false;
             }
 
-            if (TwitchPollTrigger == null)
+            if (PollTrigger == null)
             {
                 logger.Information($"Can't disable '{this.DisplayName}' as the Twitch Poll Trigger reference is invalid!");
                 return false;
             }
 
-            TwitchPollTrigger.ActiveModifierDurationModifier = TwitchPollTrigger.DefaultActiveModifierDurationModifier;
+            PollTrigger.ActiveModifierDurationModifier = PollTrigger.DefaultActiveModifierDurationModifier;
             logger.Information($"Disabled '{this.DisplayName}' successfully!");
             return true;
         }
@@ -62,13 +62,13 @@ namespace JumpKingModifiersMod.Modifiers
                 return false;
             }
 
-            if (TwitchPollTrigger == null)
+            if (PollTrigger == null)
             {
                 logger.Information($"Can't enable '{this.DisplayName}' as the Twitch Poll Trigger reference is invalid!");
                 return false;
             }
 
-            TwitchPollTrigger.ActiveModifierDurationModifier = DurationModifier;
+            PollTrigger.ActiveModifierDurationModifier = DurationModifier;
             logger.Information($"Enabled '{this.DisplayName}' successfully!");
             return true;
         }
@@ -76,7 +76,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public bool IsModifierEnabled()
         {
-            return TwitchPollTrigger != null && Math.Abs(TwitchPollTrigger.ActiveModifierDurationModifier - TwitchPollTrigger.DefaultActiveModifierDurationModifier) > float.Epsilon;
+            return PollTrigger != null && Math.Abs(PollTrigger.ActiveModifierDurationModifier - PollTrigger.DefaultActiveModifierDurationModifier) > float.Epsilon;
         }
 
         /// <inheritdoc/>

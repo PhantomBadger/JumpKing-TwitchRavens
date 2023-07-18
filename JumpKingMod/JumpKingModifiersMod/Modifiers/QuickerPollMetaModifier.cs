@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 namespace JumpKingModifiersMod.Modifiers
 {
     /// <summary>
-    /// An implementation of <see cref="IMetaModifier"/> which speeds up the poll time for the <see cref="TwitchPollTrigger"/>
+    /// An implementation of <see cref="IMetaModifier"/> which speeds up the poll time for the <see cref="PollTrigger"/>
     /// </summary>
     [ConfigurableModifier("(Meta) Quicker Poll Time", "The Polls created by the Twitch Poll trigger end quicker")]
     public class QuickerPollMetaModifier : IMetaModifier
     {
         public string DisplayName => "Quicker Poll Time";
 
-        public TwitchPollTrigger TwitchPollTrigger { get; set; }
+        public PollTrigger PollTrigger { get; set; }
 
         private readonly ILogger logger;
 
@@ -42,13 +42,13 @@ namespace JumpKingModifiersMod.Modifiers
                 return false;
             }
 
-            if (TwitchPollTrigger == null)
+            if (PollTrigger == null)
             {
                 logger.Information($"Can't disable '{this.DisplayName}' as the Twitch Poll Trigger reference is invalid!");
                 return false;
             }
 
-            TwitchPollTrigger.PollTimeModifier = TwitchPollTrigger.DefaultPollTimeModifier;
+            PollTrigger.PollTimeModifier = PollTrigger.DefaultPollTimeModifier;
             logger.Information($"Disabled '{this.DisplayName}' successfully!");
             return true;
         }
@@ -62,13 +62,13 @@ namespace JumpKingModifiersMod.Modifiers
                 return false;
             }
 
-            if (TwitchPollTrigger == null)
+            if (PollTrigger == null)
             {
                 logger.Information($"Can't enable '{this.DisplayName}' as the Twitch Poll Trigger reference is invalid!");
                 return false;
             }
 
-            TwitchPollTrigger.PollTimeModifier = PollTimeModifier;
+            PollTrigger.PollTimeModifier = PollTimeModifier;
             logger.Information($"Enabled '{this.DisplayName}' successfully!");
             return true;
         }
@@ -76,7 +76,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public bool IsModifierEnabled()
         {
-            return TwitchPollTrigger != null && Math.Abs(TwitchPollTrigger.PollTimeModifier - TwitchPollTrigger.DefaultPollTimeModifier) > float.Epsilon;
+            return PollTrigger != null && Math.Abs(PollTrigger.PollTimeModifier - PollTrigger.DefaultPollTimeModifier) > float.Epsilon;
         }
 
         /// <inheritdoc/>

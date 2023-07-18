@@ -17,10 +17,10 @@ namespace JumpKingModifiersMod.Settings
         Toggle,
 
         /// <summary>
-        /// The modifiers will be enabled pending a regular poll in twitch chat
+        /// The modifiers will be enabled pending a regular poll in stream chat
         /// in a 'chaos mod' style
         /// </summary>
-        TwitchPoll,
+        ChatPoll,
 
         /// <summary>
         /// No trigger/modifiers active at all

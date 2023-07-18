@@ -23,7 +23,7 @@ namespace JumpKingModifiersMod.Triggers
     /// An implementation of <see cref="IModifierTrigger"/> which triggers the effects based on a twitch poll.
     /// Will select a random subst of modifiers, ask the users to vote on it, then enables it for a set amount of time
     /// </summary>
-    public class TwitchPollTrigger : IModifierPollTrigger, IModEntity, IDisposable
+    public class PollTrigger : IModifierPollTrigger, IModEntity, IDisposable
     {
         public event ModifierEnabledDelegate OnModifierEnabled;
         public event ModifierDisabledDelegate OnModifierDisabled;
@@ -109,9 +109,9 @@ namespace JumpKingModifiersMod.Triggers
         private float activeModifierDurationModifier;
 
         /// <summary>
-        /// Ctor for creating a <see cref="TwitchPollTrigger"/>
+        /// Ctor for creating a <see cref="PollTrigger"/>
         /// </summary>
-        public TwitchPollTrigger(IPollChatProvider chatProvider, List<IModifier> availableModifiers, ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, UserSettings userSettings, ILogger logger)
+        public PollTrigger(IPollChatProvider chatProvider, List<IModifier> availableModifiers, ModEntityManager modEntityManager, IGameStateObserver gameStateObserver, UserSettings userSettings, ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
