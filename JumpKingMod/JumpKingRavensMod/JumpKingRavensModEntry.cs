@@ -186,7 +186,7 @@ namespace JumpKingRavensMod
                                 }
                             }
                             else if (selectedStreamingPlatform == AvailableStreamingPlatforms.YouTube)
-                            {
+                            { 
                                 // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
                                 // using that trigger
                                 YouTubeRavenTriggerTypes ravenTriggerType = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage);
@@ -201,7 +201,7 @@ namespace JumpKingRavensMod
                                             var filter = new ExcludedTermListFilter(Logger);
 
                                             // Easter Egg
-                                            string youTubeChannelId = ravenModSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
+                                            string youTubeChannelId = youtubeSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
                                             if (easterEggEnabled &&
                                                 TryGetAndStartEasterEggTrigger(youTubeChannelId, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                             {
@@ -210,7 +210,7 @@ namespace JumpKingRavensMod
 
                                             // Create the YouTube Client and kick off the connection process
                                             YouTubeChatClient youtubeClient = youtubeChatClientFactory.GetYouTubeClient();
-                                            IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, ModEntityManager.Instance, ravenModSettings, Logger);
+                                            IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, ModEntityManager.Instance, youtubeSettings, Logger);
                                             clientController.StartAttemptingConnection();
 
                                             // Create the Trigger
