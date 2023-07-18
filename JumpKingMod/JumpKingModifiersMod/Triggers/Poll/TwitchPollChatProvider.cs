@@ -70,6 +70,12 @@ namespace JumpKingModifiersMod.Triggers.Poll
             alreadyVotedChatters.Clear();
         }
 
+        /// <inheritdoc/>
+        public bool IsReadyToProvide()
+        {
+            return twitchClient.IsConnected;
+        }
+
         /// <summary>
         /// Called by the underlying Twitch Client when a message is received, updates the UI Entity
         /// </summary>

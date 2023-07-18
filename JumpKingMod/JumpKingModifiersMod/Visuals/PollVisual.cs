@@ -30,6 +30,7 @@ namespace JumpKingModifiersMod.Visuals
         private List<Tuple<ModifierPollOption, UITextEntity>> pollOptionEntities;
         private List<UITextEntity> activeModifierEntitiesPool;
         private float bottomOfOptionsYValue;
+        private float initialYOffset;
 
         private const float YPadding = 1;
         private const float CountdownYPadding = 5;
@@ -44,12 +45,13 @@ namespace JumpKingModifiersMod.Visuals
         /// <param name="trigger">The <see cref="PollTrigger"/> to act as a visual for</param>
         /// <param name="gameStateObserver">An implementation of <see cref="IGameStateObserver"/> to determine when we should draw</param>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to use for logging</param>
-        public PollVisual(ModEntityManager modEntityManager, IModifierPollTrigger trigger, IGameStateObserver gameStateObserver, ILogger logger)
+        public PollVisual(ModEntityManager modEntityManager, IModifierPollTrigger trigger, IGameStateObserver gameStateObserver, ILogger logger, int initialYOffset = 0)
         {
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
             this.trigger = trigger ?? throw new ArgumentNullException(nameof(trigger));
             this.gameStateObserver = gameStateObserver ?? throw new ArgumentNullException(nameof(gameStateObserver));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.initialYOffset = initialYOffset;
 
             pollOptionEntities = new List<Tuple<ModifierPollOption, UITextEntity>>();
 
@@ -174,7 +176,7 @@ namespace JumpKingModifiersMod.Visuals
             // Make the description text
             string descriptionText = "Vote on the modifier to activate by typing in chat!";
             Vector2 descriptionPosition = JumpGame.GAME_RECT.Size.ToVector2();
-            descriptionPosition.Y = 0;
+            descriptionPosition.Y = initialYOffset;
             descriptionPosition.X -= InitialPositionXPadding;
             pollDescriptionEntity = new UITextEntity(modEntityManager, descriptionPosition, descriptionText,
                 Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);

@@ -16,6 +16,12 @@ namespace JumpKingModifiersMod.API
         event ChatVoteDelegate OnChatVote;
 
         /// <summary>
+        /// Whether or not the provider is ready to provide chat information
+        /// </summary>
+        /// <returns><c>true</c> if so, <c>false</c> if not</returns>
+        bool IsReadyToProvide();
+
+        /// <summary>
         /// Enables the Chat Provider
         /// </summary>
         /// <returns><c>true</c> if it enables successfully, <c>false</c> if it fails</returns>

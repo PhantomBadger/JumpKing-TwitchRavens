@@ -27,6 +27,11 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
         private readonly BlockingCollection<YouTubeChatMessageBatchArgs> relayRequestQueue;
         private readonly Thread processingThread;
 
+        private readonly HashSet<string> simpleNumbersToIgnore = new HashSet<string>()
+        {
+            "0", "1", "2", "3", "4", "5"
+        };
+
         public YouTubeChatMessengerRavenTrigger(YouTubeChatClient youtubeClient, IExcludedTermFilter excludedTermFilter, ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -111,6 +116,12 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
                         if (excludedTermFilter.ContainsExcludedTerm(liveChatMessage.Snippet.DisplayMessage))
                         {
                             logger.Warning($"Skipped Triggered Chat Message from '{liveChatMessage.Snippet.DisplayMessage}', as it contained an excluded term");
+                            continue;
+                        }
+
+                        // Skip any simple numbers, as they're often used in polls
+                        if (simpleNumbersToIgnore.Contains(liveChatMessage.Snippet.DisplayMessage.Trim()))
+                        {
                             continue;
                         }
 

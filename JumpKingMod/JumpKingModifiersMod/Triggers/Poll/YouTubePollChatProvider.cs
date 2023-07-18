@@ -23,6 +23,7 @@ namespace JumpKingModifiersMod.Triggers.Poll
         private readonly ConcurrentDictionary<string, byte> alreadyVotedChatters;
 
         private bool isEnabled;
+        private bool isConnected;
 
         /// <summary>
         /// Ctor for creating a <see cref="YouTubePollChatProvider"/>
@@ -38,6 +39,8 @@ namespace JumpKingModifiersMod.Triggers.Poll
             isEnabled = false;
 
             youtubeClient.OnMessageBatchReceived += OnMessageReceived;
+            youtubeClient.OnDisconnected += OnYouTubeClientDisconnected;
+            youtubeClient.OnConnected += OnYouTubeClientConnected;
         }
 
         /// <summary>
@@ -71,6 +74,28 @@ namespace JumpKingModifiersMod.Triggers.Poll
         public void ClearPerPollData()
         {
             alreadyVotedChatters.Clear();
+        }
+
+        /// <summary>
+        /// Called by the YouTube client when it connects to a chat
+        /// </summary>
+        private void OnYouTubeClientConnected(object sender, EventArgs e)
+        {
+            isConnected = true;
+        }
+
+        /// <summary>
+        /// Called by the YouTube client when it disconnects from a chat
+        /// </summary>
+        private void OnYouTubeClientDisconnected(object sender, EventArgs e)
+        {
+            isConnected = false;
+        }
+
+        /// <inheritdoc/>
+        public bool IsReadyToProvide()
+        {
+            return isConnected;
         }
 
         /// <summary>

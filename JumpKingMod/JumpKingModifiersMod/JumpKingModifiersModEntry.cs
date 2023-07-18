@@ -160,7 +160,9 @@ namespace JumpKingModifiersMod
                             // Make twitch client factory
                             var streamSettings = new UserSettings(PBJKModBaseStreamingSettingsContext.SettingsFileName, PBJKModBaseStreamingSettingsContext.GetDefaultSettings(), Logger);
                             AvailableStreamingPlatforms selectedPlatform = streamSettings.GetSettingOrDefault(PBJKModBaseStreamingSettingsContext.SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch);
-                            
+
+                            int pollVisualYOffset = 0;
+
                             switch (selectedPlatform)
                             {
                                 case AvailableStreamingPlatforms.Twitch:
@@ -177,11 +179,21 @@ namespace JumpKingModifiersMod
                                     // YouTube Clients require us to prompt the user to connect due to the budget limits
                                     // present in the API (A connection request costs X 'tokens' and there's a limit to how
                                     // many tokens we have in a given period, making it difficult for us to automatically poll)
-                                    
-                                    // TODO: Deal with the YouTube connect text overlapping with the poll text
-                                    IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youTubeClient, ModEntityManager.Instance, youTubeSettings, Logger);
-                                    clientController.StartAttemptingConnection();
+                                    Task.Run(() =>
+                                    {
+                                        // Wait until the game is running
+                                        while (!GameStateObserverManualPatch.Instance.IsGameLoopRunning() || !GameStateObserverManualPatch.Instance.AreGameAssetsLoaded())
+                                        {
+                                            Task.Delay(100).Wait();
+                                        }
 
+                                        IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youTubeClient, ModEntityManager.Instance, youTubeSettings, Logger);
+                                        clientController.StartAttemptingConnection();
+                                    });
+
+                                    // This is gross but whatever - 15 is the height of the youtube connector text
+                                    // we can't calculate this at this point because the fonts are not yet loaded
+                                    pollVisualYOffset = 15;
                                     chatProvider = new YouTubePollChatProvider(youTubeClient, Logger);
                                     break;
                                 default:
@@ -193,7 +205,7 @@ namespace JumpKingModifiersMod
                                 ModEntityManager.Instance, GameStateObserverManualPatch.Instance, userSettings, Logger);
 
                             PollVisual pollVisual = new PollVisual(ModEntityManager.Instance, pollTrigger,
-                                GameStateObserverManualPatch.Instance, Logger);
+                                GameStateObserverManualPatch.Instance, Logger, pollVisualYOffset);
 
                             // Add a reference to the meta modifiers - a bit jank doing it this way but heyo
                             pollTimeModifier.PollTrigger = pollTrigger;

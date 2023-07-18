@@ -327,7 +327,7 @@ namespace JumpKingModifiersMod.Triggers
                     int choiceNumber = e.Item2;
 
                     // If the trigger isn't active then dip
-                    if (!isEnabled)
+                    if (!isEnabled || chatProvider == null || !chatProvider.IsReadyToProvide())
                     {
                         continue;
                     }
@@ -407,7 +407,8 @@ namespace JumpKingModifiersMod.Triggers
             try
             {
                 // If the game loop isn't running we drop what we're doing
-                if (gameStateObserver == null || !gameStateObserver.IsGameLoopRunning())
+                if (gameStateObserver == null || !gameStateObserver.IsGameLoopRunning() ||
+                    chatProvider == null || !chatProvider.IsReadyToProvide())
                 {
                     return;
                 }

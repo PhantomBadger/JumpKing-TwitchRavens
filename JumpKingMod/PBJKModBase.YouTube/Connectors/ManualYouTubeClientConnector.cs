@@ -57,7 +57,7 @@ namespace PBJKModBase.YouTube
 
             // Prime the UI Text
             connectKey = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, Keys.F9);
-            connectionStatusText = new UITextEntity(modEntityManager, new Vector2(480, 0), string.Empty, Color.Red,
+            connectionStatusText = new UITextEntity(modEntityManager, new Vector2(472, 0), string.Empty, Color.Red,
                             UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall);
 
             // Set our initial state
