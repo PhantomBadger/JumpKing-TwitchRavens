@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using JumpKing;
 using JumpKing.Player;
-using JumpKing.SaveThread;
 using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Entities;
 using JumpKingModifiersMod.Modifiers;
@@ -23,9 +22,22 @@ namespace JumpKingModifiersMod.Modifiers
     /// An implementation of <see cref="IModifier"/> and <see cref="IDisposable"/> which gives a health bar to the player
     /// and loses health whenever they fall
     /// </summary>
+    [ConfigurableModifier("Fall Damage", "The player has a health bar, a long fall will deal damage to it, when you hit zero you die and the map restarts")]
     public class FallDamageModifier : IModifier, IDisposable
     {
         public string DisplayName { get; } = "Fall Damage";
+
+        [ModifierSetting(JumpKingModifiersModSettingsContext.FallDamageModifierKey, "Distance Damage Modifier", DefaultFallDamageDistanceModifier)]
+        public readonly float DistanceDamageModifier;
+
+        [ModifierSetting(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, "Is Blood Enabled", true)]
+        public readonly bool IsBloodEnabled;
+
+        [ModifierSetting(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, "Blood Clear Key", Keys.F10, typeof(Keys))]
+        public readonly Keys ClearBloodKey;
+
+        [ModifierSetting(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, "Nice Spawns", true)]
+        public readonly bool NiceSpawns;
 
         private enum FallDamageModifierState
         {
@@ -43,11 +55,7 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly Random random;
         private readonly UserSettings userSettings;
         private readonly IYouDiedSubtextGetter subtextGetter;
-        private readonly float distanceDamageModifier;
-        private readonly bool isBloodEnabled;
         private readonly BloodSplatterPersistence bloodSplatters;
-        private readonly Keys clearBloodKey;
-        private readonly bool niceSpawns;
 
         private UITextEntity healthTextEntity;
         private UIImageEntity healthBarFrontEntity;
@@ -63,7 +71,6 @@ namespace JumpKingModifiersMod.Modifiers
         private bool reActivateModifier;
         private FallDamageModifierState fallModifierState;
         private bool clearBloodKeyReset;
-        private bool hasAlreadyDied;
 
         private float youDiedAlphaLerpCounter = 0;
         private float youDiedSubtextAlphaLerpCounter = 0;
@@ -73,6 +80,8 @@ namespace JumpKingModifiersMod.Modifiers
         private const float TimeTakenToShowYouDiedInSeconds = 2f;
         private const float TimeTakenToShowYouDiedSubtextInSeconds = 1f;
         private const float UserPromptPulseTimeInSeconds = 0.75f;
+
+        private const float DefaultFallDamageDistanceModifier = 0.1f;
 
         /// <summary>
         /// Ctor for creating a <see cref="FallDamageModifier"/>
@@ -94,15 +103,14 @@ namespace JumpKingModifiersMod.Modifiers
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             random = new Random(DateTime.Now.Second + DateTime.Now.Millisecond);
 
-            distanceDamageModifier = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, 0.1f);
-            isBloodEnabled = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
-            clearBloodKey = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
+            DistanceDamageModifier = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageModifierKey, DefaultFallDamageDistanceModifier);
+            IsBloodEnabled = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageBloodEnabledKey, true);
+            ClearBloodKey = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageClearBloodKey, Keys.F10);
+            NiceSpawns = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, true);
             clearBloodKeyReset = true;
-            niceSpawns = this.userSettings.GetSettingOrDefault(JumpKingModifiersModSettingsContext.FallDamageNiceSpawnsKey, true);
 
             bloodSplatters = new BloodSplatterPersistence(modEntityManager, userSettings, random, logger);
             fallModifierState = FallDamageModifierState.Playing;
-            hasAlreadyDied = false;
 
             gameStateObserver.OnGameLoopNotRunning += OnGameLoopNotRunning;
             gameStateObserver.OnGameLoopRunning += OnGameLoopRunning;
@@ -222,15 +230,10 @@ namespace JumpKingModifiersMod.Modifiers
                 Sprite.CreateSprite(ModifiersModContentManager.HealthBarFrontTexture),
                 zOrder: 1);
 
-            if (isBloodEnabled)
+            if (IsBloodEnabled)
             {
                 bloodSplatters.LoadBloodSplatters();
             }
-
-            hasAlreadyDied = false;
-            processSplat = false;
-            lastOnGroundPosition = null;
-
             logger.Information($"Enable Fall Damage Modifier");
             return true;
         }
@@ -269,9 +272,8 @@ namespace JumpKingModifiersMod.Modifiers
 
             lastOnGroundPosition = null;
             processSplat = false;
-            hasAlreadyDied = false;
 
-            if (isBloodEnabled)
+            if (IsBloodEnabled)
             {
                 bloodSplatters.SaveBloodSplatters();
                 bloodSplatters.ClearAllBloodSplats();
@@ -284,7 +286,7 @@ namespace JumpKingModifiersMod.Modifiers
         {
             try
             {
-                if (isBloodEnabled)
+                if (IsBloodEnabled)
                 {
                     PollClearCommand();
                 }
@@ -326,7 +328,7 @@ namespace JumpKingModifiersMod.Modifiers
         private void PollClearCommand()
         {
             KeyboardState kbState = Keyboard.GetState();
-            if (kbState.IsKeyDown(clearBloodKey))
+            if (kbState.IsKeyDown(ClearBloodKey))
             {
                 if (clearBloodKeyReset)
                 {
@@ -357,7 +359,38 @@ namespace JumpKingModifiersMod.Modifiers
             if (processSplat && lastOnGroundPosition.HasValue)
             {
                 processSplat = false;
-                ProcessSplatDamage(playerState);
+                Vector2 newSplatPosition = playerState.Position;
+
+                // Get the distance fallen and turn that into a damage value
+                float yDiff = Math.Abs(lastOnGroundPosition.Value.Y - newSplatPosition.Y);
+                float rawDamage = (yDiff * DistanceDamageModifier);
+                int damage = Math.Max(1, (int)rawDamage);
+
+                // If we landed on snow, deal no damage
+                if (playerState.IsOnSnow)
+                {
+                    damage = 0;
+                }
+
+                // If we're on that one drop screen in GotB, deal no damage
+                if (Camera.CurrentScreen == 160 && 
+                    JumpKing.SaveThread.EventFlagsSave.ContainsFlag(JumpKing.SaveThread.StoryEventFlags.StartedGhost))
+                {
+                    damage = 0;
+                }
+
+                // Apply the damage to the health
+                healthValue = Math.Max(0, healthValue - damage);
+                logger.Information($"Dealing Damage of '{damage}' (Raw damage '{rawDamage}') - Remaining Health: {healthValue}");
+
+                // Spawn the damage text
+                SpawnDamageTextEntity(damage, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
+
+                if (damage > 0 && IsBloodEnabled)
+                {
+                    // Spawn a blood splat
+                    SpawnBloodSplatEntity(playerState.Position);
+                }
             }
             else if (playerState.IsOnGround)
             {
@@ -391,10 +424,8 @@ namespace JumpKingModifiersMod.Modifiers
             healthBarFrontEntity.DestinationRectangle = destRectForHealth;
 
             // We have died, enter the death state and restart
-            if (healthValue <= 0 && !hasAlreadyDied)
+            if (healthValue <= 0)
             {
-                hasAlreadyDied = true;
-
                 // Disable walking so user can only jump + pause
                 playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: true, isXVelocityDisabled: true);
 
@@ -406,50 +437,6 @@ namespace JumpKingModifiersMod.Modifiers
                 fallModifierState = FallDamageModifierState.DisplayingYouDied;
                 JKContentManager.Audio.RaymanSFX.Play();
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
-            }
-        }
-
-        /// <summary>
-        /// Identifies how much damage to apply to the player and inflicts it
-        /// </summary>
-        private void ProcessSplatDamage(PlayerState playerState)
-        {
-            if (hasAlreadyDied)
-            {
-                return;
-            }
-
-            Vector2 newSplatPosition = playerState.Position;
-
-            // Get the distance fallen and turn that into a damage value
-            float yDiff = Math.Abs(lastOnGroundPosition.Value.Y - newSplatPosition.Y);
-            float rawDamage = (yDiff * distanceDamageModifier);
-            int damage = Math.Max(1, (int)rawDamage);
-
-            // If we landed on snow, deal no damage
-            if (playerState.IsOnSnow)
-            {
-                damage = 0;
-            }
-
-            // If we're on that one drop screen in GotB, deal no damage
-            if (Camera.CurrentScreen == 160 &&
-                JumpKing.SaveThread.EventFlagsSave.ContainsFlag(JumpKing.SaveThread.StoryEventFlags.StartedGhost))
-            {
-                damage = 0;
-            }
-
-            // Apply the damage to the health
-            healthValue = Math.Max(0, healthValue - damage);
-            logger.Information($"Dealing Damage of '{damage}' (Raw damage '{rawDamage}') - Remaining Health: {healthValue}");
-
-            // Spawn the damage text
-            SpawnDamageTextEntity(damage, Camera.TransformVector2(playerStateObserver.GetPlayerState().Position));
-
-            if (damage > 0 && isBloodEnabled)
-            {
-                // Spawn a blood splat
-                SpawnBloodSplatEntity(playerState.Position);
             }
         }
 
@@ -533,9 +520,6 @@ namespace JumpKingModifiersMod.Modifiers
             InputState inputState = playerStateObserver.GetInputState();
             if (inputState.Jump)
             {
-                processSplat = false;
-                hasAlreadyDied = false;
-
                 // Clear up the You Died & Text Entities
                 youDiedEntity?.Dispose();
                 youDiedEntity = null;
@@ -550,12 +534,11 @@ namespace JumpKingModifiersMod.Modifiers
                 playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
                 // Restart the player position and reset the health
-                playerStateObserver.RestartPlayerPosition(niceSpawns, out _);
+                playerStateObserver.RestartPlayerPosition(NiceSpawns);
                 healthValue = MaxHealthValue;
                 fallModifierState = FallDamageModifierState.Playing;
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
 
-                lastOnGroundPosition = null;
                 JKContentManager.Audio.PressStart.Play();
             }
         }
@@ -566,10 +549,7 @@ namespace JumpKingModifiersMod.Modifiers
         private void OnSplat()
         {
             logger.Information($"Received Splat notification");
-            if (!hasAlreadyDied)
-            {
-                processSplat = true;
-            }
+            processSplat = true;
         }
 
         /// <summary>

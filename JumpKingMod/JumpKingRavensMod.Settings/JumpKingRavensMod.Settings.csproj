@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AvailableStreamingPlatforms.cs" />
     <Compile Include="JumpKingRavensModSettingsContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TwitchRavenTriggerTypes.cs" />

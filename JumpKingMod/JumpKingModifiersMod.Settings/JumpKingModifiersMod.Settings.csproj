@@ -45,7 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\ConfigurableModifierAttribute.cs" />
     <Compile Include="JumpKingModifiersModSettingsContext.cs" />
+    <Compile Include="Attributes\ModifierSettingAttribute.cs" />
+    <Compile Include="ModifierSettingType.cs" />
+    <Compile Include="ModifierTriggerTypes.cs" />
+    <Compile Include="ViewModels\ConfigurableModifierViewModel.cs" />
+    <Compile Include="ViewModels\ModifierSettingViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

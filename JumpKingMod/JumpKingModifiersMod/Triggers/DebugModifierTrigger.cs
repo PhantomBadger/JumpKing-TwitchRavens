@@ -2,6 +2,7 @@
 using JumpKingModifiersMod.Modifiers;
 using JumpKingModifiersMod.Patching;
 using JumpKingModifiersMod.Settings;
+using Logging.API;
 using Microsoft.Xna.Framework.Input;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
@@ -26,8 +27,9 @@ namespace JumpKingModifiersMod.Triggers
         public event ModifierDisabledDelegate OnModifierDisabled;
 
         private readonly ModEntityManager modEntityManager;
-        private readonly List<DebugTogglePair> modifierToggles;
+        private readonly List<DebugTogglePair> debugToggles;
         private readonly UserSettings userSettings;
+        private readonly ILogger logger;
 
         private bool isTriggerActive;
 
@@ -35,13 +37,19 @@ namespace JumpKingModifiersMod.Triggers
         /// Ctor for creating a <see cref="DebugModifierTrigger"/>
         /// </summary>
         /// <param name="modEntityManager">The <see cref="ModEntityManager"/> to register itself to</param>
-        /// <param name="modifierToggles">A collection of <see cref="DebugTogglePair"/> to link a <see cref="IModifier"/> to a toggle key</param>
+        /// <param name="debugToggles">A collection of <see cref="DebugTogglePair"/> to link a <see cref="IModifier"/> to a toggle key</param>
         internal DebugModifierTrigger(ModEntityManager modEntityManager,
-            List<DebugTogglePair> modifierToggles, UserSettings userSettings)
+            List<DebugTogglePair> debugToggles, UserSettings userSettings, ILogger logger)
         {
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
-            this.modifierToggles = modifierToggles ?? throw new ArgumentNullException(nameof(modifierToggles));
+            this.debugToggles = debugToggles ?? throw new ArgumentNullException(nameof(debugToggles));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            for (int i = 0; i < debugToggles.Count; i++)
+            {
+                this.logger.Information($"[Debug Trigger] '{debugToggles[i].Modifier.DisplayName}' registered to key '{debugToggles[i].ToggleKey.ToString()}'");
+            }
 
             isTriggerActive = false;
             modEntityManager.AddEntity(this, 0);
@@ -87,9 +95,9 @@ namespace JumpKingModifiersMod.Triggers
 
             // Toggle the modifiers
             var kbState = Keyboard.GetState();
-            for (int i = 0; i < modifierToggles.Count; i++)
+            for (int i = 0; i < debugToggles.Count; i++)
             {
-                DebugTogglePair togglePair = modifierToggles[i];
+                DebugTogglePair togglePair = debugToggles[i];
 
                 if (kbState.IsKeyDown(togglePair.ToggleKey))
                 {
@@ -123,6 +131,14 @@ namespace JumpKingModifiersMod.Triggers
         public void Draw()
         {
             // Do nothing
+        }
+
+        /// <summary>
+        /// Adds a new modifier to the collection of modifiers
+        /// </summary>
+        public void AddModifier(DebugTogglePair modifier)
+        {
+            debugToggles.Add(modifier);
         }
     }
 }

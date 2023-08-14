@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using JumpKing.Player;
 using System.Collections.Concurrent;
+using JumpKingModifiersMod.Settings;
 
 namespace JumpKingModifiersMod.Modifiers
 {
@@ -15,6 +16,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// An implementation of <see cref="IModifier"/> that makes the floor bounce the player
     /// after each jump. The direction can be controlled by the player.
     /// </summary>
+    [ConfigurableModifier("Bouncy", "Makes the player do a smaller jump after each normal jump, this bounce can be steered using the arrow keys before you land")]
     public class BouncyFloorModifier : IModifier, IDisposable
     {
         public string DisplayName { get; } = "Bouncy";
@@ -164,6 +166,11 @@ namespace JumpKingModifiersMod.Modifiers
 
                 // Check to see if the player just landed
                 PlayerState playerState = playerStateAccessor.GetPlayerState();
+                if (playerState == null)
+                {
+                    return;
+                }
+
                 if (playerState.IsOnGround)
                 {
                     if (isInAir)

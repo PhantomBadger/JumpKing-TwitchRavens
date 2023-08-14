@@ -67,9 +67,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="RavensSettings.cs" />
-    <Compile Include="TwitchSettings.cs" />
-    <Compile Include="YouTubeSettings.cs" />
+    <Compile Include="API\IInstallerSettingsViewModel.cs" />
+    <Compile Include="Settings\ModifiersSettingsViewModel.cs" />
+    <Compile Include="Settings\RavensSettingsViewModel.cs" />
+    <Compile Include="Settings\StreamingSettingsViewModel.cs" />
+    <Compile Include="Settings\TwitchSettingsViewModel.cs" />
+    <Compile Include="Settings\YouTubeSettingsViewModel.cs" />
     <Page Include="AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -136,6 +139,18 @@
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
       <Name>Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.Streaming.Settings\PBJKModBase.Streaming.Settings.csproj">
+      <Project>{04A526F8-568E-417A-8C4E-C0F2418292CB}</Project>
+      <Name>PBJKModBase.Streaming.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.Twitch.Settings\PBJKModBase.Twitch.Settings.csproj">
+      <Project>{16f1cfd5-9ec2-4a45-8eda-801310c3a866}</Project>
+      <Name>PBJKModBase.Twitch.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.YouTube.Settings\PBJKModBase.YouTube.Settings.csproj">
+      <Project>{14f4d0da-85c9-48f0-921c-4304acf656a7}</Project>
+      <Name>PBJKModBase.YouTube.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="..\Settings\Settings.csproj">
       <Project>{D9C89840-A346-4334-99F2-CF323015C206}</Project>

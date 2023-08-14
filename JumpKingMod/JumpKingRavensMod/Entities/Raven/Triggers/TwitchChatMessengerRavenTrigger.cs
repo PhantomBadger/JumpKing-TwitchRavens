@@ -1,8 +1,8 @@
 ﻿using JumpKingRavensMod.API;
 using JumpKingRavensMod.Settings;
-using JumpKingRavensMod.Twitch;
 using Logging.API;
 using Microsoft.Xna.Framework;
+using PBJKModBase.Twitch;
 using Settings;
 using System;
 using System.Collections.Concurrent;
@@ -33,6 +33,11 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
         private readonly BlockingCollection<OnMessageReceivedArgs> relayRequestQueue;
         private readonly TwitchClient twitchClient;
         private readonly Thread processingThread;
+
+        private readonly HashSet<string> simpleNumbersToIgnore = new HashSet<string>()
+        { 
+            "0", "1", "2", "3", "4", "5"
+        };
 
         /// <summary>
         /// Constructor for creating a <see cref="TwitchChatMessengerRavenTrigger"/>
@@ -103,20 +108,29 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
                         nameColour = TwitchHexColourParser.ParseColourFromHex(colourHex);
                     }
 
+                    string parsedMessage = e.ChatMessage.Message.Replace("\U000e0000", "").Trim();
+
                     // Skip anything containing an excluded term
-                    if (excludedTermFilter.ContainsExcludedTerm(e.ChatMessage.Message))
+                    if (excludedTermFilter.ContainsExcludedTerm(parsedMessage))
                     {
-                        logger.Warning($"Skipped Triggered Chat Message from '{e.ChatMessage.DisplayName}', as it contained an excluded term");
+                        logger.Warning($"Skipped Triggered Chat Message from '{parsedMessage}', as it contained an excluded term");
                         continue;
                     }
 
+                    // Skip any simple numbers, as they're often used in polls
+                    if (simpleNumbersToIgnore.Contains(parsedMessage))
+                    {
+                        continue;
+                    }
+
+                    // If you're a cool cat then always put the message through >:)
                     bool isPriority = false;
                     if (e.ChatMessage.DisplayName.Equals("PhantomBadger", StringComparison.OrdinalIgnoreCase))
                     {
                         isPriority = true;
                     }
 
-                    OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, e.ChatMessage.Message, e.ChatMessage.IsSubscriber, isPriority);
+                    OnMessengerRavenTrigger?.Invoke(e.ChatMessage.DisplayName, nameColour, parsedMessage, e.ChatMessage.IsSubscriber, isPriority);
                 }
                 catch (Exception ex)
                 {

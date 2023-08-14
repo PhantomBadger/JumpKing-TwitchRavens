@@ -63,7 +63,14 @@ namespace JumpKingModifiersMod
             }
 
             bool result = registeredModifiers.TryAdd(modifierType, modifier);
-            logger.Information($"Registering the '{modifierType.Name}' Modifier with a result of '{result.ToString()}'!");
+            if (result)
+            {
+                logger.Information($"[Modifier Updater] Registered the '{modifierType.Name}' Modifier successfully!");
+            }
+            else
+            {
+                logger.Information($"[Modifier Updater] Failed to register the '{modifierType.Name}' Modifier!");
+            }
             return result;
         }
 

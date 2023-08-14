@@ -86,6 +86,30 @@ namespace Settings
         }
 
         /// <summary>
+        /// Gets an enum variation of the setting, or the default value if the key is not present
+        /// or the value is invalid
+        /// </summary>
+        public Enum GetSettingOrDefault(string key, Enum defaultValue, Type enumType)
+        {
+            if (currentSettings.ContainsKey(key))
+            {
+                try
+                {
+                    return (Enum)Enum.Parse(enumType, currentSettings[key]);
+                }
+                catch (Exception e)
+                {
+                    return defaultValue;
+                }
+            }
+            else
+            {
+                SetOrCreateSetting(key, defaultValue.ToString());
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
         /// Gets a bool variation of the setting, or the default value if the key is not present
         /// or the value is invalid
         /// </summary>

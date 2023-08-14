@@ -8,9 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("JumpKingRavensMod.Settings")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Playground Games")]
 [assembly: AssemblyProduct("JumpKingRavensMod.Settings")]
-[assembly: AssemblyCopyright("Copyright © Playground Games 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

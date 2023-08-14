@@ -1,7 +1,10 @@
-﻿using System;
+﻿using JumpKingModifiersMod.Settings;
+using JumpKingModifiersMod.Settings.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,15 +28,26 @@ namespace JumpKingRavensMod.Install.UI
 
         public MainWindow()
         {
-            installerViewModel = new InstallerViewModel();
-            this.DataContext = installerViewModel;
-            Closing += installerViewModel.OnWindowClosing;
-
             InitializeComponent();
 
             ToolTipService.InitialShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(2000));
             ToolTipService.BetweenShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(0));
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(10000));
+
+            // Create the Modifier Tab Stack Panel programmatically
+            ScrollViewer scrollViewer = new ScrollViewer();
+            scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            scrollViewer.SetValue(Grid.RowProperty, 2);
+
+            StackPanel modifiersStack = new StackPanel();
+
+            scrollViewer.Content = modifiersStack;
+            tabItemModifiersGrid.Children.Add(scrollViewer);
+
+            // Create the data context and pass it the modifiers stack
+            installerViewModel = new InstallerViewModel(modifiersStack);
+            this.DataContext = installerViewModel;
+            Closing += installerViewModel.OnWindowClosing;           
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

@@ -1,5 +1,6 @@
 ﻿using JumpKingModifiersMod.API;
 using JumpKingModifiersMod.Patching;
+using JumpKingModifiersMod.Settings;
 using Logging.API;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace JumpKingModifiersMod.Modifiers
     /// <summary>
     /// An implementation of <see cref="IModifier"/> to modify the walk speed
     /// </summary>
+    [ConfigurableModifier("Increased Walk Speed", "The player walks at a faster rate than normal")]
     public class WalkSpeedModifier : IModifier
     {
         public string DisplayName { get; } = "Increase Walk Speed";
@@ -19,6 +21,9 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly float speedModifier;
         private readonly ILogger logger;
         private readonly IWalkSpeedModifier walkSpeedModifierAccessor;
+
+        private const float OriginalValue = 1.0f;
+        public const float DefaultModifier = 2.0f;
 
         /// <summary>
         /// Ctor for creating a <see cref="WalkSpeedModifier"/>
@@ -38,7 +43,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// </summary>
         public bool IsModifierEnabled()
         {
-            return Math.Abs(walkSpeedModifierAccessor.GetWalkSpeedModifier() - 1f) > float.Epsilon;
+            return Math.Abs(walkSpeedModifierAccessor.GetWalkSpeedModifier() - OriginalValue) > float.Epsilon;
         }
 
         /// <summary>
@@ -59,7 +64,7 @@ namespace JumpKingModifiersMod.Modifiers
         public bool DisableModifier()
         {
             logger.Information($"Disable Walk Speed Modifier");
-            walkSpeedModifierAccessor.SetWalkSpeedModifer(1f);
+            walkSpeedModifierAccessor.SetWalkSpeedModifer(OriginalValue);
             return true;
         }
 

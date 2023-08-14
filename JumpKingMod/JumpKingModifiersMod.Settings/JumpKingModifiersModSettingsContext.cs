@@ -15,10 +15,24 @@ namespace JumpKingModifiersMod.Settings
         public const string SettingsFileName = "JumpKingModifiersMod.settings";
         public const char CommentCharacter = '#';
 
+        // Modifiers
+        public const string EnabledModifiersKey = "EnabledModifiers";
+        public const string TriggerTypeKey = "TriggerType";
+        public const string ModifierToggleKeysKey = "ModifierToggleKeys";
+
+        public const string PollDurationInSecondsKey = "PollDurationInSeconds";
+        public const string PollClosedDurationInSecondsKey = "PollClosedDurationInSeconds";
+        public const string TimeBetweenPollsInSecondsKey = "TimeBetweenPollsInSeconds";
+        public const string ModifierDurationInSecondsKey = "ModifierDurationInSeconds";
+
+        public const float DefaultBasePollTimeInSeconds = 60.0f;
+        public const float DefaultPollClosedTimeInSeconds = 10.0f;
+        public const float DefaultBaseActiveModifierDurationInSeconds = 120f;
+        public const float DefaultTimeBetweenPollsInSeconds = 120f;
+
         // Fall Damage
         public const string FallDamageBloodSplatterFilePath = "Content/Mods/BloodSplatters.txt";
         public const string FallDamageSubtextsFilePath = "Content/Mods/FallDamageSubtexts.txt";
-        public const string DebugTriggerFallDamageToggleKeyKey = "DebugTriggerFallDamageToggleKey";
         public const string FallDamageEnabledKey = "FallDamageEnabled";
         public const string FallDamageModifierKey = "FallDamageModifier";
         public const string FallDamageBloodEnabledKey = "FallDamageBloodEnabled";
@@ -28,15 +42,15 @@ namespace JumpKingModifiersMod.Settings
         public const float DefaultFallDamageModifier = 0.05f;
 
         // Shrinking
-        public const string DebugTriggerManualResizeToggleKey = "DebugTriggerManualResizeToggleKey";
+        public const string DebugTriggerManualResizeToggleKey = "DebugTriggerManualResizeToggle";
         public const string ManualResizeEnabledKey = "ManualResizeEnabled";
         public const string ManualResizeGrowKeyKey = "ManualResizeGrowKey";
         public const string ManualResizeShrinkKeyKey = "ManualResizeShrinkKey";
 
         // Lava
-        public const string DebugTriggerLavaRisingToggleKeyKey = "DebugTriggerLavaRisingToggleKey";
         public const string RisingLavaEnabledKey = "RisingLavaEnabled";
         public const string RisingLavaSpeedKey = "RisingLavaSpeed";
+        public const string RisingLavaTestEnum = "RisingLavaTestEnum";
         public const string RisingLavaNiceSpawnsKey = "RisingLavaNiceSpawns";
         public const float DefaultRisingLavaSpeed = 5f;
 
@@ -47,18 +61,21 @@ namespace JumpKingModifiersMod.Settings
         {
             return new Dictionary<string, string>()
             {
-                { DebugTriggerFallDamageToggleKeyKey, Keys.F11.ToString() },
+                // Fall Damage
                 { FallDamageEnabledKey, false.ToString() },
                 { FallDamageBloodEnabledKey, true.ToString() },
                 { FallDamageClearBloodKey, Keys.F10.ToString() },
                 { FallDamageModifierKey, DefaultFallDamageModifier.ToString() },
                 { FallDamagePreviousHealthKey, 100.ToString() },
                 { FallDamageNiceSpawnsKey, true.ToString() },
+
+                // Shrinking
                 { DebugTriggerManualResizeToggleKey, Keys.F9.ToString() },
                 { ManualResizeEnabledKey, false.ToString() },
                 { ManualResizeGrowKeyKey, Keys.Up.ToString() },
                 { ManualResizeShrinkKeyKey, Keys.Down.ToString() },
-                { DebugTriggerLavaRisingToggleKeyKey, Keys.F7.ToString() },
+
+                // Rising Lava
                 { RisingLavaEnabledKey, false.ToString() },
                 { RisingLavaSpeedKey, DefaultRisingLavaSpeed.ToString() },
                 { RisingLavaNiceSpawnsKey, true.ToString() },
@@ -81,6 +98,32 @@ namespace JumpKingModifiersMod.Settings
                 "Do you regret your choices yet?",
                 "You'll get it next time for sure",
             };
+        }
+
+        /// <summary>
+        /// Utility function to parse the <see cref="ModifierToggleKeysKey"/> setting
+        /// </summary>
+        public static Dictionary<string, Keys> ParseToggleKeys(string rawModifierToggleKeysSetting)
+        {
+            string[] splitModifierToggleKeys = rawModifierToggleKeysSetting.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            Dictionary<string, Keys> toggleKeys = new Dictionary<string, Keys>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < splitModifierToggleKeys.Length; i++)
+            {
+                string[] toggleSetting = splitModifierToggleKeys[i].Split(':');
+                if (toggleSetting.Length == 2)
+                {
+                    toggleKeys.Add(toggleSetting[0], (Keys)Enum.Parse(typeof(Keys), toggleSetting[1]));
+                }
+            }
+            return toggleKeys;
+        }
+
+        /// <summary>
+        /// Utility function to parse the <see cref="EnabledModifiersKey"/> setting
+        /// </summary>
+        public static HashSet<string> ParseEnabledModifiers(string rawEnabledModifiersSetting)
+        {
+            return new HashSet<string>(rawEnabledModifiersSetting.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
         }
     }
 }

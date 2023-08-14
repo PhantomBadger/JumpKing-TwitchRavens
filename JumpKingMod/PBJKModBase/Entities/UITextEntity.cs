@@ -62,6 +62,8 @@ namespace PBJKModBase.Entities
             }
         }
 
+        public bool IsEnabled { get; set; }
+
         protected readonly ModEntityManager modEntityManager;
 
         protected SpriteFont textFont;
@@ -104,6 +106,7 @@ namespace PBJKModBase.Entities
             TextColor = textColor;
             AnchorPoint = anchorPoint;
             TextFont = textFont ?? throw new ArgumentNullException(nameof(textFont));
+            IsEnabled = true;
 
             modEntityManager.AddForegroundEntity(this, zOrder);
         }
@@ -144,13 +147,16 @@ namespace PBJKModBase.Entities
         /// </summary>
         public virtual void ForegroundDraw()
         {
-            Vector2 textSize = Size;
-            Vector2 modifiedPosition = ScreenSpacePosition - new Vector2(0, textSize.Y);
-            if (AnchorPoint == UIEntityAnchor.Center)
+            if (IsEnabled)
             {
-                modifiedPosition.Y -= textSize.Y / 2f;
+                Vector2 textSize = Size;
+                Vector2 modifiedPosition = ScreenSpacePosition - new Vector2(0, textSize.Y);
+                if (AnchorPoint == UIEntityAnchor.Center)
+                {
+                    modifiedPosition.Y -= textSize.Y / 2f;
+                }
+                TextHelper.DrawString(TextFont, formattedText, modifiedPosition, TextColor, GetAnchorVector());
             }
-            TextHelper.DrawString(TextFont, formattedText, modifiedPosition, TextColor, GetAnchorVector());
         }
 
         /// <summary>

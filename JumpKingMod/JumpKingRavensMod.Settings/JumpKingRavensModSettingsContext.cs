@@ -10,18 +10,10 @@ namespace JumpKingRavensMod.Settings
         public const string RavenInsultsFilePath = "Content/Mods/RavenInsultsList.txt";
         public const char CommentCharacter = '#';
 
-        // Streaming
-        public const string SelectedStreamingPlatformKey = "SelectedStreamingPlatform";
-
         // YouTube
-        public const string YouTubeApiKeyKey = "YouTubeAPIKey";
-        public const string YouTubeChannelNameKey = "YouTubeChannelName";
-        public const string YouTubeConnectKeyKey = "YouTubeConnectKey";
         public const string YouTubeRavenTriggerTypeKey = "YouTubeRavenTriggerType";
 
         // Twitch
-        public const string ChatListenerTwitchAccountNameKey = "ChatListenerTwitchAccountName";
-        public const string OAuthKey = "OAuth";
         public const string RavenTriggerTypeKey = "RavenTriggerType";
 
         // Twitch Relay
@@ -50,18 +42,10 @@ namespace JumpKingRavensMod.Settings
         {
 ;           return new Dictionary<string, string>()
             {
-                // Selected Streaming Platform
-                { SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch.ToString() },
-
                 // YouTube
-                { YouTubeApiKeyKey, "" },
-                { YouTubeChannelNameKey, "" },
-                { YouTubeConnectKeyKey, Keys.F9.ToString() },
                 { YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage.ToString() },
 
                 // Twitch Chat
-                { ChatListenerTwitchAccountNameKey, "" },
-                { OAuthKey, "" },
                 { RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage.ToString() },
 
                 // Chat Display
