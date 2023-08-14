@@ -25,10 +25,10 @@ namespace JumpKingModifiersMod.Settings
         public const string TimeBetweenPollsInSecondsKey = "TimeBetweenPollsInSeconds";
         public const string ModifierDurationInSecondsKey = "ModifierDurationInSeconds";
 
-        public const float DefaultBasePollTimeInSeconds = 20.0f;
-        public const float DefaultPollClosedTimeInSeconds = 2.5f;
-        public const float DefaultBaseActiveModifierDurationInSeconds = 30f;
-        public const float DefaultTimeBetweenPollsInSeconds = 2.5f;
+        public const float DefaultBasePollTimeInSeconds = 60.0f;
+        public const float DefaultPollClosedTimeInSeconds = 10.0f;
+        public const float DefaultBaseActiveModifierDurationInSeconds = 120f;
+        public const float DefaultTimeBetweenPollsInSeconds = 120f;
 
         // Fall Damage
         public const string FallDamageBloodSplatterFilePath = "Content/Mods/BloodSplatters.txt";
