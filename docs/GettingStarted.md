@@ -3,7 +3,7 @@ _This information is accurate as of Release v4.1_
 
 1. [Installation](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#installation)
 2. [Chat Ravens Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#chat-ravens-mod)
-3. [Modifiers/Chaos Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#modifiers-chaos-mod)
+3. [Modifiers/Chaos Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#modifierschaos-mod)
 4. [Editing Settings](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#editing-settings)
 
 ## Installation
