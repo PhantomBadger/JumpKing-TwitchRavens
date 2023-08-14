@@ -3,7 +3,7 @@ _This information is accurate as of Release v4.1_
 
 1. [Installation](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#installation)
 2. [Chat Ravens Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#chat-ravens-mod)
-3. [Fall Damage Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#fall-damage-mod)
+3. [Modifiers/Chaos Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#modifiers-chaos-mod)
 4. [Editing Settings](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#editing-settings)
 
 ## Installation
@@ -72,15 +72,21 @@ For YouTube you will also need to specify a key to be pressed to connect to the 
 
 ### For a breakdown of all Ravens Settings [click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/RavensModSettings.md)
 
-## Fall Damage Mod
+## Modifiers/Chaos Mod
 
-_Added in Release v4.1_
+_Added in Release v5_
 
-The Fall Damage Mod is currently packaged alongside the Ravens Mod released previously. However it can be used with or without the chat Ravens.
+The modifiers mod is currently packaged alongside the ravens mod, but can be used with, or without it. It contains 10+ Modifiers for selection, which can be manually enabled for a challenge, or your Twitch/YouTube chat can vote on which ones to enable in this Chaos Mod style adventure!
 
-### For a breakdown of all Fall Damage Settings [click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/FallDamageModSettings.md)
+To set up the Modifiers/Chaos Mod, please follow [these instructions](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToSetupModifiers.md)
 
-### Nice Spawns
+### Fall Damage Mod
+
+The Fall Damage Mod is currently packaged as part of the Modifiers Mod released. It is recommended to use it in 'Toggle' mode.
+
+#### For a breakdown of all Fall Damage Settings [click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/FallDamageModSettings.md)
+
+#### Nice Spawns
 With 'Nice Spawns' enabled, a death in 'New Babe+' will spawn you here:
 
 <img src="https://user-images.githubusercontent.com/9095972/233860256-df48c841-697c-4823-b918-2c602c781704.png" width="50%"/>
@@ -93,15 +99,15 @@ Without 'Nice Spawns' enabled, a death in any map will spawn you here:
 
 <img src="https://user-images.githubusercontent.com/9095972/233860334-48041723-3f29-495a-8cd5-becb665d1f93.png" width="50%"/>
 
-### Custom Maps
+#### Custom Maps
 
 For custom maps using JK+, all deaths will spawn you at the start of the map
 
-### Safe Falls
+#### Safe Falls
 
 Any fall that lands in Deep Snow or the Bog won't harm you. Additionally the required fall in 'Ghost of the Babe' won't harm you either.
 
-### Custom Death Text
+#### Custom Death Text
 
 You can add a 'FallDamageSubtexts.txt' file to the 'Content/Mods' folder of your Jump King install directory. If present the game will pick a random line from the file to display when the player has died
 
