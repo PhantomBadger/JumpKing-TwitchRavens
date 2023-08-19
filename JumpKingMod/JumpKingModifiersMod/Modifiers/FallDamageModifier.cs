@@ -534,7 +534,7 @@ namespace JumpKingModifiersMod.Modifiers
                 playerStateObserver?.DisablePlayerWalking(isWalkingDisabled: false);
 
                 // Restart the player position and reset the health
-                playerStateObserver.RestartPlayerPosition(NiceSpawns);
+                playerStateObserver.RestartPlayerPosition(NiceSpawns, out _);
                 healthValue = MaxHealthValue;
                 fallModifierState = FallDamageModifierState.Playing;
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");

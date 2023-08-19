@@ -299,7 +299,7 @@ namespace JumpKingModifiersMod.Modifiers
                             playerStateObserver.DisablePlayerWalking(isWalkingDisabled: false, isXVelocityDisabled: false);
                             playerStateObserver.DisablePlayerDrawing(isDrawDisabled: false);
                             playerStateObserver.DisablePlayerBodyComp(isBodyCompDisabled: false);
-                            playerStateObserver.RestartPlayerPosition(NiceSpawns);
+                            playerStateObserver.RestartPlayerPosition(NiceSpawns, out _);
                             
                             cutoutPauseCounter = 0;
 
