@@ -19,7 +19,7 @@ namespace JumpKingModifiersMod.Patching
     {
         private static ILogger logger;
         private static float walkSpeedModifier = 1f;
-        private static float jumpTimeModifier = 0.6f;
+        private static float jumpTimeModifier = 1f;
 
         /// <summary>
         /// Ctor for creating a <see cref="PlayerValuesManualPatch"/>

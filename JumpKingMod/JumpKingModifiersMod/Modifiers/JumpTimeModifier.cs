@@ -21,8 +21,8 @@ namespace JumpKingModifiersMod.Modifiers
         private readonly ILogger logger;
         private readonly IJumpTimeModifier jumpTimeModifierAccessor;
 
-        private const float OriginalValue = 0.6f;
-        public const float DefaultModifier = 0.25f;
+        private const float OriginalModifier = 1f;
+        public const float DefaultModifier = 0.55f;
 
         /// <summary>
         /// Ctor for creating a <see cref="JumpTimeModifier"/>
@@ -38,7 +38,7 @@ namespace JumpKingModifiersMod.Modifiers
         public bool DisableModifier()
         {
             logger.Information($"Disable Jump Time Modifier");
-            jumpTimeModifierAccessor.SetJumpTimeModifer(OriginalValue);
+            jumpTimeModifierAccessor.SetJumpTimeModifer(OriginalModifier);
             return true;
         }
 
@@ -53,7 +53,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// <inheritdoc/>
         public bool IsModifierEnabled()
         {
-            return Math.Abs(jumpTimeModifierAccessor.GetJumpTimeModifier() - OriginalValue) > float.Epsilon;
+            return Math.Abs(jumpTimeModifierAccessor.GetJumpTimeModifier() - OriginalModifier) > float.Epsilon;
         }
 
         /// <inheritdoc/>
