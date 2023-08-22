@@ -1,4 +1,4 @@
-# Please read our [Getting Started Guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md) to install the Ravens or Fall Damage Mods
+# Please read our [Getting Started Guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md) to install the Ravens or Modifier/Chaos Mode Mods
 
 # Jump King Chat Raven Mod
 This Mod allows your Twitch or YouTube Chat to lend words of encouragement whilst you climb to the babe! It will also include the 'Fall Damage' mod until we can get around to splitting it out properly.
@@ -32,6 +32,10 @@ Toggle a 'free flying' mode for the Jump King, which will let you explore or pra
 
 _**Note:** Enabling this aspect of the mod will disable achievements in the game until the Free Flying mod is turned off in the settings!_
 
+# Chaos Mode/Modifiers
+I'll write this one day :) 
+Go [here]([https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v5.1](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases)) for latest release:
+
 ## Installation
 
 [Check out the Instructions here!](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md)
@@ -53,13 +57,3 @@ For YouTube Support, check out [this guide](https://github.com/PhantomBadger/Jum
 You can reach out to me on [Twitter](https://twitter.com/PhantomBadger_)
 
 ![heartchatmessage](https://user-images.githubusercontent.com/9095972/135729076-857302a4-7878-4654-b288-73283ae76090.png)
-
-# Future Features
-
-- [x] Configurable exclusion word list [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
-- [x] Custom Insults for the Insult Ravens [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
-- [x] Text Wrapping for Longer Messages [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
-- [x] Runtime Sub-Only Toggles [Supported in v1.2](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v1.2)
-- [ ] Twitch Emote Support
-- [ ] Support for Different Raven Sprites
-- [x] YouTube Chat Support [Supported in v2.0](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v2.0)
