@@ -4,12 +4,6 @@
 This Mod allows your Twitch or YouTube Chat to lend words of encouragement whilst you climb to the babe! It will also include the 'Fall Damage' mod until we can get around to splitting it out properly.
 
 ## Features
-### Fall Damage
-The King is no longer the resilient hero he once was, each fall takes a bit more of his health away - until you're forced to try again from the start!
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/9095972/233857633-34c0744b-53ca-4b97-b772-2971690007e8.gif" width="75%" height="75%" alt="Every Fall deals damage to the King!"/>
-</p>
-
 ### Twitch & YouTube Ravens
 Both Twitch and YouTube Chat can now communicate with you within the world of Jump King! Messages from chat will be parroted by small ravens that land on the stage as you traverse it. You have the option of gating this behind a Channel Point reward for busier chats!
 <p align="center">
@@ -33,8 +27,13 @@ Toggle a 'free flying' mode for the Jump King, which will let you explore or pra
 _**Note:** Enabling this aspect of the mod will disable achievements in the game until the Free Flying mod is turned off in the settings!_
 
 # Chaos Mode/Modifiers
-I'll write this one day :) 
-Go [here]([https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases/tag/v5.1](https://github.com/PhantomBadger/JumpKing-TwitchRavens/releases)) for latest release:
+
+## Features
+### Fall Damage
+The King is no longer the resilient hero he once was, each fall takes a bit more of his health away - until you're forced to try again from the start!
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/9095972/233857633-34c0744b-53ca-4b97-b772-2971690007e8.gif" width="75%" height="75%" alt="Every Fall deals damage to the King!"/>
+</p>
 
 ## Installation
 
