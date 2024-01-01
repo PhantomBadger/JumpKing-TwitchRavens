@@ -68,7 +68,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="API\IInstallerSettingsViewModel.cs" />
+    <Compile Include="Settings\FeedbackDeviceSettingsViewModel.cs" />
     <Compile Include="Settings\ModifiersSettingsViewModel.cs" />
+    <Compile Include="Settings\PiShockSettingsViewModel.cs" />
+    <Compile Include="Settings\PunishmentSettingsViewModel.cs" />
     <Compile Include="Settings\RavensSettingsViewModel.cs" />
     <Compile Include="Settings\StreamingSettingsViewModel.cs" />
     <Compile Include="Settings\TwitchSettingsViewModel.cs" />
@@ -132,6 +135,10 @@
       <Project>{9544190F-5C10-4C4B-8EB7-FFD8BC3DE76C}</Project>
       <Name>JumpKingModifiersMod.Settings</Name>
     </ProjectReference>
+    <ProjectReference Include="..\JumpKingPunishmentMod.Settings\JumpKingPunishmentMod.Settings.csproj">
+      <Project>{9428b4f2-19c3-448e-b086-7c4bc39f68e7}</Project>
+      <Name>JumpKingPunishmentMod.Settings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JumpKingRavensMod.Settings\JumpKingRavensMod.Settings.csproj">
       <Project>{5d82fbd1-fc33-4116-9355-3d9aa6a17ccc}</Project>
       <Name>JumpKingRavensMod.Settings</Name>
@@ -139,6 +146,14 @@
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{E26BA6E7-FA46-4525-BC28-50F1044ADE07}</Project>
       <Name>Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.FeedbackDevice.Settings\PBJKModBase.FeedbackDevice.Settings.csproj">
+      <Project>{a507ddec-1afa-4ecb-b812-f3fad4a59e78}</Project>
+      <Name>PBJKModBase.FeedbackDevice.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.PiShock.Settings\PBJKModBase.PiShock.Settings.csproj">
+      <Project>{0e2865cb-21d5-46c0-89e6-24d4d874b526}</Project>
+      <Name>PBJKModBase.PiShock.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="..\PBJKModBase.Streaming.Settings\PBJKModBase.Streaming.Settings.csproj">
       <Project>{04A526F8-568E-417A-8C4E-C0F2418292CB}</Project>

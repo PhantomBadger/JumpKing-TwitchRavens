@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AD419A62-00FF-4D90-9CEF-CFD87D7CECCE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JumpKingPunishmentMod</RootNamespace>
+    <AssemblyName>JumpKingPunishmentMod</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\Harmony\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="JumpKing">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Jump King\JumpKing.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Jump King\MonoGame.Framework.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="API\IPunishmentDevice.cs" />
+    <Compile Include="Devices\PiShockPunishmentDevice.cs" />
+    <Compile Include="Entities\PunishmentManagerEntity.cs" />
+    <Compile Include="JumpKingPunishmentModEntry.cs" />
+    <Compile Include="Patching\PunishmentPlayerStateObserverManualPatch.cs" />
+    <Compile Include="Patching\States\PunishmentPlayerState.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JumpKingPunishmentMod.Settings\JumpKingPunishmentMod.Settings.csproj">
+      <Project>{9428b4f2-19c3-448e-b086-7c4bc39f68e7}</Project>
+      <Name>JumpKingPunishmentMod.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Logging\Logging.csproj">
+      <Project>{e26ba6e7-fa46-4525-bc28-50f1044ade07}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.FeedbackDevice.Settings\PBJKModBase.FeedbackDevice.Settings.csproj">
+      <Project>{a507ddec-1afa-4ecb-b812-f3fad4a59e78}</Project>
+      <Name>PBJKModBase.FeedbackDevice.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.PiShock.Settings\PBJKModBase.PiShock.Settings.csproj">
+      <Project>{0e2865cb-21d5-46c0-89e6-24d4d874b526}</Project>
+      <Name>PBJKModBase.PiShock.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase.PiShock\PBJKModBase.PiShock.csproj">
+      <Project>{a1375ec0-a53b-4fea-8628-f4f432224338}</Project>
+      <Name>PBJKModBase.PiShock</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBJKModBase\PBJKModBase.csproj">
+      <Project>{de2b97be-f646-4158-a63b-330dafef06e2}</Project>
+      <Name>PBJKModBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Settings\Settings.csproj">
+      <Project>{d9c89840-a346-4334-99f2-cf323015c206}</Project>
+      <Name>Settings</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /E /C /S "$(SolutionDir)JumpKingModLoader\bin\$(ConfigurationName)\*" "D:\SteamLibrary\steamapps\common\Jump King\Content\Mods"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

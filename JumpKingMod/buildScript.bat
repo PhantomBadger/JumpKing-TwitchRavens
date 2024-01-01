@@ -12,4 +12,5 @@ cd ..
 robocopy "JumpKingMod.Install.UI/bin/Debug/" "Jump King Mod Release/Installer" /COPYALL /E
 robocopy "JumpKingModifiersMod/bin/Debug/" "Jump King Mod Release/Mod Files" /COPYALL /E
 robocopy "JumpKingRavensMod/bin/Debug/" "Jump King Mod Release/Mod Files" /COPYALL /E
+robocopy "JumpKingPunishmentMod/bin/Debug/" "Jump King Mod Release/Mod Files" /COPYALL /E
 robocopy "JumpKingModLoader/bin/Debug/" "Jump King Mod Release/Mod Files" /COPYALL /E

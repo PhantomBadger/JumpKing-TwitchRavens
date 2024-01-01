@@ -59,6 +59,46 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="ToggleFlipSwitchFeedbackDeviceStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <StackPanel Orientation="Horizontal">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <Border x:Name="on" Width="60" Height="25" Background="LightGray" CornerRadius="2,0,0,4" Margin="10,0,0,0">
+                                <TextBlock x:Name="onText" Text="None" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="off" Width="60" Height="25" Background="LightGray" CornerRadius="0,2,4,0">
+                                <TextBlock x:Name="offText" Text="PiShock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter TargetName="on" Property="Background" Value="#474747"/>
+                                <Setter TargetName="onText" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="off" Property="Background" Value="#0011ff"/>
+                                <Setter TargetName="offText" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#ADADAD"/>
+                                <Setter TargetName="on" Property="Background" Value="LightGray"/>
+                                <Setter TargetName="onText" Property="Foreground" Value="DarkGray"/>
+                                <Setter TargetName="off" Property="Background" Value="LightGray"/>
+                                <Setter TargetName="offText" Property="Foreground" Value="DarkGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     
     <DockPanel>
@@ -114,11 +154,13 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <ToggleButton Grid.Row="0" Content="Streaming Platform:" Margin="2,2,10,2" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Style="{StaticResource ToggleFlipSwitchStyle}" IsChecked="{Binding StreamingSettings.IsStreamingOnTwitch, Mode=TwoWay}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Unchecked"/>
-                <TabControl Grid.Row="1" x:Name="tabControl" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Padding="5" SelectedIndex="0">
+                <ToggleButton Grid.Row="1" Content="Feedback Device:" Margin="2,2,10,2" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Style="{StaticResource ToggleFlipSwitchFeedbackDeviceStyle}" IsChecked="{Binding FeedbackDeviceSettings.IsUsingNoDevice, Mode=TwoWay}" Checked="ToggleButtonFeedbackDevice_Checked"/>
+                <TabControl Grid.Row="2" x:Name="tabControl" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Padding="5" SelectedIndex="0">
                     <TabItem x:Name="tabItemTwitch" Header="Twitch" Visibility="{Binding StreamingSettings.IsStreamingOnTwitch, Converter={StaticResource boolToVisibilityConverter}}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -206,6 +248,54 @@
                             <!-- Connect Key -->
                             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Text="Connect Key:" ToolTip="When pressed this will cause the mod to connect/disconnect from the YouTube Stream" />
                             <ComboBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding YouTubeSettings.ConnectKey, Mode=TwoWay}" ToolTip="When pressed this will cause the mod to connect/disconnect from the YouTube Stream"/>
+                        </Grid>
+                    </TabItem>
+                    <TabItem x:Name="tabItemPiShock" Header="PiShock" Visibility="{Binding FeedbackDeviceSettings.IsUsingPiShock, Converter={StaticResource boolToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.Resources>
+                                <ToolTip x:Key="pishockUsernameTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        Your username for the PiShock API, required to make requests to your PiShock device.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="pishockAPIKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        Your API Key for the PiShock API, required to make requests to your PiShock device.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="pishockSharecodeTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        Your share code for the PiShock API, required to make requests to your PiShock device.
+                                    </TextBlock>
+                                </ToolTip>
+                            </Grid.Resources>
+                            <!-- Warning -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,0,10,0" FontSize="9" Visibility="{Binding PiShockSettings.PiShockEnabled, Converter={StaticResource boolToVisibilityConverter}}">
+                                <Italic>
+                                    You shouldn't show/share these with anyone!
+                                </Italic>
+                            </TextBlock>
+                            <!-- Username -->
+                            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource pishockUsernameTooltip}" Text="PiShock Username:" />
+                            <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource pishockUsernameTooltip}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Text="{Binding PiShockSettings.Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- API Key -->
+                            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource pishockAPIKeyTooltip}" Text="PiShock API Key:" />
+                            <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource pishockAPIKeyTooltip}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Text="{Binding PiShockSettings.APIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Share Code -->
+                            <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource pishockSharecodeTooltip}" Text="PiShock Share Code:" />
+                            <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource pishockSharecodeTooltip}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Text="{Binding PiShockSettings.ShareCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
                     </TabItem>
                     <TabItem x:Name="tabItemRavens" Header="Ravens">
@@ -577,6 +667,243 @@
                             <ComboBox Grid.Row="20" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource gunKeyTooltip}" Visibility="{Binding RavensSettings.GunSettingsVisible, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding RavensSettings.GunToggleKey, Mode=TwoWay}"/>
                         </Grid>
                     </TabItem>
+                    <TabItem x:Name="tabItemPunishment" Header="Punishment" Visibility="{Binding FeedbackDeviceSettings.IsUsingAnyDevice, Converter={StaticResource boolToVisibilityConverter}}" >
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="FirstColumn"/>
+                                <ColumnDefinition Width="*" SharedSizeGroup="SecondColumn"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <!-- Enabled -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Seperator -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Toggle Key -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Test Beep Key -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Round Durations -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Punishment Enabled -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Min Shock Duration -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Min Shock Intensity -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Max Shock Duration -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Max Shock Intensity -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Min Fall Distance -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Max Fall Distance -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Punishment Easy Mode -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Rewards Enabled -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Min Reward Duration -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Min Reward Intensity -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Max Reward Duration -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Max Reward Intensity -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Min Progress Distance -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Max Progress Distance -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Reward Progress Only -->
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.Resources>
+                                <ToolTip x:Key="punishmentEnabledTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        If enabled, you will recieve punishments/rewards during gameplay.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentToggleKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        A key you can press during gameplay to enable/disable the Punishment functionality on the fly.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentTestFeedbackKeyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        A key you can press during gameplay to send a test feedback event to your punishment device to ensure everything is working.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentRoundDurationTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        When calculating punishments durations will be rounded to the nearest second during calculation.
+                                        This means durations only calculate/display on screen to the nearest second- but some APIs (the PiShock) only support this anyways.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentPunishmentEnabledTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        Whether or not punishments will be sent for falling.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMinPunishmentDurationTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The minimum duration for a punishment.
+                                        Note: Some devices may have limits on durations.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMinPunishmentIntensityTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The minimum intensity (0-100) for a punishment.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMaxPunishmentDurationTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The maximum duration for a punishment.
+                                        Note: Some devices may have limits on durations.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMaxPunishmentIntensityTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The maximum intensity (0-100) for a punishment.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMinFallTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The minimum distance you must fall to receive a punishment.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMaxFallTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The distance you must fall before you will receive the maximum punishment.
+                                        Note: One screen should be 360 pixels.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentPunishmentEasyModeTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        If enabled you should recieve easier punishments (e.g. nicer forms of feedback, reduced feedback, etc).
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentRewardsEnabledTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        Whether or not rewards will be sent for progress.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMinRewardDurationTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The minimum duration for a reward.
+                                        Note: Some devices may have limits on durations.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMinRewardIntensityTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The minimum intensity (0-100) for a reward.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMaxRewardDurationTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The maximum duration for a reward.
+                                        Note: Some devices may have limits on durations.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMaxRewardIntensityTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The maximum intensity (0-100) for a reward.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMinProgressTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The minimum distance you must progress to receive a reward.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentMaxProgressTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        The distance you must progress before you will receive the maximum reward.
+                                    </TextBlock>
+                                </ToolTip>
+                                <ToolTip x:Key="punishmentRewardProgressOnlyTooltip" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+                                    <TextBlock>
+                                        If enabled you will only receive rewards the first time you make progress (note this does not save between sessions).
+                                        Falling and getting back to an area will not give you a reward if enabled.
+                                    </TextBlock>
+                                </ToolTip>
+                            </Grid.Resources>
+                            <!-- Enabled -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource punishmentEnabledTooltip}" Text="Enabled: "  />
+                            <CheckBox Grid.Row="0" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource punishmentEnabledTooltip}" IsChecked="{Binding PunishmentSettings.PunishmentModEnabled, Mode=TwoWay}" IsEnabled="{Binding PunishmentSettings.ArePunishmentSettingsLoaded}"/>
+                            <!-- Seperator -->
+                            <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}"/>
+                            <!-- Toggle Key -->
+                            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource punishmentToggleKeyTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Toggle Punishment Key:" />
+                            <ComboBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource punishmentToggleKeyTooltip}" IsEnabled="{Binding PunishmentSettings.ArePunishmentSettingsLoaded}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding PunishmentSettings.PunishmentToggleDebugKey, Mode=TwoWay}"/>
+                            <!-- Test Beep Key -->
+                            <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" ToolTip="{StaticResource punishmentTestFeedbackKeyTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Test Feedback Key:" />
+                            <ComboBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" ToolTip="{StaticResource punishmentTestFeedbackKeyTooltip}" IsEnabled="{Binding PunishmentSettings.ArePunishmentSettingsLoaded}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding PunishmentSettings.PunishmentTestFeedbackDebugKey, Mode=TwoWay}"/>
+                            <!-- Round Durations -->
+                            <TextBlock Grid.Row="6" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource punishmentRoundDurationTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Round Durations: "  />
+                            <CheckBox Grid.Row="6" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource punishmentRoundDurationTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding PunishmentSettings.RoundDurations, Mode=TwoWay}" IsEnabled="{Binding PunishmentSettings.ArePunishmentSettingsLoaded}"/>
+                            <!-- Punishment Enabled -->
+                            <TextBlock Grid.Row="7" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource punishmentPunishmentEnabledTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Punishment Enabled: "  />
+                            <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource punishmentPunishmentEnabledTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding PunishmentSettings.EnabledPunishment, Mode=TwoWay}" IsEnabled="{Binding PunishmentSettings.ArePunishmentSettingsLoaded}"/>
+                            <!-- Min Shock Duration -->
+                            <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinPunishmentDurationTooltip}" Text="Minimum Punishment Duration:" />
+                            <TextBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinPunishmentDurationTooltip}" Text="{Binding PunishmentSettings.MinPunishmentDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Min Shock Intensity -->
+                            <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinPunishmentIntensityTooltip}" Text="Minimum Punishment Intensity:" />
+                            <TextBox Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinPunishmentIntensityTooltip}" Text="{Binding PunishmentSettings.MinPunishmentIntensity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Max Shock Duration -->
+                            <TextBlock Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxPunishmentDurationTooltip}" Text="Maximum Punishment Duration:" />
+                            <TextBox Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxPunishmentDurationTooltip}" Text="{Binding PunishmentSettings.MaxPunishmentDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Max Shock Intensity -->
+                            <TextBlock Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxPunishmentIntensityTooltip}" Text="Maximum Punishment Intensity:" />
+                            <TextBox Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxPunishmentIntensityTooltip}" Text="{Binding PunishmentSettings.MaxPunishmentIntensity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Min Fall Distance -->
+                            <TextBlock Grid.Row="16" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinFallTooltip}" Text="Minimum Punishment Fall Distance:" />
+                            <TextBox Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinFallTooltip}" Text="{Binding PunishmentSettings.MinFallDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Max Fall Distance -->
+                            <TextBlock Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxFallTooltip}" Text="Maximum Punishment Fall Distance:" />
+                            <TextBox Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxFallTooltip}" Text="{Binding PunishmentSettings.MaxFallDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Punishment Easy Mode -->
+                            <TextBlock Grid.Row="20" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource punishmentPunishmentEasyModeTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Punishment Easy Mode: "  />
+                            <CheckBox Grid.Row="20" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource punishmentPunishmentEasyModeTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding PunishmentSettings.PunishmentEasyMode, Mode=TwoWay}" IsEnabled="{Binding PunishmentSettings.ArePunishmentSettingsLoaded}"/>
+                            <!-- Rewards Enabled -->
+                            <TextBlock Grid.Row="21" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource punishmentRewardsEnabledTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Rewards Enabled: "  />
+                            <CheckBox Grid.Row="21" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource punishmentRewardsEnabledTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding PunishmentSettings.EnabledRewards, Mode=TwoWay}" IsEnabled="{Binding PunishmentSettings.ArePunishmentSettingsLoaded}"/>
+                            <!-- Min Reward Duration -->
+                            <TextBlock Grid.Row="22" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinRewardDurationTooltip}" Text="Minimum Reward Duration:" />
+                            <TextBox Grid.Row="23" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinRewardDurationTooltip}" Text="{Binding PunishmentSettings.MinRewardDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Min Reward Intensity -->
+                            <TextBlock Grid.Row="24" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinRewardIntensityTooltip}" Text="Minimum Reward Intensity:" />
+                            <TextBox Grid.Row="25" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinRewardIntensityTooltip}" Text="{Binding PunishmentSettings.MinRewardIntensity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Max Reward Duration -->
+                            <TextBlock Grid.Row="26" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxRewardDurationTooltip}" Text="Maximum Reward Duration:" />
+                            <TextBox Grid.Row="27" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxRewardDurationTooltip}" Text="{Binding PunishmentSettings.MaxRewardDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Max Reward Intensity -->
+                            <TextBlock Grid.Row="28" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxRewardIntensityTooltip}" Text="Maximum Reward Intensity:" />
+                            <TextBox Grid.Row="29" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxRewardIntensityTooltip}" Text="{Binding PunishmentSettings.MaxRewardIntensity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Min Progress Distance -->
+                            <TextBlock Grid.Row="30" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinProgressTooltip}" Text="Minimum Reward Progress Distance:" />
+                            <TextBox Grid.Row="31" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMinProgressTooltip}" Text="{Binding PunishmentSettings.MinRewardDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Max Progress Distance -->
+                            <TextBlock Grid.Row="32" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxProgressTooltip}" Text="Maximum Reward Progress Distance:" />
+                            <TextBox Grid.Row="33" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" ToolTip="{StaticResource punishmentMaxProgressTooltip}" Text="{Binding PunishmentSettings.MaxRewardDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Reward Progress Only -->
+                            <TextBlock Grid.Row="34" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource punishmentPunishmentEasyModeTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" Text="Reward On New Progress Only: "  />
+                            <CheckBox Grid.Row="34" Grid.Column="1" Margin="5,2,10,2" HorizontalAlignment="Right" ToolTip="{StaticResource punishmentRewardProgressOnlyTooltip}" Visibility="{Binding PunishmentSettings.PunishmentModEnabled, Converter={StaticResource boolToVisibilityConverter}}" IsChecked="{Binding PunishmentSettings.RewardProgressOnlyMode, Mode=TwoWay}" IsEnabled="{Binding PunishmentSettings.ArePunishmentSettingsLoaded}"/>
+                        </Grid>
+                    </TabItem>
                     
     <!-- Fall Damage now handled by dynamic setting creation of Modifiers
                     <TabItem x:Name="tabFallDamage" Header="Fall Damage">
@@ -885,7 +1212,7 @@
                     </TabItem>
                 </TabControl>
                 <!-- Update Settings Button-->
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Save Settings" MaxWidth="100" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding UpdateSettingsCommand}"/>
                     <Button Content="Load Settings" MaxWidth="100" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding LoadSettingsCommand}"/>
                 </StackPanel>

@@ -84,9 +84,19 @@ namespace JumpKingRavensMod.Install.UI
         public YouTubeSettingsViewModel YouTubeSettings { get; set; }
 
         /// <summary>
+        /// An aggregate class of PiShock Settings
+        /// </summary>
+        public PiShockSettingsViewModel PiShockSettings { get; set; }
+
+        /// <summary>
         /// An aggregate class of Raven Settings
         /// </summary>
         public RavensSettingsViewModel RavensSettings { get; set; }
+
+        /// <summary>
+        /// An aggregate class of Punishment Mod Settings
+        /// </summary>
+        public PunishmentSettingsViewModel PunishmentSettings { get; set; }
 
         /// <summary>
         /// An aggregate class of Modifiers Settings
@@ -97,6 +107,11 @@ namespace JumpKingRavensMod.Install.UI
         /// An aggregate class of Streaming Settings
         /// </summary>
         public StreamingSettingsViewModel StreamingSettings { get; set; }
+
+        /// <summary>
+        /// An aggregate class of Feedback Device Settings
+        /// </summary>
+        public FeedbackDeviceSettingsViewModel FeedbackDeviceSettings { get; set; }
 
         /// <summary>
         /// Combines <see cref="GameDirectory"/> with the <see cref="RemoteModFolderSuffix"/> to get the expected Mod Directory
@@ -196,16 +211,22 @@ namespace JumpKingRavensMod.Install.UI
             InitialiseCommands();
 
             RavensSettings = new RavensSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+            PunishmentSettings = new PunishmentSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
             ModifiersSettings = new ModifiersSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger, modifiersStackPanel);
             TwitchSettings = new TwitchSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
             YouTubeSettings = new YouTubeSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+            PiShockSettings = new PiShockSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
             StreamingSettings = new StreamingSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
+            FeedbackDeviceSettings = new FeedbackDeviceSettingsViewModel(UpdateSettingsCommand, LoadSettingsCommand, logger);
 
             registeredSettings.Add(RavensSettings);
+            registeredSettings.Add(PunishmentSettings);
             registeredSettings.Add(ModifiersSettings);
             registeredSettings.Add(TwitchSettings);
             registeredSettings.Add(YouTubeSettings);
+            registeredSettings.Add(PiShockSettings);
             registeredSettings.Add(StreamingSettings);
+            registeredSettings.Add(FeedbackDeviceSettings);
 
             GameDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.GameDirectoryKey, string.Empty);
             ModDirectory = installerSettings.GetSettingOrDefault(JumpKingModInstallerSettingsContext.ModDirectoryKey, string.Empty);

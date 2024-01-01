@@ -35,6 +35,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase.YouTube.Setting
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase.Streaming.Settings", "PBJKModBase.Streaming.Settings\PBJKModBase.Streaming.Settings.csproj", "{04A526F8-568E-417A-8C4E-C0F2418292CB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase.PiShock.Settings", "PBJKModBase.PiShock.Settings\PBJKModBase.PiShock.Settings.csproj", "{0E2865CB-21D5-46C0-89E6-24D4D874B526}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase.PiShock", "PBJKModBase.PiShock\PBJKModBase.PiShock.csproj", "{A1375EC0-A53B-4FEA-8628-F4F432224338}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingPunishmentMod", "JumpKingPunishmentMod\JumpKingPunishmentMod.csproj", "{AD419A62-00FF-4D90-9CEF-CFD87D7CECCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpKingPunishmentMod.Settings", "JumpKingPunishmentMod.Settings\JumpKingPunishmentMod.Settings.csproj", "{9428B4F2-19C3-448E-B086-7C4BC39F68E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBJKModBase.FeedbackDevice.Settings", "PBJKModBase.FeedbackDevice.Settings\PBJKModBase.FeedbackDevice.Settings.csproj", "{A507DDEC-1AFA-4ECB-B812-F3FAD4A59E78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +111,26 @@ Global
 		{04A526F8-568E-417A-8C4E-C0F2418292CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04A526F8-568E-417A-8C4E-C0F2418292CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04A526F8-568E-417A-8C4E-C0F2418292CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E2865CB-21D5-46C0-89E6-24D4D874B526}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E2865CB-21D5-46C0-89E6-24D4D874B526}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E2865CB-21D5-46C0-89E6-24D4D874B526}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E2865CB-21D5-46C0-89E6-24D4D874B526}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1375EC0-A53B-4FEA-8628-F4F432224338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1375EC0-A53B-4FEA-8628-F4F432224338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1375EC0-A53B-4FEA-8628-F4F432224338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1375EC0-A53B-4FEA-8628-F4F432224338}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD419A62-00FF-4D90-9CEF-CFD87D7CECCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD419A62-00FF-4D90-9CEF-CFD87D7CECCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD419A62-00FF-4D90-9CEF-CFD87D7CECCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD419A62-00FF-4D90-9CEF-CFD87D7CECCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9428B4F2-19C3-448E-B086-7C4BC39F68E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9428B4F2-19C3-448E-B086-7C4BC39F68E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9428B4F2-19C3-448E-B086-7C4BC39F68E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9428B4F2-19C3-448E-B086-7C4BC39F68E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A507DDEC-1AFA-4ECB-B812-F3FAD4A59E78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A507DDEC-1AFA-4ECB-B812-F3FAD4A59E78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A507DDEC-1AFA-4ECB-B812-F3FAD4A59E78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A507DDEC-1AFA-4ECB-B812-F3FAD4A59E78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

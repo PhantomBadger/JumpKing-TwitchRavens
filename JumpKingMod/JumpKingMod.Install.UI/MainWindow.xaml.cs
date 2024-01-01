@@ -93,5 +93,16 @@ namespace JumpKingRavensMod.Install.UI
                 //}
             }
         }
+
+        private void ToggleButtonFeedbackDevice_Checked(object sender, RoutedEventArgs e)
+        {
+            if (tabControl != null)
+            {
+                if (tabControl.SelectedItem == tabItemPiShock || tabControl.SelectedItem == tabItemPunishment)
+                {
+                    tabControl.SelectedItem = tabItemRavens;
+                }
+            }
+        }
     }
 }
