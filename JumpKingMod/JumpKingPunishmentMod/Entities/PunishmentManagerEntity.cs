@@ -82,7 +82,7 @@ namespace JumpKingPunishmentMod.Entities
 
             ResetState();
 
-            IncomingPunishmentTextEntity = new UITextEntity(modEntityManager, new Vector2(8, 0), "", new Color(1.0f, 1.0f, 1.0f, 0.5f), UIEntityAnchor.TopLeft, JKContentManager.Font.StyleFont);
+            IncomingPunishmentTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 16), "", new Color(1.0f, 1.0f, 1.0f, 0.5f), UIEntityAnchor.Center, JKContentManager.Font.StyleFont);
             LastActionTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 360), "", Color.White, UIEntityAnchor.Center, JKContentManager.Font.StyleFont);
             LastActionDrawTimer = 0.0f;
 
