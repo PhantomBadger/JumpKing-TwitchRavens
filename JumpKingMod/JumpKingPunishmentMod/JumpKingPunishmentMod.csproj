@@ -92,6 +92,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /E /C /S "$(SolutionDir)JumpKingModLoader\bin\$(ConfigurationName)\*" "D:\SteamLibrary\steamapps\common\Jump King\Content\Mods"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y /E /C /S "$(SolutionDir)JumpKingPunishmentMod\bin\$(ConfigurationName)\*" "D:\SteamLibrary\steamapps\common\Jump King\Content\Mods"</PostBuildEvent>
   </PropertyGroup>
 </Project>
