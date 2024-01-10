@@ -15,7 +15,7 @@ namespace JumpKingPunishmentMod.Settings
 
         public const string PunishmentModToggleKeyKey = "PunishmentModToggleKey";
         public const string PunishmentFeedbackTestKeyKey = "FeedbackTestKey";
-        public const string DisplayFeedbackStrengthKey = "DisplayFeedbackStrength";
+        public const string OnScreenDisplayBehaviorKey = "OnScreenDisplayBehavior";
         public const string RoundDurationsKey = "RoundDurations";
 
         public const string EnablePunishmentKey = "EnablePunishment";
@@ -49,7 +49,7 @@ namespace JumpKingPunishmentMod.Settings
                 // General
                 { PunishmentModToggleKeyKey, Keys.F8.ToString() },
                 { PunishmentFeedbackTestKeyKey, Keys.F9.ToString() },
-                { DisplayFeedbackStrengthKey, true.ToString() },
+                { OnScreenDisplayBehaviorKey, PunishmentOnScreenDisplayBehavior.FeedbackIntensityAndDuration.ToString() },
                 { RoundDurationsKey, false.ToString() },
 
                 // Punishment

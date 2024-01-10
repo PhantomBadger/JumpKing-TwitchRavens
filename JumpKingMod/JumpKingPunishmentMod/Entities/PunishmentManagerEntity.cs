@@ -49,7 +49,7 @@ namespace JumpKingPunishmentMod.Entities
 
         private readonly Keys toggleKey;
         private readonly Keys testKey;
-        private readonly bool displayFeedbackStrength;
+        private readonly PunishmentOnScreenDisplayBehavior onScreenDisplayBehavior;
         private readonly bool roundDurations;
 
         private readonly bool enablePunishment;
@@ -97,7 +97,7 @@ namespace JumpKingPunishmentMod.Entities
             // Cache our settings off so we don't need to read them every time
             toggleKey = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentModToggleKeyKey, Keys.F8);
             testKey = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentFeedbackTestKeyKey, Keys.F9);
-            displayFeedbackStrength = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.DisplayFeedbackStrengthKey, false);
+            onScreenDisplayBehavior = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.OnScreenDisplayBehaviorKey, PunishmentOnScreenDisplayBehavior.None);
             roundDurations = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.RoundDurationsKey, false);
 
             enablePunishment = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.EnablePunishmentKey, false);
@@ -205,9 +205,8 @@ namespace JumpKingPunishmentMod.Entities
                                     var reward = CalculateReward(yDelta);
                                     if (reward.Item1)
                                     {
-                                        punishmentDevice.Reward(reward.Item2, reward.Item3);
-                                        // Do some rounding to keep the string length sane
-                                        UpdateLastAction(displayFeedbackStrength ? $"Reward! ({Math.Round(reward.Item2)}% x {Math.Round(reward.Item3, 2)}s)" : "Reward!", Color.Lime);
+                                        punishmentDevice.Reward(reward.Item3, reward.Item4);
+                                        UpdateLastAction(GenerateFeedbackInfoString("Reward!", reward.Item2, reward.Item3, reward.Item4), Color.Lime);
                                     }
                                 }
                             }
@@ -216,9 +215,8 @@ namespace JumpKingPunishmentMod.Entities
                                 var punishment = CalculatePunishment(yDelta);
                                 if (punishment.Item1)
                                 {
-                                    punishmentDevice.Punish(punishment.Item2, punishment.Item3, easyModePunishment);
-                                    // Do some rounding to keep the string length sane
-                                    UpdateLastAction(displayFeedbackStrength ? $"Punishment! ({Math.Round(punishment.Item2)}% x {Math.Round(punishment.Item3, 2)}s)" : "Punishment!", easyModePunishment ? Color.Lime : Color.Red);
+                                    punishmentDevice.Punish(punishment.Item3, punishment.Item4, easyModePunishment);
+                                    UpdateLastAction(GenerateFeedbackInfoString("Punishment!", punishment.Item2, punishment.Item3, punishment.Item4), easyModePunishment ? Color.Lime : Color.Red);
                                 }
                             }
                         }
@@ -242,7 +240,7 @@ namespace JumpKingPunishmentMod.Entities
                 // Update the incoming text entity
                 // Only show punishments incoming as rewards will be weird with the arcs of a jump (and punishments
                 // generally can't be avoided once they start)
-                var incomingPunishment = (false, 0.0f, 0.0f);
+                var incomingPunishment = (false, 0.0f, 0.0f, 0.0f);
                 if (isInAir && hasValidGroundedY)
                 {
                     // Again add teleport compensation to work in 'non-teleported' space
@@ -259,8 +257,7 @@ namespace JumpKingPunishmentMod.Entities
                 }
                 else
                 {
-                    // Do some rounding to keep the string length sane
-                    incomingPunishmentTextEntity.TextValue = displayFeedbackStrength ? $"Incoming punishment ({Math.Round(incomingPunishment.Item2)}% x {Math.Round(incomingPunishment.Item3, 2)}s)..." : "Incoming punishment...";
+                    incomingPunishmentTextEntity.TextValue = GenerateFeedbackInfoString("Incoming punishment", incomingPunishment.Item2, incomingPunishment.Item3, incomingPunishment.Item4, "...");
                 }
 
                 // Fade the last action text out overtime (over the second half of it's lifetime)
@@ -318,9 +315,10 @@ namespace JumpKingPunishmentMod.Entities
         /// <summary>
         /// Calculates a Reward given the provided delta and considering the player settings
         /// </summary>
-        private (bool, float, float) CalculateReward(float yDelta, bool logResult = true)
+        private (bool, float, float, float) CalculateReward(float yDelta, bool logResult = true)
         {
             bool receivingReward = false;
+            float rewardFraction = 0.0f;
             float rewardIntensity = 0.0f;
             float rewardDuration = 0.0f;
 
@@ -330,7 +328,7 @@ namespace JumpKingPunishmentMod.Entities
                 if (rewardDistance >= minRewardDistance)
                 {
                     receivingReward = true;
-                    float rewardFraction = 1.0f;
+                    rewardFraction = 1.0f;
 
                     float rewardDistanceDiff = maxRewardDistance - minRewardDistance;
                     if (rewardDistanceDiff > 0.0f)
@@ -359,15 +357,16 @@ namespace JumpKingPunishmentMod.Entities
                 }
             }
 
-            return (receivingReward, rewardIntensity, rewardDuration);
+            return (receivingReward, rewardFraction, rewardIntensity, rewardDuration);
         }
 
         /// <summary>
         /// Calculates a Punishment given the provided delta and considering the player settings
         /// </summary>
-        private (bool, float, float) CalculatePunishment(float yDelta, bool logResult = true)
+        private (bool, float, float, float) CalculatePunishment(float yDelta, bool logResult = true)
         {
             bool receivingPunishment = false;
+            float punishmentFraction = 0.0f;
             float punishmentIntensity = 0.0f;
             float punishmentDuration = 0.0f;
 
@@ -377,7 +376,7 @@ namespace JumpKingPunishmentMod.Entities
                 if (punishmentDistance >= minFallDistance)
                 {
                     receivingPunishment = true;
-                    float punishmentFraction = 1.0f;
+                    punishmentFraction = 1.0f;
 
                     float punishmentDistanceDiff = maxFallDistance - minFallDistance;
                     if (punishmentDistanceDiff > 0.0f)
@@ -406,7 +405,7 @@ namespace JumpKingPunishmentMod.Entities
                 }
             }
 
-            return (receivingPunishment, punishmentIntensity, punishmentDuration);
+            return (receivingPunishment, punishmentFraction, punishmentIntensity, punishmentDuration);
         }
 
         /// <summary>
@@ -419,6 +418,25 @@ namespace JumpKingPunishmentMod.Entities
             highestGroundY = 0.0f;
             hasValidGroundedY = false;
             teleportCompensation = 0.0f;
+        }
+
+        /// <summary>
+        /// Generations a string for display on screen feedback information, taking the current on screen display behavior into account
+        /// </summary>
+        private string GenerateFeedbackInfoString(string baseString, float distanceFraction, float intensity, float duration, string postFix = "")
+        {
+            // When displaying values do some rounding to keep the string length sane
+            switch (onScreenDisplayBehavior)
+            {
+                case PunishmentOnScreenDisplayBehavior.FeedbackIntensityAndDuration:
+                    return $"{baseString} ({Math.Round(intensity)}% x {Math.Round(duration, 2)}s){postFix}";
+                case PunishmentOnScreenDisplayBehavior.DistanceBasedPercentage:
+                    return $"{baseString} ({Math.Round(distanceFraction * 100.0f)}%){postFix}";
+                case PunishmentOnScreenDisplayBehavior.MessageOnly:
+                    return baseString+postFix;
+                default:
+                    return "";
+            }
         }
 
         /// <summary>

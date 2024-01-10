@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="JumpKingPunishmentModSettingsContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PunishmentOnScreenDisplayBehavior.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

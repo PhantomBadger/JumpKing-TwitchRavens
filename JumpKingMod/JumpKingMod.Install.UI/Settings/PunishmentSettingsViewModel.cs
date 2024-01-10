@@ -87,24 +87,24 @@ namespace JumpKingMod.Install.UI.Settings
         private Keys punishmentTestFeedbackDebugKey;
 
         /// <summary>
-        /// Whether to display punishment/reward strength/duration in the UI
+        /// The on screen display behavior we want to use
         /// </summary>
-        public bool DisplayFeedbackStrength
+        public PunishmentOnScreenDisplayBehavior OnScreenDisplayBehavior
         {
             get
             {
-                return displayFeedbackStrength;
+                return onScreenDisplayBehavior;
             }
             set
             {
-                if (displayFeedbackStrength != value)
+                if (onScreenDisplayBehavior != value)
                 {
-                    displayFeedbackStrength = value;
-                    RaisePropertyChanged(nameof(DisplayFeedbackStrength));
+                    onScreenDisplayBehavior = value;
+                    RaisePropertyChanged(nameof(OnScreenDisplayBehavior));
                 }
             }
         }
-        private bool displayFeedbackStrength;
+        private PunishmentOnScreenDisplayBehavior onScreenDisplayBehavior;
 
         /// <summary>
         /// Whether calculated durations should round to the nearest second
@@ -601,7 +601,7 @@ namespace JumpKingMod.Install.UI.Settings
                 // General
                 PunishmentToggleDebugKey = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentModToggleKeyKey, Keys.F8);
                 PunishmentTestFeedbackDebugKey = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentFeedbackTestKeyKey, Keys.F9);
-                DisplayFeedbackStrength = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.DisplayFeedbackStrengthKey, true);
+                OnScreenDisplayBehavior = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.OnScreenDisplayBehaviorKey, PunishmentOnScreenDisplayBehavior.FeedbackIntensityAndDuration);
                 RoundDurations = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.RoundDurationsKey, false);
 
                 // Punishment
@@ -655,7 +655,7 @@ namespace JumpKingMod.Install.UI.Settings
             //General
             PunishmentSettings.SetOrCreateSetting(JumpKingPunishmentModSettingsContext.PunishmentModToggleKeyKey, PunishmentToggleDebugKey.ToString());
             PunishmentSettings.SetOrCreateSetting(JumpKingPunishmentModSettingsContext.PunishmentFeedbackTestKeyKey, PunishmentTestFeedbackDebugKey.ToString());
-            PunishmentSettings.SetOrCreateSetting(JumpKingPunishmentModSettingsContext.DisplayFeedbackStrengthKey, DisplayFeedbackStrength.ToString());
+            PunishmentSettings.SetOrCreateSetting(JumpKingPunishmentModSettingsContext.OnScreenDisplayBehaviorKey, OnScreenDisplayBehavior.ToString());
             PunishmentSettings.SetOrCreateSetting(JumpKingPunishmentModSettingsContext.RoundDurationsKey, RoundDurations.ToString());
 
             // Punishment
