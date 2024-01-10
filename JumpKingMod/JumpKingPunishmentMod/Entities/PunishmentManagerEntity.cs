@@ -38,9 +38,10 @@ namespace JumpKingPunishmentMod.Entities
         private float teleportCompensation;
 
         private const float LastActionDisplayTime = 3.0f;
-        private float LastActionDrawTimer;
-        private UITextEntity IncomingPunishmentTextEntity;
-        private UITextEntity LastActionTextEntity;
+
+        private float lastActionDrawTimer;
+        private UITextEntity incomingPunishmentTextEntity;
+        private UITextEntity lastActionTextEntity;
 
         private bool debugToggledOff;
         private bool wasToggleHeld;
@@ -49,25 +50,25 @@ namespace JumpKingPunishmentMod.Entities
         private readonly Keys toggleKey;
         private readonly Keys testKey;
         private readonly bool displayFeedbackStrength;
-        private readonly bool RoundDurations;
+        private readonly bool roundDurations;
 
-        private readonly bool EnablePunishment;
-        private readonly float MinPunishmentDuration;
-        private readonly float MinPunishmentIntensity;
-        private readonly float MaxPunishmentDuration;
-        private readonly float MaxPunishmentIntensity;
-        private readonly float MinFallDistance;
-        private readonly float MaxFallDistance;
-        private readonly bool EasyModePunishment;
+        private readonly bool enablePunishment;
+        private readonly float minPunishmentDuration;
+        private readonly float minPunishmentIntensity;
+        private readonly float maxPunishmentDuration;
+        private readonly float maxPunishmentIntensity;
+        private readonly float minFallDistance;
+        private readonly float maxFallDistance;
+        private readonly bool easyModePunishment;
 
-        private readonly bool EnableRewards;
-        private readonly float MinRewardDuration;
-        private readonly float MinRewardIntensity;
-        private readonly float MaxRewardDuration;
-        private readonly float MaxRewardIntensity;
-        private readonly float MinRewardDistance;
-        private readonly float MaxRewardDistance;
-        private readonly bool ProgressOnlyRewards;
+        private readonly bool enableRewards;
+        private readonly float minRewardDuration;
+        private readonly float minRewardIntensity;
+        private readonly float maxRewardDuration;
+        private readonly float maxRewardIntensity;
+        private readonly float minRewardDistance;
+        private readonly float maxRewardDistance;
+        private readonly bool progressOnlyRewards;
 
         /// <summary>
         /// Ctor for creating a <see cref="PunishmentManagerEntity"/>
@@ -83,9 +84,9 @@ namespace JumpKingPunishmentMod.Entities
 
             ResetState();
 
-            IncomingPunishmentTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 16), "", new Color(1.0f, 1.0f, 1.0f, 0.5f), UIEntityAnchor.Center, JKContentManager.Font.StyleFont);
-            LastActionTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 360), "", Color.White, UIEntityAnchor.Center, JKContentManager.Font.StyleFont);
-            LastActionDrawTimer = 0.0f;
+            incomingPunishmentTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 16), "", new Color(1.0f, 1.0f, 1.0f, 0.5f), UIEntityAnchor.Center, JKContentManager.Font.StyleFont);
+            lastActionTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 360), "", Color.White, UIEntityAnchor.Center, JKContentManager.Font.StyleFont);
+            lastActionDrawTimer = 0.0f;
 
             debugToggledOff = false;
             wasToggleHeld = false;
@@ -97,33 +98,33 @@ namespace JumpKingPunishmentMod.Entities
             toggleKey = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentModToggleKeyKey, Keys.F8);
             testKey = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentFeedbackTestKeyKey, Keys.F9);
             displayFeedbackStrength = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.DisplayFeedbackStrengthKey, false);
-            RoundDurations = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.RoundDurationsKey, false);
+            roundDurations = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.RoundDurationsKey, false);
 
-            EnablePunishment = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.EnablePunishmentKey, false);
-            MinPunishmentDuration = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentDurationKey, 1.0f);
-            MinPunishmentIntensity = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentIntensityKey, 1.0f);
-            MaxPunishmentDuration = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentDurationKey, 1.0f);
-            MaxPunishmentIntensity = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentIntensityKey, 1.0f);
-            MinFallDistance = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentFallDistanceKey, 0.0f);
-            MaxFallDistance = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentfallDistanceKey, 0.0f);
-            EasyModePunishment = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentEasyModeKey, false);
+            enablePunishment = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.EnablePunishmentKey, false);
+            minPunishmentDuration = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentDurationKey, 1.0f);
+            minPunishmentIntensity = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentIntensityKey, 1.0f);
+            maxPunishmentDuration = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentDurationKey, 1.0f);
+            maxPunishmentIntensity = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentIntensityKey, 1.0f);
+            minFallDistance = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentFallDistanceKey, 0.0f);
+            maxFallDistance = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentfallDistanceKey, 0.0f);
+            easyModePunishment = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentEasyModeKey, false);
 
-            EnableRewards = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.EnableRewardsKey, false);
-            MinRewardDuration = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardDurationKey, 1.0f);
-            MinRewardIntensity = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardIntensityKey, 1.0f);
-            MaxRewardDuration = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardDurationKey, 1.0f);
-            MaxRewardIntensity = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardIntenityKey, 1.0f);
-            MinRewardDistance = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardProgressDistanceKey, 0.0f);
-            MaxRewardDistance = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardProgressDistanceKey, 0.0f);
-            ProgressOnlyRewards = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.RewardProgressOnlyKey, false);
+            enableRewards = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.EnableRewardsKey, false);
+            minRewardDuration = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardDurationKey, 1.0f);
+            minRewardIntensity = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardIntensityKey, 1.0f);
+            maxRewardDuration = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardDurationKey, 1.0f);
+            maxRewardIntensity = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardIntenityKey, 1.0f);
+            minRewardDistance = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardProgressDistanceKey, 0.0f);
+            maxRewardDistance = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardProgressDistanceKey, 0.0f);
+            progressOnlyRewards = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.RewardProgressOnlyKey, false);
 
             // Some validation on settings here so we don't have to worry about it below
-            MaxPunishmentDuration = Math.Max(MinPunishmentDuration, MaxPunishmentDuration);
-            MaxPunishmentIntensity = Math.Max(MinPunishmentIntensity, MaxPunishmentIntensity);
-            MaxFallDistance = Math.Max(MinFallDistance, MaxFallDistance);
-            MaxRewardDuration = Math.Max(MinRewardDuration, MaxRewardDuration);
-            MaxRewardIntensity = Math.Max(MinRewardIntensity, MaxRewardIntensity);
-            MaxRewardDistance = Math.Max(MinRewardDistance, MaxRewardDistance);
+            maxPunishmentDuration = Math.Max(minPunishmentDuration, maxPunishmentDuration);
+            maxPunishmentIntensity = Math.Max(minPunishmentIntensity, maxPunishmentIntensity);
+            maxFallDistance = Math.Max(minFallDistance, maxFallDistance);
+            maxRewardDuration = Math.Max(minRewardDuration, maxRewardDuration);
+            maxRewardIntensity = Math.Max(minRewardIntensity, maxRewardIntensity);
+            maxRewardDistance = Math.Max(minRewardDistance, maxRewardDistance);
 
             modEntityManager.AddEntity(this, 0);
         }
@@ -133,11 +134,11 @@ namespace JumpKingPunishmentMod.Entities
         /// </summary>
         public void Dispose()
         {
-            IncomingPunishmentTextEntity?.Dispose();
-            IncomingPunishmentTextEntity = null;
+            incomingPunishmentTextEntity?.Dispose();
+            incomingPunishmentTextEntity = null;
 
-            LastActionTextEntity?.Dispose();
-            LastActionTextEntity = null;
+            lastActionTextEntity?.Dispose();
+            lastActionTextEntity = null;
 
             playerStateObserver.OnPlayerYTeleported -= OnPlayerYTeleported;
 
@@ -177,7 +178,7 @@ namespace JumpKingPunishmentMod.Entities
                 }
                 wasTestHeld = testHeld;
 
-                LastActionDrawTimer = Math.Max(0.0f, LastActionDrawTimer - delta);
+                lastActionDrawTimer = Math.Max(0.0f, lastActionDrawTimer - delta);
 
                 PunishmentPlayerState playerState = playerStateObserver.GetPlayerState();
                 if (!debugToggledOff && isGameLoopRunning && (playerState != null))
@@ -195,7 +196,7 @@ namespace JumpKingPunishmentMod.Entities
                             // Note, Y DECREASES as you move upward
                             if (yDelta < 0.0f)  // Positive progress
                             {
-                                if (ProgressOnlyRewards)
+                                if (progressOnlyRewards)
                                 {
                                     yDelta = yLocation - highestGroundY;
                                 }
@@ -215,9 +216,9 @@ namespace JumpKingPunishmentMod.Entities
                                 var punishment = CalculatePunishment(yDelta);
                                 if (punishment.Item1)
                                 {
-                                    punishmentDevice.Punish(punishment.Item2, punishment.Item3, EasyModePunishment);
+                                    punishmentDevice.Punish(punishment.Item2, punishment.Item3, easyModePunishment);
                                     // Do some rounding to keep the string length sane
-                                    UpdateLastAction(displayFeedbackStrength ? $"Punishment! ({Math.Round(punishment.Item2)}% x {Math.Round(punishment.Item3, 2)}s)" : "Punishment!", EasyModePunishment ? Color.Lime : Color.Red);
+                                    UpdateLastAction(displayFeedbackStrength ? $"Punishment! ({Math.Round(punishment.Item2)}% x {Math.Round(punishment.Item3, 2)}s)" : "Punishment!", easyModePunishment ? Color.Lime : Color.Red);
                                 }
                             }
                         }
@@ -254,21 +255,21 @@ namespace JumpKingPunishmentMod.Entities
 
                 if (!incomingPunishment.Item1)
                 {
-                    IncomingPunishmentTextEntity.TextValue = "";
+                    incomingPunishmentTextEntity.TextValue = "";
                 }
                 else
                 {
                     // Do some rounding to keep the string length sane
-                    IncomingPunishmentTextEntity.TextValue = displayFeedbackStrength ? $"Incoming punishment ({Math.Round(incomingPunishment.Item2)}% x {Math.Round(incomingPunishment.Item3, 2)}s)..." : "Incoming punishment...";
+                    incomingPunishmentTextEntity.TextValue = displayFeedbackStrength ? $"Incoming punishment ({Math.Round(incomingPunishment.Item2)}% x {Math.Round(incomingPunishment.Item3, 2)}s)..." : "Incoming punishment...";
                 }
 
                 // Fade the last action text out overtime (over the second half of it's lifetime)
                 float Alpha = 1.0f;
-                if (LastActionDrawTimer < (LastActionDisplayTime / 2.0f))
+                if (lastActionDrawTimer < (LastActionDisplayTime / 2.0f))
                 {
-                    Alpha = LastActionDrawTimer / (LastActionDisplayTime / 2.0f);
+                    Alpha = lastActionDrawTimer / (LastActionDisplayTime / 2.0f);
                 }
-                LastActionTextEntity.TextColor = new Color(LastActionTextEntity.TextColor, Alpha);
+                lastActionTextEntity.TextColor = new Color(lastActionTextEntity.TextColor, Alpha);
             }
             catch (Exception e)
             {
@@ -317,31 +318,31 @@ namespace JumpKingPunishmentMod.Entities
         /// <summary>
         /// Calculates a Reward given the provided delta and considering the player settings
         /// </summary>
-        private (bool, float, float) CalculateReward(float DeltaY, bool bLog = true)
+        private (bool, float, float) CalculateReward(float yDelta, bool logResult = true)
         {
             bool receivingReward = false;
             float rewardIntensity = 0.0f;
             float rewardDuration = 0.0f;
 
-            if (EnableRewards)
+            if (enableRewards)
             {
-                float rewardDistance = Math.Abs(DeltaY);
-                if (rewardDistance >= MinRewardDistance)
+                float rewardDistance = Math.Abs(yDelta);
+                if (rewardDistance >= minRewardDistance)
                 {
                     receivingReward = true;
                     float rewardFraction = 1.0f;
 
-                    float rewardDistanceDiff = MaxRewardDistance - MinRewardDistance;
+                    float rewardDistanceDiff = maxRewardDistance - minRewardDistance;
                     if (rewardDistanceDiff > 0.0f)
                     {
-                        rewardFraction = (rewardDistance - MinRewardDistance) / rewardDistanceDiff;
+                        rewardFraction = (rewardDistance - minRewardDistance) / rewardDistanceDiff;
                         rewardFraction = Math.Min(rewardFraction, 1.0f);
                     }
 
-                    rewardIntensity = MinRewardIntensity + ((MaxRewardIntensity - MinRewardIntensity) * rewardFraction);
-                    rewardDuration = MinRewardDuration + ((MaxRewardDuration - MinRewardDuration) * rewardFraction);
+                    rewardIntensity = minRewardIntensity + ((maxRewardIntensity - minRewardIntensity) * rewardFraction);
+                    rewardDuration = minRewardDuration + ((maxRewardDuration - minRewardDuration) * rewardFraction);
 
-                    if (RoundDurations)
+                    if (roundDurations)
                     {
                         rewardDuration = (float)Math.Round(rewardDuration);
                         // If rounding turned the duration to zero return that we aren't actually doing a reward
@@ -351,7 +352,7 @@ namespace JumpKingPunishmentMod.Entities
                         }
                     }
                 }
-                if (bLog)
+                if (logResult)
                 {
                     logger.Information($"Calculating reward for {rewardDistance} units progressed...");
                     logger.Information($"\tReward: '{receivingReward}' | Intensity: {rewardIntensity} | Duration: {rewardDuration}");
@@ -364,31 +365,31 @@ namespace JumpKingPunishmentMod.Entities
         /// <summary>
         /// Calculates a Punishment given the provided delta and considering the player settings
         /// </summary>
-        private (bool, float, float) CalculatePunishment(float DeltaY, bool bLog = true)
+        private (bool, float, float) CalculatePunishment(float yDelta, bool logResult = true)
         {
             bool receivingPunishment = false;
             float punishmentIntensity = 0.0f;
             float punishmentDuration = 0.0f;
 
-            if (EnablePunishment)
+            if (enablePunishment)
             {
-                float punishmentDistance = Math.Abs(DeltaY);
-                if (punishmentDistance >= MinFallDistance)
+                float punishmentDistance = Math.Abs(yDelta);
+                if (punishmentDistance >= minFallDistance)
                 {
                     receivingPunishment = true;
                     float punishmentFraction = 1.0f;
 
-                    float punishmentDistanceDiff = MaxFallDistance - MinFallDistance;
+                    float punishmentDistanceDiff = maxFallDistance - minFallDistance;
                     if (punishmentDistanceDiff > 0.0f)
                     {
-                        punishmentFraction = (punishmentDistance - MinFallDistance) / punishmentDistanceDiff;
+                        punishmentFraction = (punishmentDistance - minFallDistance) / punishmentDistanceDiff;
                         punishmentFraction = Math.Min(punishmentFraction, 1.0f);
                     }
 
-                    punishmentIntensity = MinPunishmentIntensity + ((MaxPunishmentIntensity - MinPunishmentIntensity) * punishmentFraction);
-                    punishmentDuration = MinPunishmentDuration + ((MaxPunishmentDuration - MinPunishmentDuration) * punishmentFraction);
+                    punishmentIntensity = minPunishmentIntensity + ((maxPunishmentIntensity - minPunishmentIntensity) * punishmentFraction);
+                    punishmentDuration = minPunishmentDuration + ((maxPunishmentDuration - minPunishmentDuration) * punishmentFraction);
 
-                    if (RoundDurations)
+                    if (roundDurations)
                     {
                         punishmentDuration = (float)Math.Round(punishmentDuration);
                         // If rounding our punishment turned the duration to zero return that we aren't actually doing a punishment
@@ -398,7 +399,7 @@ namespace JumpKingPunishmentMod.Entities
                         }
                     }
                 }
-                if (bLog)
+                if (logResult)
                 {
                     logger.Information($"Calculating punishment for {punishmentDistance} units fell...");
                     logger.Information($"\tPunishment: '{receivingPunishment}' | Intensity: {punishmentIntensity} | Duration: {punishmentDuration}");
@@ -423,12 +424,12 @@ namespace JumpKingPunishmentMod.Entities
         /// <summary>
         /// Updates the last action text and restarts its display timer
         /// </summary>
-        private void UpdateLastAction(string ActionText, Color TextColor)
+        private void UpdateLastAction(string actionText, Color textColor)
         {
-            LastActionDrawTimer = LastActionDisplayTime;
+            lastActionDrawTimer = LastActionDisplayTime;
 
-            LastActionTextEntity.TextValue = ActionText;
-            LastActionTextEntity.TextColor = TextColor;
+            lastActionTextEntity.TextValue = actionText;
+            lastActionTextEntity.TextColor = textColor;
         }
     }
 }

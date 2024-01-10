@@ -20,10 +20,10 @@ namespace PBJKModBase.PiShock
         private readonly string apiKey;
         private readonly string apiShareCode;
 
-        private static string apiEndpoint = "https://do.pishock.com/api/apioperate/";
-        private static string apiRequestName = "PBJKMod_PiShock";
-
         private HttpClient client;
+
+        private static string ApiEndpoint = "https://do.pishock.com/api/apioperate/";
+        private static string ApiRequestName = "PBJKMod_PiShock";
 
         /// <summary>
         /// Ctor for creating a <see cref="PiShockDevice"/>
@@ -41,7 +41,7 @@ namespace PBJKModBase.PiShock
             this.apiShareCode = apiShareCode ?? throw new ArgumentNullException(nameof(apiShareCode));
 
             client = new HttpClient();
-            client.BaseAddress = new Uri(apiEndpoint);
+            client.BaseAddress = new Uri(ApiEndpoint);
 
             // There's no API end point to check if you have valid credentials, you just need to try
             // to send a command and see if it succeeds- even worse even if they aren't valid you get
@@ -52,30 +52,30 @@ namespace PBJKModBase.PiShock
 
         /// <summary>
         /// Send a shock to the PiShock device
-        /// <param name="Duration">The durtion of the shock in seconds, should be a value 0 to 15</param>
-        /// <param name="Intensity">The intensity of the shock, should be a value 0 to 100</param>
+        /// <param name="duration">The durtion of the shock in seconds, should be a value 0 to 15</param>
+        /// <param name="intensity">The intensity of the shock, should be a value 0 to 100</param>
         /// </summary>
-        public async void Shock(int Duration, int Intensity)
+        public async void Shock(int duration, int intensity)
         {
             // Ignore empty requests, this will make the API return an error anyways
-            if ((Duration <= 0) || (Intensity <= 0))
+            if ((duration <= 0) || (intensity <= 0))
             {
-                logger.Information($"PiShock - Ignoring bad shock | Duration: {Duration} | Intensity: {Intensity}");
+                logger.Information($"PiShock - Ignoring bad shock | Duration: {duration} | Intensity: {intensity}");
                 return;
             }
 
             try
             {
-                logger.Information($"PiShock - Sending shock | Duration: {Duration} | Intensity: {Intensity}");
+                logger.Information($"PiShock - Sending shock | Duration: {duration} | Intensity: {intensity}");
                 var PayloadData = new
                 {
                     Username = apiUserName,
                     Apikey = apiKey,
                     Code = apiShareCode,
-                    Name = apiRequestName,
+                    Name = ApiRequestName,
                     Op = 0,
-                    Duration = Math.Min(Duration, 15),      // Clamp the values passed to the API as it will error out if they are out of bounds
-                    Intensity = Math.Min(Intensity, 100)
+                    Duration = Math.Min(duration, 15),      // Clamp the values passed to the API as it will error out if they are out of bounds
+                    Intensity = Math.Min(intensity, 100)
                 };
                 StringContent JsonContent = new StringContent(JsonConvert.SerializeObject(PayloadData), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync("", JsonContent);
@@ -90,30 +90,30 @@ namespace PBJKModBase.PiShock
 
         /// <summary>
         /// Send a vibration to the PiShock device
-        /// <param name="Duration">The durtion of the vibration in seconds, should be a value greater than 0</param>
-        /// <param name="Intensity">The intensity of the shock, should be a value 0 to 100</param>
+        /// <param name="duration">The durtion of the vibration in seconds, should be a value greater than 0</param>
+        /// <param name="intensity">The intensity of the shock, should be a value 0 to 100</param>
         /// </summary>
-        public async void Vibrate(int Duration, int Intensity)
+        public async void Vibrate(int duration, int intensity)
         {
             // Ignore empty requests, this will make the API return an error anyways
-            if ((Duration <= 0) || (Intensity <= 0))
+            if ((duration <= 0) || (intensity <= 0))
             {
-                logger.Information($"PiShock - Ignoring bad vibrate | Duration: {Duration} | Intensity: {Intensity}");
+                logger.Information($"PiShock - Ignoring bad vibrate | Duration: {duration} | Intensity: {intensity}");
                 return;
             }
 
             try
             {
-                logger.Information($"PiShock - Sending vibration | Duration: {Duration} | Intensity: {Intensity}");
+                logger.Information($"PiShock - Sending vibration | Duration: {duration} | Intensity: {intensity}");
                 var PayloadData = new
                 {
                     Username = apiUserName,
                     Apikey = apiKey,
                     Code = apiShareCode,
-                    Name = apiRequestName,
+                    Name = ApiRequestName,
                     Op = 1,
-                    Duration = Duration,
-                    Intensity = Math.Min(Intensity, 100)    // Clamp the values passed to the API as it will error out if they are out of bounds
+                    Duration = duration,
+                    Intensity = Math.Min(intensity, 100)    // Clamp the values passed to the API as it will error out if they are out of bounds
                 };
                 StringContent JsonContent = new StringContent(JsonConvert.SerializeObject(PayloadData), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync("", JsonContent);
@@ -130,26 +130,26 @@ namespace PBJKModBase.PiShock
         /// Send a beep to the PiShock device
         /// <param name="Duration">The durtion of the beepin seconds, should be a value greater than 0</param>
         /// </summary>
-        public async void Beep(int Duration)
+        public async void Beep(int duration)
         {
             // Ignore empty requests, this will make the API return an error anyways
-            if (Duration <= 0)
+            if (duration <= 0)
             {
-                logger.Information($"PiShock - Ignoring bad beep | Duration: {Duration}");
+                logger.Information($"PiShock - Ignoring bad beep | Duration: {duration}");
                 return;
             }
 
             try
             {
-                logger.Information($"PiShock - Sending beep | Duration: {Duration}");
+                logger.Information($"PiShock - Sending beep | Duration: {duration}");
                 var PayloadData = new
                 {
                     Username = apiUserName,
                     Apikey = apiKey,
                     Code = apiShareCode,
-                    Name = apiRequestName,
+                    Name = ApiRequestName,
                     Op = 2,
-                    Duration = Duration
+                    Duration = duration
                 };
                 StringContent JsonContent = new StringContent(JsonConvert.SerializeObject(PayloadData), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync("", JsonContent);
