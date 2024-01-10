@@ -48,6 +48,7 @@ namespace JumpKingPunishmentMod.Entities
 
         private readonly Keys toggleKey;
         private readonly Keys testKey;
+        private readonly bool displayFeedbackStrength;
         private readonly bool RoundDurations;
 
         private readonly bool EnablePunishment;
@@ -95,6 +96,7 @@ namespace JumpKingPunishmentMod.Entities
             // Cache our settings off so we don't need to read them every time
             toggleKey = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentModToggleKeyKey, Keys.F8);
             testKey = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentFeedbackTestKeyKey, Keys.F9);
+            displayFeedbackStrength = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.DisplayFeedbackStrengthKey, false);
             RoundDurations = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.RoundDurationsKey, false);
 
             EnablePunishment = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.EnablePunishmentKey, false);
@@ -204,7 +206,7 @@ namespace JumpKingPunishmentMod.Entities
                                     {
                                         punishmentDevice.Reward(reward.Item2, reward.Item3);
                                         // Do some rounding to keep the string length sane
-                                        UpdateLastAction($"Reward! ({Math.Round(reward.Item2)}% x {Math.Round(reward.Item3, 2)}s)", Color.Lime);
+                                        UpdateLastAction(displayFeedbackStrength ? $"Reward! ({Math.Round(reward.Item2)}% x {Math.Round(reward.Item3, 2)}s)" : "Reward!", Color.Lime);
                                     }
                                 }
                             }
@@ -215,7 +217,7 @@ namespace JumpKingPunishmentMod.Entities
                                 {
                                     punishmentDevice.Punish(punishment.Item2, punishment.Item3, EasyModePunishment);
                                     // Do some rounding to keep the string length sane
-                                    UpdateLastAction($"Punishment! ({Math.Round(punishment.Item2)}% x {Math.Round(punishment.Item3, 2)}s)", EasyModePunishment ? Color.Lime : Color.Red);
+                                    UpdateLastAction(displayFeedbackStrength ? $"Punishment! ({Math.Round(punishment.Item2)}% x {Math.Round(punishment.Item3, 2)}s)" : "Punishment!", EasyModePunishment ? Color.Lime : Color.Red);
                                 }
                             }
                         }
@@ -257,7 +259,7 @@ namespace JumpKingPunishmentMod.Entities
                 else
                 {
                     // Do some rounding to keep the string length sane
-                    IncomingPunishmentTextEntity.TextValue = $"Incoming punishment ({Math.Round(incomingPunishment.Item2)}% x {Math.Round(incomingPunishment.Item3, 2)}s)...";
+                    IncomingPunishmentTextEntity.TextValue = displayFeedbackStrength ? $"Incoming punishment ({Math.Round(incomingPunishment.Item2)}% x {Math.Round(incomingPunishment.Item3, 2)}s)..." : "Incoming punishment...";
                 }
 
                 // Fade the last action text out overtime (over the second half of it's lifetime)
