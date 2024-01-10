@@ -588,17 +588,17 @@ namespace JumpKingMod.Install.UI.Settings
                 MinPunishmentDuration = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentDurationKey, 1.0f.ToString(CultureInfo.InvariantCulture));
                 MinPunishmentIntensity = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentIntensityKey, 1.0f.ToString(CultureInfo.InvariantCulture));
                 MaxPunishmentDuration = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentDurationKey, 1.0f.ToString(CultureInfo.InvariantCulture));
-                MaxPunishmentIntensity = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentIntensityKey, 30.0f.ToString(CultureInfo.InvariantCulture));
-                MinFallDistance = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentFallDistanceKey, 100.0f.ToString(CultureInfo.InvariantCulture));
+                MaxPunishmentIntensity = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentIntensityKey, 15.0f.ToString(CultureInfo.InvariantCulture));
+                MinFallDistance = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinPunishmentFallDistanceKey, 150.0f.ToString(CultureInfo.InvariantCulture));
                 MaxFallDistance = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxPunishmentfallDistanceKey, 1000.0f.ToString(CultureInfo.InvariantCulture));
                 PunishmentEasyMode = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentEasyModeKey, false);
 
                 // Rewards
                 EnabledRewards = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.EnableRewardsKey, false);
                 MinRewardDuration = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardDurationKey, 1.0f.ToString(CultureInfo.InvariantCulture));
-                MinRewardIntensity = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardIntensityKey, 5.0f.ToString(CultureInfo.InvariantCulture));
+                MinRewardIntensity = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardIntensityKey, 10.0f.ToString(CultureInfo.InvariantCulture));
                 MaxRewardDuration = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardDurationKey, 1.0f.ToString(CultureInfo.InvariantCulture));
-                MaxRewardIntensity = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardIntenityKey, 50.0f.ToString(CultureInfo.InvariantCulture));
+                MaxRewardIntensity = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardIntenityKey, 100.0f.ToString(CultureInfo.InvariantCulture));
                 MinRewardDistance = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MinRewardProgressDistanceKey, 0.0f.ToString(CultureInfo.InvariantCulture));
                 MaxRewardDistance = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.MaxRewardProgressDistanceKey, 150.0f.ToString(CultureInfo.InvariantCulture));
                 RewardProgressOnlyMode = PunishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.RewardProgressOnlyKey, true);
