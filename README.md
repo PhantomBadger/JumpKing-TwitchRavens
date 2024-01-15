@@ -35,6 +35,26 @@ The King is no longer the resilient hero he once was, each fall takes a bit more
   <img src="https://user-images.githubusercontent.com/9095972/233857633-34c0744b-53ca-4b97-b772-2971690007e8.gif" width="75%" height="75%" alt="Every Fall deals damage to the King!"/>
 </p>
 
+# Punishment Mod
+Turn Jump King into a Skinner Box!
+
+This mod interacts with an external device (only the [PiShock](https://pishock.com/) is currently supported) to trigger force feedback as you make and lose progress. The mod is highly configurable to allow controlling the strength and duration of the feedback, which feedbacks are enabled, the distances the feedback triggers at, and more!
+
+## Features
+### Punishment
+A bit of negative reinforcement.  
+Recieve a punishment whenever the King falls- the strength and duration of the punishment are dependent on the distance the King falls.
+<p align="center">
+  <img src="https://github.com/zarradeth/JumpKing-TwitchRavens/assets/20621507/6e8eb2dc-8a4f-457e-bbbe-3ae1720ecd80" width="75%" height="75%" alt=""/>
+</p>
+
+### Rewards
+A bit of positive reinforcement.  
+Receive a reward whenever the King makes progress- again with the strength and duration being based on the amount of progress made.
+<p align="center">
+  <img src="https://github.com/zarradeth/JumpKing-TwitchRavens/assets/20621507/e0d0f878-e723-4463-aad7-137d2919a885" width="75%" height="75%" alt=""/>
+</p>
+
 ## Installation
 
 [Check out the Instructions here!](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md)
