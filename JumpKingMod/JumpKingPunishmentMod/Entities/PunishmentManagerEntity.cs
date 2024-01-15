@@ -153,6 +153,8 @@ namespace JumpKingPunishmentMod.Entities
         {
             try
             {
+                punishmentDevice.Update(delta);
+
                 // Debug controls
                 KeyboardState keyboardState = Keyboard.GetState();
                 bool toggleHeld = keyboardState.IsKeyDown(toggleKey);
