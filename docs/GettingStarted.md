@@ -4,7 +4,8 @@ _This information is accurate as of Release v4.1_
 1. [Installation](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#installation)
 2. [Chat Ravens Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#chat-ravens-mod)
 3. [Modifiers/Chaos Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#modifierschaos-mod)
-4. [Editing Settings](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#editing-settings)
+4. [Punishment Mod](GettingStarted.md#punishment-mod)
+5. [Editing Settings](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#editing-settings)
 
 ## Installation
 
@@ -114,6 +115,21 @@ You can add a 'FallDamageSubtexts.txt' file to the 'Content/Mods' folder of your
 ![image](https://user-images.githubusercontent.com/9095972/233860969-bfd4fb2f-2f9e-4c92-bfa0-3cf95b3a849e.png)
 
 <img src="https://user-images.githubusercontent.com/9095972/233861040-6716c32c-c59a-459c-900a-98a084b100a2.png" width="50%"/>
+
+## Punishment Mod
+
+The punishment mod allows the game to interact with an external force feedback device based on the player falling or making progress.  
+**The settings for this mod only show up if you have a feedback device selected (outlined below).**
+
+### PiShock Setup
+
+First click on the 'PiShock' button next to the Feedback Device setting, a **'PiShock'** tab will now be visible in the Settings Editor (this will also reveal the settings for the Punishment Mod if **'None'** was previously selected).
+
+![image](https://github.com/zarradeth/JumpKing-TwitchRavens/assets/20621507/17e123f6-1035-4049-bf9a-cadc5a986666)
+
+Enter your username, API Key, and Sharecode for the PiShock shocker you would like to use. [Click here](FeedbackDeviceSetup.md#pishock) for more instructions on where to get/generate these if you are unsure.
+
+### For a breakdown of all Punishment Mod Settings [click here](PunishmentModSettings.md)
 
 ## Editing Settings
 
