@@ -169,6 +169,7 @@ namespace JumpKingPunishmentMod.Entities
                     {
                         logger.Information("Toggling Punishment mod back on!");
                     }
+                    ResetState();
                 }
                 wasToggleHeld = toggleHeld;
 
@@ -243,7 +244,7 @@ namespace JumpKingPunishmentMod.Entities
                 // Only show punishments incoming as rewards will be weird with the arcs of a jump (and punishments
                 // generally can't be avoided once they start)
                 var incomingPunishment = (false, 0.0f, 0.0f, 0.0f);
-                if (isInAir && hasValidGroundedY)
+                if (!debugToggledOff && isInAir && hasValidGroundedY)
                 {
                     // Again add teleport compensation to work in 'non-teleported' space
                     float currentYDelta = (playerState.Position.Y + teleportCompensation) - lastGroundedY;
