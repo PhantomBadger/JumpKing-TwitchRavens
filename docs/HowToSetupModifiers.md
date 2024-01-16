@@ -37,7 +37,7 @@ at the top of the window. These settings will let you configure how the poll wor
 ![image](https://github.com/PhantomBadger/JumpKingMod-PrivateMirror/assets/9095972/5eb402a4-5005-448d-b6d8-8082764f4600)
 
 The mod will choose four modifier options from the pool at random and display a poll on screen for the chat to vote. Chat will type "1", "2", "3", or "4", to choose the option they want. Each chatter can only vote once per poll. Both YouTube and Twitch chats are supported. 
-For help setting up YouTube/Twitch integration, please [read our guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#youtube).
+For help setting up YouTube/Twitch integration, please [read our guide](HowToGenerateCredentials.md#youtube).
 
 ![image](https://github.com/PhantomBadger/JumpKingMod-PrivateMirror/assets/9095972/7ecc82fe-f459-46c0-bb00-4d4d18aa420b)
 

@@ -1,11 +1,11 @@
 # Getting Started
 _This information is accurate as of Release v4.1_
 
-1. [Installation](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#installation)
-2. [Chat Ravens Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#chat-ravens-mod)
-3. [Modifiers/Chaos Mod](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#modifierschaos-mod)
+1. [Installation](GettingStarted.md#installation)
+2. [Chat Ravens Mod](GettingStarted.md#chat-ravens-mod)
+3. [Modifiers/Chaos Mod](GettingStarted.md#modifierschaos-mod)
 4. [Punishment Mod](GettingStarted.md#punishment-mod)
-5. [Editing Settings](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md#editing-settings)
+5. [Editing Settings](GettingStarted.md#editing-settings)
 
 ## Installation
 
@@ -59,7 +59,7 @@ First click the 'Twitch' side of the button, a **'Twitch'** tab will now be visi
 
 ![image](https://user-images.githubusercontent.com/9095972/233858244-5e4a74ff-8680-4889-bb35-12394b65847e.png)
 
-Enter your Twitch Account Name and your Twitch OAuth token so the mod can connect to your Twitch Chat. For more instructions on how to generate a [Twitch OAuth token click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#twitch)
+Enter your Twitch Account Name and your Twitch OAuth token so the mod can connect to your Twitch Chat. For more instructions on how to generate a [Twitch OAuth token click here](HowToGenerateCredentials.md#twitch)
 
 ### YouTube Setup
 
@@ -67,11 +67,11 @@ First click the 'YouTube side of the button, a **'YouTube'** tab will now be vis
 
 ![image](https://user-images.githubusercontent.com/9095972/233858375-8253cc8c-f809-49ec-b758-c94f65c4f076.png)
 
-Enter your YouTube Channel ID (Which can be found using [websites like this](https://commentpicker.com/youtube-channel-id.php) or through [your Channel Settings](https://support.google.com/youtube/answer/3250431?hl=en-GB)) and your API Key. For more instructions on how to generate a [YouTube API Key click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#youtube). 
+Enter your YouTube Channel ID (Which can be found using [websites like this](https://commentpicker.com/youtube-channel-id.php) or through [your Channel Settings](https://support.google.com/youtube/answer/3250431?hl=en-GB)) and your API Key. For more instructions on how to generate a [YouTube API Key click here](HowToGenerateCredentials.md#youtube). 
 
-For YouTube you will also need to specify a key to be pressed to connect to the chat once you are live. [More info on this process is available here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/ConnectingToYouTube.md)
+For YouTube you will also need to specify a key to be pressed to connect to the chat once you are live. [More info on this process is available here](ConnectingToYouTube.md)
 
-### For a breakdown of all Ravens Settings [click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/RavensModSettings.md)
+### For a breakdown of all Ravens Settings [click here](RavensModSettings.md)
 
 ## Modifiers/Chaos Mod
 
@@ -79,13 +79,13 @@ _Added in Release v5_
 
 The modifiers mod is currently packaged alongside the ravens mod, but can be used with, or without it. It contains 10+ Modifiers for selection, which can be manually enabled for a challenge, or your Twitch/YouTube chat can vote on which ones to enable in this Chaos Mod style adventure!
 
-To set up the Modifiers/Chaos Mod, please follow [these instructions](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToSetupModifiers.md)
+To set up the Modifiers/Chaos Mod, please follow [these instructions](HowToSetupModifiers.md)
 
 ### Fall Damage Mod
 
 The Fall Damage Mod is currently packaged as part of the Modifiers Mod released. It is recommended to use it in 'Toggle' mode.
 
-#### For a breakdown of all Fall Damage Settings [click here](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/FallDamageModSettings.md)
+#### For a breakdown of all Fall Damage Settings [click here](FallDamageModSettings.md)
 
 #### Nice Spawns
 With 'Nice Spawns' enabled, a death in 'New Babe+' will spawn you here:

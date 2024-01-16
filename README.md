@@ -1,4 +1,4 @@
-# Please read our [Getting Started Guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md) to install the Ravens or Modifier/Chaos Mode Mods
+# Please read our [Getting Started Guide](docs/GettingStarted.md) to install the Ravens or Modifier/Chaos Mode Mods
 
 # Jump King Chat Raven Mod
 This Mod allows your Twitch or YouTube Chat to lend words of encouragement whilst you climb to the babe! It will also include the 'Fall Damage' mod until we can get around to splitting it out properly.
@@ -57,9 +57,9 @@ Receive a reward whenever the King makes progress- again with the strength and d
 
 ## Installation
 
-[Check out the Instructions here!](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md)
+[Check out the Instructions here!](docs/GettingStarted.md)
 
-For YouTube Support, check out [this guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/ConnectingToYouTube.md)
+For YouTube Support, check out [this guide](docs/ConnectingToYouTube.md)
   
 ## Updating the Settings
 
