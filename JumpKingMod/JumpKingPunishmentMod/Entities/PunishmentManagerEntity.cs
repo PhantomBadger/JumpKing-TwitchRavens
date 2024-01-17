@@ -331,7 +331,7 @@ namespace JumpKingPunishmentMod.Entities
                 if (rewardDistance >= minRewardDistance)
                 {
                     receivingReward = true;
-                    rewardFraction = 1.0f;
+                    rewardFraction = 0.0f;
 
                     float rewardDistanceDiff = maxRewardDistance - minRewardDistance;
                     if (rewardDistanceDiff > 0.0f)
@@ -379,7 +379,7 @@ namespace JumpKingPunishmentMod.Entities
                 if (punishmentDistance >= minFallDistance)
                 {
                     receivingPunishment = true;
-                    punishmentFraction = 1.0f;
+                    punishmentFraction = 0.0f;
 
                     float punishmentDistanceDiff = maxFallDistance - minFallDistance;
                     if (punishmentDistanceDiff > 0.0f)
