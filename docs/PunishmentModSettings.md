@@ -73,7 +73,7 @@ Note that for the 'Reward On New Progress Only' setting the highest Y value you 
 
 #### What about teleports, user maps, or other mods?
 
-Sometimes when changing between screens in Jump King the player is teleported as the map physically cannot exist as it's laid out. This **should be supported and work correctly** (at least with teleports done in the original game/DLC). If user maps use the same functionality to do teleports as the original game they should be supported as well (note however no testing has been done with user maps, you may want to test stuff yourself before committing to anything).
+Sometimes when changing between screens in Jump King the player is teleported as the map physically cannot exist as it's laid out. This **should be supported and work correctly** (at least with teleports done in the original game/DLC). If user maps use the same functionality to do teleports as the original game they should be supported as well (note however only basic testing has been done with user maps, you may want to test stuff yourself before committing to anything).
 
 Other mods will likely work in tandem with the punishment mod, however you should be cautious of mods that move/teleport the player- there is a good chance they will not work correctly and may incorrectly trigger punishments/rewards. If you would like to use other such mods in tandem with the punishment mod you should probably do some basic testing with them before using them.
 
@@ -96,4 +96,4 @@ If you would like to test various distances/durations/intensities the results of
 ![image](https://github.com/zarradeth/JumpKing-TwitchRavens/assets/20621507/7e094ec1-5486-47ed-a334-bb07f0e4b55f)
 
 ### What if I don't want any variation in the punishment/reward?
-If you do not want any variation in the punishment/reward you can set the min and max fall/progress distance to the same value (the value at which a feedback event should trigger)- in this case **the maximum duration/intensity settings will always trigger** (the minimum duration/intensity is effectively unused). It's recommended you also just set your minimum and maximum duration/intensity settings to match if you do this.
+If you do not want any variation in the punishment/reward you can set the min and max fall/progress distance to the same value (the value at which a feedback event should trigger)- in this case **the minimum duration/intensity settings will always trigger** (the maximum duration/intensity is effectively unused).
