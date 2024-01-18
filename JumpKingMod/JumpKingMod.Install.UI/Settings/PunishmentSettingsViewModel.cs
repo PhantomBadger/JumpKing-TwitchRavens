@@ -33,18 +33,21 @@ namespace JumpKingMod.Install.UI.Settings
         {
             get
             {
-                return punishmentModEnaled;
+                return punishmentModEnabled;
             }
             set
             {
-                if (punishmentModEnaled != value)
+                if (punishmentModEnabled != value)
                 {
-                    punishmentModEnaled = value;
+                    punishmentModEnabled = value;
                     RaisePropertyChanged(nameof(PunishmentModEnabled));
+                    RaisePropertyChanged(nameof(PunishmentSettingsVisible));
+                    RaisePropertyChanged(nameof(RewardSettingsVisible));
+
                 }
             }
         }
-        private bool punishmentModEnaled;
+        private bool punishmentModEnabled;
 
         /// <summary>
         /// The key to use to toggle Punishment functionality during gameplay
@@ -141,10 +144,19 @@ namespace JumpKingMod.Install.UI.Settings
                 {
                     enabledPunishment = value;
                     RaisePropertyChanged(nameof(EnabledPunishment));
+                    RaisePropertyChanged(nameof(PunishmentSettingsVisible));
                 }
             }
         }
         private bool enabledPunishment;
+
+        public bool PunishmentSettingsVisible
+        {
+            get
+            {
+                return enabledPunishment && punishmentModEnabled;
+            }
+        }
 
         /// <summary>
         /// The minimum punishment duration
@@ -343,10 +355,19 @@ namespace JumpKingMod.Install.UI.Settings
                 {
                     enabledRewards = value;
                     RaisePropertyChanged(nameof(EnabledRewards));
+                    RaisePropertyChanged(nameof(RewardSettingsVisible));
                 }
             }
         }
         private bool enabledRewards;
+
+        public bool RewardSettingsVisible
+        {
+            get
+            {
+                return enabledRewards && punishmentModEnabled;
+            }
+        }
 
         /// <summary>
         /// The minimum shock duration when receiving a reward
