@@ -43,7 +43,7 @@ This mod interacts with an external device (only the [PiShock](https://pishock.c
 ## Features
 ### Punishment
 A bit of negative reinforcement.  
-Recieve a punishment whenever the King falls- the strength and duration of the punishment are dependent on the distance the King falls.
+Receive a punishment whenever the King falls- the strength and duration of the punishment are dependent on the distance the King falls.
 <p align="center">
   <img src="https://github.com/zarradeth/JumpKing-TwitchRavens/assets/20621507/6e8eb2dc-8a4f-457e-bbbe-3ae1720ecd80" width="75%" height="75%" alt=""/>
 </p>
