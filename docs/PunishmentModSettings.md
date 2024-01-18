@@ -11,7 +11,7 @@ You should follow any warnings/recommendations related to the usage of your devi
 
 It's also highly recommended you experiment with your device before configuring/using this mod to find intensity/duration/distance values you are sure you will be comfortable with!
 
-![image](https://github.com/zarradeth/JumpKing-TwitchRavens/assets/20621507/4d7fc0f6-44ba-4110-941d-36686fb20d9e)
+![image](https://github.com/zarradeth/JumpKing-TwitchRavens/assets/20621507/74ceb094-8045-46ca-9a90-ad43f5b52299)
 
 - **Enabled:** Ticking this means the Punishment mod is now enabled and will be used by Jump King. Untick if you do not want to use this portion of the mod.
 - **Toggle Punishment Key:** Press this key during play to toggle the punishment mod functionality (toggling punishments and rewards).
@@ -21,24 +21,24 @@ It's also highly recommended you experiment with your device before configuring/
 - **Round Durations:** Ticking this causes feedback event durations to be rounded when calculated.
   - This is useful when using the PiShock as it only supports durations that are whole seconds (no fractions)- you do not **need** to enable this as without this the duration sent to the PiShock API will still be rounded and it will still work, but enabling this makes any information displayed on screen match with your actual punishment/reward.
 - **Punishment Enabled:** Ticking this enables the generation of punishment feedback events.
-- **Minimum Punishment Duration:** The minimum duration (in seconds) for a punishment feedback event (the amount triggered after falling your minimum fall distance).
-- **Minimum Punishment Intensity:** The minimum intensity (0-100) for a punishment feedback event (the amount triggered after falling your minimum fall distance).
-- **Maximum Punishment Duration:** The maximum duration (in seconds) for a punishment feedback event (the amount triggered after falling your maximum fall distance).
-- **Maximum Punishment Intensity:** The maximum intensity (0-100) for a punishment feedback event (the amount triggered after falling your maximum fall distance).
-- **Minimum Punishment Fall Distance:** The minimum fall distance you must fall in order to receive a punishment feedback event.
-  - For more information about distances/what might be good values see sections below.
-- **Maximum Punishment Fall Distance:** The fall distance at which you will receive a maximum stength/duration punishment feedback event.
-- **Punishment Easy Mode:** Ticking this enables 'easy mode' for punishments, changing the type (or potentially strength/duration) of feedback generated for punishments.
-  - For the PiShock this causes vibrations to be sent instead of shocks.  
+  - **Minimum Punishment Duration:** The minimum duration (in seconds) for a punishment feedback event (the amount triggered after falling your minimum fall distance).
+  - **Minimum Punishment Intensity:** The minimum intensity (0-100) for a punishment feedback event (the amount triggered after falling your minimum fall distance).
+  - **Maximum Punishment Duration:** The maximum duration (in seconds) for a punishment feedback event (the amount triggered after falling your maximum fall distance).
+  - **Maximum Punishment Intensity:** The maximum intensity (0-100) for a punishment feedback event (the amount triggered after falling your maximum fall distance).
+  - **Minimum Punishment Fall Distance:** The minimum fall distance you must fall in order to receive a punishment feedback event.
+    - For more information about distances/what might be good values see sections below.
+  - **Maximum Punishment Fall Distance:** The fall distance at which you will receive a maximum stength/duration punishment feedback event.
+  - **Punishment Easy Mode:** Ticking this enables 'easy mode' for punishments, changing the type (or potentially strength/duration) of feedback generated for punishments.
+    - For the PiShock this causes vibrations to be sent instead of shocks.  
 - **Rewards Enabled:** Ticking this enables the generation of reward feedback events.
-- **Minimum Reward Duration:** The minimum duration (in seconds) for a reward feedback event (the amount triggered after gaining your minimum reward progress distance).
-- **Minimum Reward Intensity:** The minimum intensity (0-100) for a reward feedback event (the amount triggered after gaining your minimum reward progress distance).
-- **Maximum Reward Duration:** The maximum duration (in seconds) for a reward feedback event (the amount triggered after gaining your maximum reward progress distance).
-- **Maximum Reward Intensity:** The maximum intensity (0-100) for a punishment feedback event (the amount triggered after gaining your maximum reward progress distance).
-- **Minimum Reward Progress Distance:** The minimum amount of progress you must gain in order to receive a reward feedback event.
-- **Maximum Reward Progress Distance:** The progress distance at which you will receive a maximum strength/duration reward feedback event.
-- **Reward On New Progress Only:** Ticking this means you will only be rewarded the first time you make progress (based on height, not any displayed progress percentage). If enabled falling and re-making progress will not generate rewards.
-  - **Note:** This value is not saved, restarting the game (or toggling the mod at runtime) will reset this value and you may be rewarded for progress you technically previously made already.
+  - **Minimum Reward Duration:** The minimum duration (in seconds) for a reward feedback event (the amount triggered after gaining your minimum reward progress distance).
+  - **Minimum Reward Intensity:** The minimum intensity (0-100) for a reward feedback event (the amount triggered after gaining your minimum reward progress distance).
+  - **Maximum Reward Duration:** The maximum duration (in seconds) for a reward feedback event (the amount triggered after gaining your maximum reward progress distance).
+  - **Maximum Reward Intensity:** The maximum intensity (0-100) for a punishment feedback event (the amount triggered after gaining your maximum reward progress distance).
+  - **Minimum Reward Progress Distance:** The minimum amount of progress you must gain in order to receive a reward feedback event.
+  - **Maximum Reward Progress Distance:** The progress distance at which you will receive a maximum strength/duration reward feedback event.
+  - **Reward On New Progress Only:** Ticking this means you will only be rewarded the first time you make progress (based on height, not any displayed progress percentage). If enabled falling and re-making progress will not generate rewards.
+    - **Note:** This value is not saved, restarting the game (or toggling the mod at runtime) will reset this value and you may be rewarded for progress you technically previously made already.
 
  ### On Screen Display Behaviors
  
