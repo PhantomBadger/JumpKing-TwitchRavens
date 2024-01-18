@@ -49,10 +49,10 @@ namespace JumpKingPunishmentMod
 
                 // Create the feedback device now so that we can run a test to let the user know it's working ASAP
                 // (also we can make it so we only do the init if we actually have a configured device)
-                bool punishemntEnabled = punishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.EnablePunishmentKey, false);
+                bool punishmentModEnabled = punishmentSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentModEnabledKey, false);
                 
                 IPunishmentDevice punishmentDevice = null;
-                if (punishemntEnabled)
+                if (punishmentModEnabled)
                 {
                     AvailableFeedbackDevices selectedDevice = deviceSettings.GetSettingOrDefault(PBJKModBaseFeedbackDeviceSettingsContext.SelectedFeedbackDeviceKey, AvailableFeedbackDevices.None);
                     if (selectedDevice == AvailableFeedbackDevices.PiShock)
@@ -69,7 +69,7 @@ namespace JumpKingPunishmentMod
                     }
                 }
 
-                if (punishemntEnabled && (punishmentDevice != null))
+                if (punishmentModEnabled && (punishmentDevice != null))
                 {
                     // Send a test feedback event so the user can know the mod is working
                     punishmentDevice.Test(50.0f, 1.0f);
