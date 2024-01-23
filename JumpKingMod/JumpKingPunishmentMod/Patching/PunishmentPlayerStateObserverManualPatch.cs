@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using JumpKing;
 using JumpKing.Player;
+using JumpKing.SaveThread;
 using JumpKingPunishmentMod.Patching.States;
 using Microsoft.Xna.Framework;
 using PBJKModBase.API;
@@ -15,6 +16,7 @@ using System.Reflection;
 namespace JumpKingPunishmentMod.Patching
 {
     public delegate void OnPlayerYTeleportedDelegate(float yDelta);
+    public delegate void OnPlayerSaveStateApplyingDelegate();
 
     /// <summary>
     /// An implementation of <see cref="IManualPatch"/> to keep track of the player state
@@ -31,6 +33,7 @@ namespace JumpKingPunishmentMod.Patching
 
         private static float preCapYLocation;
         public event OnPlayerYTeleportedDelegate OnPlayerYTeleported;
+        public event OnPlayerSaveStateApplyingDelegate OnPlayerSaveStateApplying;
 
         /// <summary>
         /// Ctor for creating a <see cref="PunishmentPlayerStateObserverManualPatch"/>
@@ -54,6 +57,10 @@ namespace JumpKingPunishmentMod.Patching
             var prefixCapPositionMethod = AccessTools.Method($"JumpKingPunishmentMod.Patching.{this.GetType().Name}:PrefixCapPositionMethod");
             var postfixCapPositionMethod = AccessTools.Method($"JumpKingPunishmentMod.Patching.{this.GetType().Name}:PostfixCapPositionMethod");
             harmony.Patch(capPositionMethod, prefix: new HarmonyMethod(prefixCapPositionMethod), postfix: new HarmonyMethod(postfixCapPositionMethod));
+
+            var applySaveStateMethod = AccessTools.Method("JumpKing.Player.PlayerEntity:ApplySaveState");
+            var prefixApplyStateMthod = AccessTools.Method($"JumpKingPunishmentMod.Patching.{this.GetType().Name}:PrefixApplyStateMethod");
+            harmony.Patch(applySaveStateMethod, prefix: new HarmonyMethod(prefixApplyStateMthod));
         }
 
         /// <summary>
@@ -98,7 +105,7 @@ namespace JumpKingPunishmentMod.Patching
         }
 
         /// <summary>
-        /// Runs after <see cref="JumpKing.Player.BodyComp.CapPosition(bool)"/> and allows us tto check if the function modified the player Y for a teleport
+        /// Runs after <see cref="JumpKing.Player.BodyComp.CapPosition(bool)"/> and allows us to check if the function modified the player Y for a teleport
         /// </summary>
         public static void PostfixCapPositionMethod(object __instance, bool p_capped_x)
         {
@@ -110,6 +117,14 @@ namespace JumpKingPunishmentMod.Patching
                     instance?.OnPlayerYTeleported?.Invoke(preCapYLocation - cappedYLocation);
                 }
             }
+        }
+
+        /// <summary>
+        /// Runs before <see cref="JumpKing.Player.PlayerEntity.ApplySaveState(SaveState)"/> and lets us know (/assume) the player is being warped by a state restore
+        /// </summary>
+        public static void PrefixApplyStateMethod(object __instance, SaveState p_save)
+        {
+            instance?.OnPlayerSaveStateApplying?.Invoke();
         }
 
         /// <summary>

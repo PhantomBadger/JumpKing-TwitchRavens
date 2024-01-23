@@ -36,8 +36,10 @@ namespace JumpKingPunishmentMod.Entities
         private float highestGroundY;
         private bool hasValidGroundedY;
         private float teleportCompensation;
+        private float feedbackPauseTimer;
 
         private const float LastActionDisplayTime = 3.0f;
+        private const float ApplyStatePauseTime = 0.1f;
 
         private float lastActionDrawTimer;
         private UITextEntity incomingPunishmentTextEntity;
@@ -84,8 +86,8 @@ namespace JumpKingPunishmentMod.Entities
 
             ResetState();
 
-            incomingPunishmentTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 16), "", new Color(1.0f, 1.0f, 1.0f, 0.5f), UIEntityAnchor.Center, JKContentManager.Font.StyleFont);
-            lastActionTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 360), "", Color.White, UIEntityAnchor.Center, JKContentManager.Font.StyleFont);
+            incomingPunishmentTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 16), "", new Color(1.0f, 1.0f, 1.0f, 0.5f), UIEntityAnchor.Center, JKContentManager.Font.StyleFont, zOrder: 10);
+            lastActionTextEntity = new UITextEntity(modEntityManager, new Vector2(240, 360), "", Color.White, UIEntityAnchor.Center, JKContentManager.Font.StyleFont, zOrder: 10);
             lastActionDrawTimer = 0.0f;
 
             debugToggledOff = false;
@@ -93,6 +95,7 @@ namespace JumpKingPunishmentMod.Entities
             wasTestHeld = false;
 
             playerStateObserver.OnPlayerYTeleported += OnPlayerYTeleported;
+            playerStateObserver.OnPlayerSaveStateApplying += OnPlayerSaveStateApplying;
 
             // Cache our settings off so we don't need to read them every time
             toggleKey = userSettings.GetSettingOrDefault(JumpKingPunishmentModSettingsContext.PunishmentModToggleKeyKey, Keys.F8);
@@ -141,6 +144,7 @@ namespace JumpKingPunishmentMod.Entities
             lastActionTextEntity = null;
 
             playerStateObserver.OnPlayerYTeleported -= OnPlayerYTeleported;
+            playerStateObserver.OnPlayerSaveStateApplying -= OnPlayerSaveStateApplying;
 
             modEntityManager?.RemoveEntity(this);
         }
@@ -181,13 +185,31 @@ namespace JumpKingPunishmentMod.Entities
                 }
                 wasTestHeld = testHeld;
 
+                UpdateFeedback(delta);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Error updating Punishment Manager {e.ToString()}");
+            }
+        }
+
+        /// <summary>
+        /// Called to update feedback state to track, trigger, and display feedback
+        /// </summary>
+        private void UpdateFeedback(float delta = 0.0f, bool forceGrounded = false)
+        {
+            try
+            {
+                bool feedbackDisabled = debugToggledOff || (feedbackPauseTimer > 0.0f);
+
                 lastActionDrawTimer = Math.Max(0.0f, lastActionDrawTimer - delta);
+                feedbackPauseTimer = Math.Max(0.0f, feedbackPauseTimer - delta);
 
                 PunishmentPlayerState playerState = playerStateObserver.GetPlayerState();
-                if (!debugToggledOff && isGameLoopRunning && (playerState != null))
+                if (!feedbackDisabled && isGameLoopRunning && (playerState != null))
                 {
                     // Consider sand ground too for our purposes
-                    bool isOnGround = playerState.IsOnGround || playerState.IsOnSand;
+                    bool isOnGround = forceGrounded || playerState.IsOnGround || playerState.IsOnSand;
                     if (isOnGround)
                     {
                         // Add the teleport compensation at all times so we are always working with 'Y's in 'non-teleported' space
@@ -244,7 +266,7 @@ namespace JumpKingPunishmentMod.Entities
                 // Only show punishments incoming as rewards will be weird with the arcs of a jump (and punishments
                 // generally can't be avoided once they start)
                 var incomingPunishment = (false, 0.0f, 0.0f, 0.0f);
-                if (!debugToggledOff && isInAir && hasValidGroundedY)
+                if (!feedbackDisabled && isInAir && hasValidGroundedY)
                 {
                     // Again add teleport compensation to work in 'non-teleported' space
                     float currentYDelta = (playerState.Position.Y + teleportCompensation) - lastGroundedY;
@@ -273,7 +295,7 @@ namespace JumpKingPunishmentMod.Entities
             }
             catch (Exception e)
             {
-                logger.Error($"Error updating Punishment Manager {e.ToString()}");
+                logger.Error($"Error updating punishment feedback {e.ToString()}");
             }
         }
 
@@ -286,7 +308,7 @@ namespace JumpKingPunishmentMod.Entities
         }
 
         /// <summary>
-        /// Called by the <see cref="GameStateObserverManualPatch.OnGameLoopRunning"/> and used to cleanup state between games
+        /// Called by the <see cref="GameStateObserverManualPatch.OnGameLoopRunning"/> event and used to cleanup state between games
         /// </summary>
         public void OnGameLoopStarted()
         {
@@ -296,7 +318,7 @@ namespace JumpKingPunishmentMod.Entities
         }
 
         /// <summary>
-        /// Called by the <see cref="GameStateObserverManualPatch.OnGameLoopNotRunning"/> and used to cleanup state between games
+        /// Called by the <see cref="GameStateObserverManualPatch.OnGameLoopNotRunning"/> event and used to cleanup state between games
         /// </summary>
         public void OnGameLoopStopped()
         {
@@ -306,13 +328,32 @@ namespace JumpKingPunishmentMod.Entities
         }
 
         /// <summary>
-        /// Called by the <see cref="PlayerStateObserverManualPatch.OnPlayerYTeleported"/> and used to detect the player's
+        /// Called by the <see cref="PunishmentPlayerStateObserverManualPatch.OnPlayerYTeleported"/> event and used to detect the player's
         /// Y position being modified for a teleport when moving between screens so we can account for the change in Y location
         /// when calculating rewards/punishments
         /// </summary>
-        public void OnPlayerYTeleported(float yDelta)
+        private void OnPlayerYTeleported(float yDelta)
         {
             teleportCompensation += yDelta;
+        }
+
+        /// <summary>
+        /// Called by the <see cref="PunishmentPlayerStateObserverManualPatch.OnPlayerSaveStateApplying"/> event and used to detect when the player's state
+        /// is about to be modified due to a save state will be applied.
+        /// </summary>
+        private void OnPlayerSaveStateApplying()
+        {
+            if (isGameLoopRunning)
+            {
+                // We could calculate out the distance moved by the apply (as teleport compensation) and still punish/reward the player- but given the player is
+                // either loading a save or is being moved by a death from a modifier we will instead just trigger feedback immediately (so they don't get out of it)...
+                UpdateFeedback(forceGrounded: true);
+
+                // Then reset state since we are about to be warped and don't want our current state to carry through the warp.
+                // We also want to pause state updates for a bit as it seems to take a couple frames for the player to properly update state (such as IsOnGround)
+                // when save state is applied
+                ResetState(ApplyStatePauseTime);
+            }
         }
 
         /// <summary>
@@ -412,15 +453,17 @@ namespace JumpKingPunishmentMod.Entities
         }
 
         /// <summary>
-        /// Resets falling/grounded/teleport/etc. state
+        /// Resets falling/grounded/teleport/etc. state and allows pausing future state updates for a provided amount of time.
         /// </summary>
-        private void ResetState()
+        private void ResetState(float pauseTime = 0.0f)
         {
             isInAir = false;
             lastGroundedY = 0.0f;
             highestGroundY = 0.0f;
             hasValidGroundedY = false;
             teleportCompensation = 0.0f;
+
+            feedbackPauseTimer = pauseTime;
         }
 
         /// <summary>
