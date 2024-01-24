@@ -75,7 +75,7 @@ Note that for the 'Reward On New Progress Only' setting the highest Y value you 
 
 Sometimes when changing between screens in Jump King the player is teleported as the map physically cannot exist as it's laid out. This **should be supported and work correctly** (at least with teleports done in the original game/DLC). If user maps use the same functionality to do teleports as the original game they should be supported as well (note however only basic testing has been done with user maps, you may want to test stuff yourself before committing to anything).
 
-Other mods will likely work in tandem with the punishment mod, however you should be cautious of mods that move/teleport the player- there is a good chance they will not work correctly and may incorrectly trigger punishments/rewards. If you would like to use other such mods in tandem with the punishment mod you should probably do some basic testing with them before using them.
+Other mods will likely work in tandem with the punishment mod, however you should be careful with mods that move/teleport the player (such as Jump King Plus's teleports and SavePos/LoadPos, or using Fly Mode)- the punishment mod will attempt to detect and as properly as possible handle teleports but its detection may not be perfect. The Rising Lava and Fall Damage modifiers (which warp you on death) are generally supported. If you would like to use other such mods in tandem with the punishment mod you should do some basic testing with them before using them.
 
 ### What can I do to find distances that work for me?
 
