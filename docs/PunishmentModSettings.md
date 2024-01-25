@@ -15,7 +15,6 @@ It's also highly recommended you experiment with your device before configuring/
 
 - **Enabled:** Ticking this means the Punishment mod is now enabled and will be used by Jump King. Untick if you do not want to use this portion of the mod.
 - **Toggle Punishment Key:** Press this key during play to toggle the punishment mod functionality (toggling punishments and rewards).
-  - **Note:** This will also clear your 'max progress' tracked by the mod used by the **'Reward on New Progress Only'** setting, meaning you can get rewarded for progress you have already made again if you toggle the mod off and back on.
 - **Test Feedback Key:** Press this key during play to trigger a test feedback event to your feedback device. This is useful to test that your device is properly configured/working.
 - **On Screen Display Behavior:** Controls how the mod displays messages on screen about punishments and rewards, see sections below for more information.
 - **Round Durations:** Ticking this causes feedback event durations to be rounded when calculated.
@@ -38,7 +37,7 @@ It's also highly recommended you experiment with your device before configuring/
   - **Minimum Reward Progress Distance:** The minimum amount of progress you must gain in order to receive a reward feedback event.
   - **Maximum Reward Progress Distance:** The progress distance at which you will receive a maximum strength/duration reward feedback event.
   - **Reward On New Progress Only:** Ticking this means you will only be rewarded the first time you make progress (based on height, not any displayed progress percentage). If enabled falling and re-making progress will not generate rewards.
-    - **Note:** This value is not saved, restarting the game (or toggling the mod at runtime) will reset this value and you may be rewarded for progress you technically previously made already.
+    - **Note:** This value is not saved, restarting the game will reset this value and you may be rewarded for progress you technically previously made already.
 
  ### On Screen Display Behaviors
  
