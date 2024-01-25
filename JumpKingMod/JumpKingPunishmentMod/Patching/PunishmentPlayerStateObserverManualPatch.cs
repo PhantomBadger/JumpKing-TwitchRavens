@@ -21,7 +21,7 @@ namespace JumpKingPunishmentMod.Patching
     /// <summary>
     /// An implementation of <see cref="IManualPatch"/> to keep track of the player state
     /// </summary>
-    public class PunishmentPlayerStateObserverManualPatch
+    public class PunishmentPlayerStateObserverManualPatch : IManualPatch
     {
         private static MethodInfo isOnGroundMethod;
         private static MethodInfo isOnSandMethod;

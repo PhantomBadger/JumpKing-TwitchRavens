@@ -1,4 +1,5 @@
-﻿using JumpKing;
+﻿using HarmonyLib;
+using JumpKing;
 using JumpKingPunishmentMod.Patching;
 using JumpKingPunishmentMod.Patching.States;
 using JumpKingPunishmentMod.Settings;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace JumpKingPunishmentMod.Entities
 {
@@ -31,15 +33,20 @@ namespace JumpKingPunishmentMod.Entities
 
         private bool isGameLoopRunning;
 
+        private readonly MethodInfo getPlayerValuesJumpMethod;
+        private readonly MethodInfo getPlayerValuesMaxFallMethod;
+
         private bool isInAir;
         private float lastGroundedY;
         private float highestGroundY;
-        private bool hasValidGroundedY;
+        private float preResetHighestGroundY;
+        private float lastPlayerY;
         private float teleportCompensation;
         private float feedbackPauseTimer;
 
         private const float LastActionDisplayTime = 3.0f;
-        private const float ApplyStatePauseTime = 0.1f;
+        private const float TeleportPauseTime = 0.1f;
+        private const float TeleportDetectionMaxExpectedVelocityMultipler = 1.25f;
 
         private float lastActionDrawTimer;
         private UITextEntity incomingPunishmentTextEntity;
@@ -83,6 +90,11 @@ namespace JumpKingPunishmentMod.Entities
             this.playerStateObserver = playerStateObserver ?? throw new ArgumentNullException(nameof(playerStateObserver));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.isGameLoopRunning = isGameLoopRunning;
+
+            getPlayerValuesJumpMethod = AccessTools.Method("JumpKing.PlayerValues:get_JUMP")
+                ?? throw new InvalidOperationException($"Cannot find 'JumpKing.PlayerValues:get_JUMP' method in Jump King");
+            getPlayerValuesMaxFallMethod = AccessTools.Method("JumpKing.PlayerValues:get_MAX_FALL")
+                ?? throw new InvalidOperationException($"Cannot find 'JumpKing.PlayerValues:get_MAX_FALL' method in Jump King");
 
             ResetState();
 
@@ -150,42 +162,29 @@ namespace JumpKingPunishmentMod.Entities
         }
 
         /// <summary>
-        /// Called each frame by the Mod Entity Manager, allows control of the mod, managers punishing and rewarding the player,
-        /// and handles updating on screen messages related to the mod
+        /// Called each frame by the Mod Entity Manager, handles the main logic for updating the mod
         /// </summary>
         public void Update(float delta)
         {
             try
             {
+                feedbackPauseTimer = Math.Max(0.0f, feedbackPauseTimer - delta);
+
                 punishmentDevice.Update(delta);
 
-                // Debug controls
-                KeyboardState keyboardState = Keyboard.GetState();
-                bool toggleHeld = keyboardState.IsKeyDown(toggleKey);
-                if (toggleHeld && !wasToggleHeld)
-                {
-                    debugToggledOff = !debugToggledOff;
-                    if (debugToggledOff)
-                    {
-                        logger.Information("Toggling Punishment mod off...");
-                    }
-                    else
-                    {
-                        logger.Information("Toggling Punishment mod back on!");
-                    }
-                    ResetState();
-                }
-                wasToggleHeld = toggleHeld;
+                UpdateInput();
 
-                bool testHeld = keyboardState.IsKeyDown(testKey);
-                if (testHeld && !wasTestHeld)
+                PunishmentPlayerState playerState = playerStateObserver.GetPlayerState();
+                if (IsFeedbackEnabled())
                 {
-                    logger.Information("Sending test feedback to your feedback device...");
-                    punishmentDevice.Test(50.0f, 1.0f);
+                    if (!UpdateTeleportDetection(delta, playerState))
+                    {
+                        // We only need to do normal feedback updates if we didn't detect a teleport as teleports reset state
+                        CheckAndTriggerFeedback(playerState);
+                    }
                 }
-                wasTestHeld = testHeld;
 
-                UpdateFeedback(delta);
+                UpdateOnScreenText(delta, playerState);
             }
             catch (Exception e)
             {
@@ -194,109 +193,202 @@ namespace JumpKingPunishmentMod.Entities
         }
 
         /// <summary>
-        /// Called to update feedback state to track, trigger, and display feedback
+        /// Called each frame by <see cref="PunishmentManagerEntity.Update"/>
+        /// Handles updating debug/keyboard input
         /// </summary>
-        private void UpdateFeedback(float delta = 0.0f, bool forceGrounded = false)
+        private void UpdateInput()
         {
-            try
+            KeyboardState keyboardState = Keyboard.GetState();
+            bool toggleHeld = keyboardState.IsKeyDown(toggleKey);
+            if (toggleHeld && !wasToggleHeld)
             {
-                bool feedbackDisabled = debugToggledOff || (feedbackPauseTimer > 0.0f);
-
-                lastActionDrawTimer = Math.Max(0.0f, lastActionDrawTimer - delta);
-                feedbackPauseTimer = Math.Max(0.0f, feedbackPauseTimer - delta);
-
-                PunishmentPlayerState playerState = playerStateObserver.GetPlayerState();
-                if (!feedbackDisabled && isGameLoopRunning && (playerState != null))
+                debugToggledOff = !debugToggledOff;
+                if (debugToggledOff)
                 {
-                    // Consider sand ground too for our purposes
-                    bool isOnGround = forceGrounded || playerState.IsOnGround || playerState.IsOnSand;
-                    if (isOnGround)
-                    {
-                        // Add the teleport compensation at all times so we are always working with 'Y's in 'non-teleported' space
-                        float yLocation = playerState.Position.Y + teleportCompensation;
-                        if (isInAir && hasValidGroundedY)
-                        {
-                            // We have landed, calculate and execute a shock/reward
-                            float yDelta = yLocation - lastGroundedY;
-                            // Note, Y DECREASES as you move upward
-                            if (yDelta < 0.0f)  // Positive progress
-                            {
-                                if (progressOnlyRewards)
-                                {
-                                    yDelta = yLocation - highestGroundY;
-                                }
-                                if (yDelta < 0.0f)  // Make sure we actually made progress in the case of progress only rewards
-                                {
-                                    var reward = CalculateReward(yDelta);
-                                    if (reward.Item1)
-                                    {
-                                        punishmentDevice.Reward(reward.Item3, reward.Item4);
-                                        UpdateLastAction(GenerateFeedbackInfoString("Reward!", reward.Item2, reward.Item3, reward.Item4), Color.Lime);
-                                    }
-                                }
-                            }
-                            else if (yDelta > 0.0f)  // Negative progress
-                            {
-                                var punishment = CalculatePunishment(yDelta);
-                                if (punishment.Item1)
-                                {
-                                    punishmentDevice.Punish(punishment.Item3, punishment.Item4, easyModePunishment);
-                                    UpdateLastAction(GenerateFeedbackInfoString("Punishment!", punishment.Item2, punishment.Item3, punishment.Item4), easyModePunishment ? Color.Lime : Color.Red);
-                                }
-                            }
-                        }
-                        lastGroundedY = yLocation;
-                        if (!hasValidGroundedY)
-                        {
-                            // If we don't have a valid grounded Y that means our highest grounded
-                            // isn't valid either so we should just take the location without a min check
-                            highestGroundY = yLocation;
-                        }
-                        else
-                        {
-                            // Again, upward progress is NEGATIVE
-                            highestGroundY = Math.Min(yLocation, highestGroundY);
-                        }
-                        hasValidGroundedY = true;
-                    }
-                    isInAir = !isOnGround;
-                }
-
-                // Update the incoming text entity
-                // Only show punishments incoming as rewards will be weird with the arcs of a jump (and punishments
-                // generally can't be avoided once they start)
-                var incomingPunishment = (false, 0.0f, 0.0f, 0.0f);
-                if (!feedbackDisabled && isInAir && hasValidGroundedY)
-                {
-                    // Again add teleport compensation to work in 'non-teleported' space
-                    float currentYDelta = (playerState.Position.Y + teleportCompensation) - lastGroundedY;
-                    if (currentYDelta > 0.0f)
-                    {
-                        incomingPunishment = CalculatePunishment(currentYDelta, false);
-                    }
-                }
-
-                if (!incomingPunishment.Item1)
-                {
-                    incomingPunishmentTextEntity.TextValue = "";
+                    logger.Information("Toggling Punishment mod off...");
                 }
                 else
                 {
-                    incomingPunishmentTextEntity.TextValue = GenerateFeedbackInfoString("Incoming punishment", incomingPunishment.Item2, incomingPunishment.Item3, incomingPunishment.Item4, "...");
+                    logger.Information("Toggling Punishment mod back on!");
+                    ResetState(rememberProgress: true);
                 }
+            }
+            wasToggleHeld = toggleHeld;
 
-                // Fade the last action text out overtime (over the second half of it's lifetime)
-                float Alpha = 1.0f;
-                if (lastActionDrawTimer < (LastActionDisplayTime / 2.0f))
-                {
-                    Alpha = lastActionDrawTimer / (LastActionDisplayTime / 2.0f);
-                }
-                lastActionTextEntity.TextColor = new Color(lastActionTextEntity.TextColor, Alpha);
-            }
-            catch (Exception e)
+            bool testHeld = keyboardState.IsKeyDown(testKey);
+            if (testHeld && !wasTestHeld)
             {
-                logger.Error($"Error updating punishment feedback {e.ToString()}");
+                logger.Information("Sending test feedback to your feedback device...");
+                punishmentDevice.Test(50.0f, 1.0f);
             }
+            wasTestHeld = testHeld;
+        }
+
+        /// <summary>
+        /// Called each frame by <see cref="PunishmentManagerEntity.Update"/>
+        /// Handles updating teleport detection and handling feedback when a teleport is detected
+        /// </summary>
+        private bool UpdateTeleportDetection(float delta, PunishmentPlayerState playerState)
+        {
+            if (playerState == null)
+            {
+                return false;
+            }
+
+            float yLocation = playerState.Position.Y + teleportCompensation;
+
+            bool teleportDetected = false;
+            if (!float.IsNaN(lastPlayerY))
+            {
+                // We don't need to divide out delta here as Jump King doesn't apply velocities based on delta time (the current velocity
+                // is just added to the player position each frame- entities in Jump King update with a fixed time step).
+                // MAX_FALL and JUMP from PlayerValues are the same- they are fixed numbers that are never multiplied with DT when they
+                // influence the player's velocity.
+                float lastYVelocity = (yLocation - lastPlayerY);
+
+                // Values to check against to see if the player has exceeded what should be the max possible velocity in a single frame.
+                // TeleportDetectionMaxExpectedVelocityMultipler exists to help prevent false positives as well as potentially allow
+                // some wiggle room (the value may need to be adjusted) if mods ever do weird things with launching the player or something
+                float maxExpectedNegativeVelocity = GetPlayerValuesJUMP() * TeleportDetectionMaxExpectedVelocityMultipler;
+                float maxExpectedPositiveVelocity = GetPlayerValuesMAX_FALL() * TeleportDetectionMaxExpectedVelocityMultipler;
+
+                teleportDetected = (lastYVelocity > 0.0f) ? (lastYVelocity > maxExpectedPositiveVelocity) : (lastYVelocity < maxExpectedNegativeVelocity);
+            }
+
+            // If we detected a teleport trigger a punishment from before the teleport (if needed) and then reset state
+            // like we do for OnPlayerSaveStateApplying
+            if (teleportDetected)
+            {
+                logger.Information("The punishment mod detected a potential teleport- triggering punishments now and resetting state!");
+                // Trigger feedback (so they can't get out of it) from the point they were at before the teleport
+                CheckAndTriggerFeedback(playerState, lastPlayerY, true);
+                // Reset state since we don't want to carry any positioning/movement/feedback/etc through the teleport
+                ResetState(TeleportPauseTime, true);
+                // No need to update lastPlayerY as it was cleared in ResetState and will be updated again on future ticks
+            }
+            else
+            {
+                lastPlayerY = yLocation;
+            }
+
+            return teleportDetected;
+        }
+
+        /// <summary>
+        /// Called each frame by <see cref="PunishmentManagerEntity.Update"/>
+        /// Updates on screen text for punishment actions and incoming punishment
+        /// </summary>
+        void UpdateOnScreenText(float delta, PunishmentPlayerState playerState)
+        {
+            // Fade the last action text out overtime (over the second half of it's lifetime)
+            lastActionDrawTimer = Math.Max(0.0f, lastActionDrawTimer - delta);
+            float Alpha = 1.0f;
+            if (lastActionDrawTimer < (LastActionDisplayTime / 2.0f))
+            {
+                Alpha = lastActionDrawTimer / (LastActionDisplayTime / 2.0f);
+            }
+            lastActionTextEntity.TextColor = new Color(lastActionTextEntity.TextColor, Alpha);
+
+            // Update the incoming text entity
+            // Only show punishments incoming as rewards will be weird with the arcs of a jump (and punishments
+            // generally can't be avoided once they start)
+            var incomingPunishment = (false, 0.0f, 0.0f, 0.0f);
+            if (IsFeedbackEnabled() && (playerState != null) && isInAir && !float.IsNaN(lastGroundedY))
+            {
+                float currentYDelta = (playerState.Position.Y + teleportCompensation) - lastGroundedY;
+                if (currentYDelta > 0.0f)
+                {
+                    incomingPunishment = CalculatePunishment(currentYDelta, false);
+                }
+            }
+
+            if (!incomingPunishment.Item1)
+            {
+                incomingPunishmentTextEntity.TextValue = "";
+            }
+            else
+            {
+                incomingPunishmentTextEntity.TextValue = GenerateFeedbackInfoString("Incoming punishment", incomingPunishment.Item2, incomingPunishment.Item3, incomingPunishment.Item4, "...");
+            }
+        }
+
+        /// <summary>
+        /// Checks and updates state to see if feedback should be triggered, and triggers it if needed
+        /// Called each frame from <see cref="PunishmentManagerEntity.Update"/>
+        /// Also called manually when teleports are detected/handled to immediately trigger feedback
+        /// </summary>
+        private void CheckAndTriggerFeedback(PunishmentPlayerState providedPlayerState = null, float overridePlayerY = float.NaN, bool forcePunishment = false)
+        {
+            PunishmentPlayerState playerState = (providedPlayerState != null) ? providedPlayerState : playerStateObserver.GetPlayerState();
+            if (playerState == null)
+            {
+                return;
+            }
+
+            // Consider sand ground too for our purposes
+            bool isOnGround = playerState.IsOnGround || playerState.IsOnSand;
+            if (isOnGround || forcePunishment)
+            {
+                float yLocation = !float.IsNaN(overridePlayerY) ? overridePlayerY : (playerState.Position.Y + teleportCompensation);
+                if (isInAir && !float.IsNaN(lastGroundedY))
+                {
+                    // We have landed, calculate and execute a shock/reward
+                    // Note, Y DECREASES as you move upward
+                    float yDelta = yLocation - lastGroundedY;
+                    
+                    // Positive progress- we only want to trigger positive progress if you are actually on the ground
+                    // as forced rewards should only really be possible if the player is mid jump when something happens
+                    // and triggering a reward would be incorrect/potentially problematic in that case
+                    if ((yDelta < 0.0f) && isOnGround && !float.IsNaN(highestGroundY))
+                    {
+                        if (progressOnlyRewards)
+                        {
+                            yDelta = yLocation - highestGroundY;
+                        }
+
+                        // Make sure we actually made progress in the case of progress only rewards
+                        if (yDelta < 0.0f)
+                        {
+                            var reward = CalculateReward(yDelta);
+                            if (reward.Item1)
+                            {
+                                punishmentDevice.Reward(reward.Item3, reward.Item4);
+                                UpdateLastAction(GenerateFeedbackInfoString("Reward!", reward.Item2, reward.Item3, reward.Item4), Color.Lime);
+                            }
+                        }
+                    }
+                    else if (yDelta > 0.0f)  // Negative progress
+                    {
+                        var punishment = CalculatePunishment(yDelta);
+                        if (punishment.Item1)
+                        {
+                            punishmentDevice.Punish(punishment.Item3, punishment.Item4, easyModePunishment);
+                            UpdateLastAction(GenerateFeedbackInfoString("Punishment!", punishment.Item2, punishment.Item3, punishment.Item4), easyModePunishment ? Color.Lime : Color.Red);
+                        }
+                    }
+                }
+                // This can short the player rewards if they are making positive progress when we try to
+                // force a punishment, but that generally shouldn't happen and isn't a huge deal if it does
+                lastGroundedY = yLocation;
+                if (isOnGround)     // Don't update highest grounded if they aren't actually on the ground
+                {
+                    if (float.IsNaN(highestGroundY))
+                    {
+                        // When first updating highestGroundY use preResetHighestGroundY if we have it set and it's further progress.
+                        // This works in tandem with ResetState() calls to prevent the player from being rewarded for progress from stuff
+                        // like teleports or toggling the mod off and on- but we also won't reset/lower the furthest progress in the case
+                        // of teleporting downward or more importantly warping for something like a modifier death.
+                        // preResetHighestGroundY will not be set when returning to the main menu so it won't carry through different runs.
+                        highestGroundY = float.IsNaN(preResetHighestGroundY) ? yLocation : Math.Min(yLocation, preResetHighestGroundY);
+                        preResetHighestGroundY = float.NaN;
+                    }
+                    else
+                    {
+                        highestGroundY = Math.Min(yLocation, highestGroundY);
+                    }
+                }
+            }
+            isInAir = !isOnGround;
         }
 
         /// <summary>
@@ -343,17 +435,32 @@ namespace JumpKingPunishmentMod.Entities
         /// </summary>
         private void OnPlayerSaveStateApplying()
         {
-            if (isGameLoopRunning)
+            try
             {
-                // We could calculate out the distance moved by the apply (as teleport compensation) and still punish/reward the player- but given the player is
-                // either loading a save or is being moved by a death from a modifier we will instead just trigger feedback immediately (so they don't get out of it)...
-                UpdateFeedback(forceGrounded: true);
+                if (IsFeedbackEnabled())
+                {
+                    // We could calculate out the distance moved by the apply (as teleport compensation) and still punish/reward the player- but given the player is
+                    // either loading a save or is being moved by a death from a modifier we will instead just trigger feedback immediately (so they don't get out of it)...
+                    CheckAndTriggerFeedback(forcePunishment: true);
 
-                // Then reset state since we are about to be warped and don't want our current state to carry through the warp.
-                // We also want to pause state updates for a bit as it seems to take a couple frames for the player to properly update state (such as IsOnGround)
-                // when save state is applied
-                ResetState(ApplyStatePauseTime);
+                    // Then reset state since we are about to be warped and don't want our current state to carry through the warp.
+                    // We also want to pause state updates for a bit as it seems to take a couple frames for the player to properly update state (such as IsOnGround)
+                    // when save state is applied
+                    ResetState(TeleportPauseTime, true);
+                }
             }
+            catch (Exception e)
+            {
+                logger.Error($"Error handling PlayerSaveStateApplying {e.ToString()}");
+            }
+        }
+
+        /// <summary>
+        /// Returns whether feedback is enabled and should generate or not
+        /// </summary>
+        private bool IsFeedbackEnabled()
+        {
+            return isGameLoopRunning && !debugToggledOff && (feedbackPauseTimer <= 0.0f);
         }
 
         /// <summary>
@@ -455,12 +562,14 @@ namespace JumpKingPunishmentMod.Entities
         /// <summary>
         /// Resets falling/grounded/teleport/etc. state and allows pausing future state updates for a provided amount of time.
         /// </summary>
-        private void ResetState(float pauseTime = 0.0f)
+        private void ResetState(float pauseTime = 0.0f, bool rememberProgress = false)
         {
+            preResetHighestGroundY = rememberProgress ? highestGroundY : float.NaN;
+
             isInAir = false;
-            lastGroundedY = 0.0f;
-            highestGroundY = 0.0f;
-            hasValidGroundedY = false;
+            lastGroundedY = float.NaN;
+            highestGroundY = float.NaN;
+            lastPlayerY = float.NaN;
             teleportCompensation = 0.0f;
 
             feedbackPauseTimer = pauseTime;
@@ -494,6 +603,22 @@ namespace JumpKingPunishmentMod.Entities
 
             lastActionTextEntity.TextValue = actionText;
             lastActionTextEntity.TextColor = textColor;
+        }
+
+        /// <summary>
+        /// Returns <see cref="JumpKing.PlayerValues.JUMP"/>
+        /// </summary>
+        private float GetPlayerValuesJUMP()
+        {
+            return (float)getPlayerValuesJumpMethod.Invoke(null, null);
+        }
+
+        /// <summary>
+        /// Returns <see cref="JumpKing.PlayerValues.MAX_FALL"/>
+        /// </summary>
+        private float GetPlayerValuesMAX_FALL()
+        {
+            return (float)getPlayerValuesMaxFallMethod.Invoke(null, null);
         }
     }
 }
