@@ -494,11 +494,12 @@ namespace JumpKingPunishmentMod.Entities
                     if (roundDurations)
                     {
                         rewardDuration = (float)Math.Round(rewardDuration);
-                        // If rounding turned the duration to zero return that we aren't actually doing a reward
-                        if (rewardDuration == 0.0f)
-                        {
-                            receivingReward = false;
-                        }
+                    }
+
+                    // If we didn't calculate a positive intensity or duration we aren't actually receiving a reward
+                    if ((rewardDuration <= 0.0f) || (rewardIntensity <= 0.0f))
+                    {
+                        receivingReward = false;
                     }
                 }
                 if (logResult)
@@ -542,11 +543,12 @@ namespace JumpKingPunishmentMod.Entities
                     if (roundDurations)
                     {
                         punishmentDuration = (float)Math.Round(punishmentDuration);
-                        // If rounding our punishment turned the duration to zero return that we aren't actually doing a punishment
-                        if (punishmentDuration == 0.0f)
-                        {
-                            receivingPunishment = false;
-                        }
+                    }
+
+                    // If we didn't calculate a positive intensity or duration we aren't actually receiving a punishment
+                    if ((punishmentDuration <= 0.0f) || (punishmentIntensity <= 0.0f))
+                    {
+                        receivingPunishment = false;
                     }
                 }
                 if (logResult)
