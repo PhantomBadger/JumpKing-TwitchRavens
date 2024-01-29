@@ -39,7 +39,6 @@ namespace JumpKingPunishmentMod.Entities
         private bool isInAir;
         private float lastGroundedY;
         private float highestGroundY;
-        private float preResetHighestGroundY;
         private float lastPlayerY;
         private float teleportCompensation;
         private float feedbackPauseTimer;
@@ -210,7 +209,7 @@ namespace JumpKingPunishmentMod.Entities
                 else
                 {
                     logger.Information("Toggling Punishment mod back on!");
-                    ResetState(rememberProgress: true);
+                    ResetState();
                 }
             }
             wasToggleHeld = toggleHeld;
@@ -263,7 +262,7 @@ namespace JumpKingPunishmentMod.Entities
                 // Trigger feedback (so they can't get out of it) from the point they were at before the teleport
                 CheckAndTriggerFeedback(playerState, lastPlayerY, true);
                 // Reset state since we don't want to carry any positioning/movement/feedback/etc through the teleport
-                ResetState(TeleportPauseTime, true);
+                ResetState(TeleportPauseTime);
                 // No need to update lastPlayerY as it was cleared in ResetState and will be updated again on future ticks
             }
             else
@@ -372,20 +371,7 @@ namespace JumpKingPunishmentMod.Entities
                 lastGroundedY = yLocation;
                 if (isOnGround)     // Don't update highest grounded if they aren't actually on the ground
                 {
-                    if (float.IsNaN(highestGroundY))
-                    {
-                        // When first updating highestGroundY use preResetHighestGroundY if we have it set and it's further progress.
-                        // This works in tandem with ResetState() calls to prevent the player from being rewarded for progress from stuff
-                        // like teleports or toggling the mod off and on- but we also won't reset/lower the furthest progress in the case
-                        // of teleporting downward or more importantly warping for something like a modifier death.
-                        // preResetHighestGroundY will not be set when returning to the main menu so it won't carry through different runs.
-                        highestGroundY = float.IsNaN(preResetHighestGroundY) ? yLocation : Math.Min(yLocation, preResetHighestGroundY);
-                        preResetHighestGroundY = float.NaN;
-                    }
-                    else
-                    {
-                        highestGroundY = Math.Min(yLocation, highestGroundY);
-                    }
+                    highestGroundY = float.IsNaN(highestGroundY) ? yLocation : Math.Min(yLocation, highestGroundY);
                 }
             }
             isInAir = !isOnGround;
@@ -446,7 +432,7 @@ namespace JumpKingPunishmentMod.Entities
                     // Then reset state since we are about to be warped and don't want our current state to carry through the warp.
                     // We also want to pause state updates for a bit as it seems to take a couple frames for the player to properly update state (such as IsOnGround)
                     // when save state is applied
-                    ResetState(TeleportPauseTime, true);
+                    ResetState(TeleportPauseTime);
                 }
             }
             catch (Exception e)
@@ -564,10 +550,8 @@ namespace JumpKingPunishmentMod.Entities
         /// <summary>
         /// Resets falling/grounded/teleport/etc. state and allows pausing future state updates for a provided amount of time.
         /// </summary>
-        private void ResetState(float pauseTime = 0.0f, bool rememberProgress = false)
+        private void ResetState(float pauseTime = 0.0f)
         {
-            preResetHighestGroundY = rememberProgress ? highestGroundY : float.NaN;
-
             isInAir = false;
             lastGroundedY = float.NaN;
             highestGroundY = float.NaN;
