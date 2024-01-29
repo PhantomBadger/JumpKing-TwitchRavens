@@ -15,6 +15,7 @@ It's also highly recommended you experiment with your device before configuring/
 
 - **Enabled:** Ticking this means the Punishment mod is now enabled and will be used by Jump King. Untick if you do not want to use this portion of the mod.
 - **Toggle Punishment Key:** Press this key during play to toggle the punishment mod functionality (toggling punishments and rewards).
+  - **Note:** This will also clear your 'max progress' tracked by the mod used by the **'Reward on New Progress Only'** setting, meaning you can get rewarded for progress you have already made again if you toggle the mod off and back on.
 - **Test Feedback Key:** Press this key during play to trigger a test feedback event to your feedback device. This is useful to test that your device is properly configured/working.
 - **On Screen Display Behavior:** Controls how the mod displays messages on screen about punishments and rewards, see sections below for more information.
 - **Round Durations:** Ticking this causes feedback event durations to be rounded when calculated.
@@ -37,7 +38,7 @@ It's also highly recommended you experiment with your device before configuring/
   - **Minimum Reward Progress Distance:** The minimum amount of progress you must gain in order to receive a reward feedback event.
   - **Maximum Reward Progress Distance:** The progress distance at which you will receive a maximum strength/duration reward feedback event.
   - **Reward On New Progress Only:** Ticking this means you will only be rewarded the first time you make progress (based on height, not any displayed progress percentage). If enabled falling and re-making progress will not generate rewards.
-    - **Note:** This value is not saved, restarting the game will reset this value and you may be rewarded for progress you technically previously made already.
+    - **Note:** This value is not saved- restarting the game, toggling the mod at runtime, or teleports from other mods will reset this value and you may be rewarded for progress you technically previously made already.
 
  ### On Screen Display Behaviors
  
@@ -74,7 +75,7 @@ Note that for the 'Reward On New Progress Only' setting the highest Y value you 
 
 Sometimes when changing between screens in Jump King the player is teleported as the map physically cannot exist as it's laid out. This **should be supported and work correctly** (at least with teleports done in the original game/DLC). If user maps use the same functionality to do teleports as the original game they should be supported as well (note however only basic testing has been done with user maps, you may want to test stuff yourself before committing to anything).
 
-Other mods will likely work in tandem with the punishment mod, however you should be careful with mods that move/teleport the player (such as Jump King Plus's teleports and SavePos/LoadPos, or using Fly Mode)- the punishment mod will attempt to detect and as properly as possible handle teleports but its detection may not be perfect. The Rising Lava and Fall Damage modifiers (which warp you on death) are generally supported. If you would like to use other such mods in tandem with the punishment mod you should do some basic testing with them before using them.
+Other mods will likely work in tandem with the punishment mod, however you should be careful with mods that move/teleport the player (such as Jump King Plus's teleports and SavePos/LoadPos, or using Fly Mode)- the punishment mod will attempt to detect and as properly as possible handle teleports but its detection may not be perfect. The Rising Lava and Fall Damage modifiers (which warp you on death) are generally supported. Note that when a teleport is detected your 'max progress' used for the **'Reward on New Progress Only'** setting will be reset. If you would like to use other mods in tandem with the punishment mod you should do some basic testing with them before using them.
 
 ### What can I do to find distances that work for me?
 
