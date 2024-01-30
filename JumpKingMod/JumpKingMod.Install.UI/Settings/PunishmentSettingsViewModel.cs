@@ -749,7 +749,7 @@ namespace JumpKingMod.Install.UI.Settings
 
             // Clamp to valid ranges
             float clampedMinPunishmentDuration = Math.Max(minPunishmentDuration, 0.0f);
-            //clampedMinPunishmentDuration = Math.Min(clampedMinPunishmentDuration, 15.0f);
+            clampedMinPunishmentDuration = Math.Min(clampedMinPunishmentDuration, 10.0f);
             if (minPunishmentDuration != clampedMinPunishmentDuration)
             {
                 MinPunishmentDuration = clampedMinPunishmentDuration.ToString();
@@ -761,7 +761,7 @@ namespace JumpKingMod.Install.UI.Settings
                 MinPunishmentIntensity = clampedMinPunishmentIntensity.ToString();
             }
             float clampedMaxPunishmentDuration = Math.Max(maxPunishmentDuration, 0.0f);
-            //clampedMaxPunishmentDuration = Math.Min(clampedMaxPunishmentDuration, 15.0f);
+            clampedMaxPunishmentDuration = Math.Min(clampedMaxPunishmentDuration, 10.0f);
             if (maxPunishmentDuration != clampedMaxPunishmentDuration)
             {
                 MaxPunishmentDuration = clampedMaxPunishmentDuration.ToString();
@@ -774,7 +774,7 @@ namespace JumpKingMod.Install.UI.Settings
             }
 
             float clampedMinRewardDuration = Math.Max(minRewardDuration, 0.0f);
-            //clampedMinRewardDuration = Math.Min(clampedMinRewardDuration, 15.0f);
+            clampedMinRewardDuration = Math.Min(clampedMinRewardDuration, 10.0f);
             if (minRewardDuration != clampedMinRewardDuration)
             {
                 MinRewardDuration = clampedMinRewardDuration.ToString();
@@ -786,7 +786,7 @@ namespace JumpKingMod.Install.UI.Settings
                 MinRewardIntensity = clampedMinRewardIntensity.ToString();
             }
             float clampedMaxRewardDuration = Math.Max(maxRewardDuration, 0.0f);
-            //clampedMaxRewardDuration = Math.Min(clampedMaxRewardDuration, 15.0f);
+            clampedMaxRewardDuration = Math.Min(clampedMaxRewardDuration, 10.0f);
             if (maxRewardDuration != clampedMaxRewardDuration)
             {
                 MaxRewardDuration = clampedMaxRewardDuration.ToString();

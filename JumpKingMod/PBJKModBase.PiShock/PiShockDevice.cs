@@ -66,6 +66,10 @@ namespace PBJKModBase.PiShock
 
             try
             {
+                // Clamp the values passed to the API as it will error out (or at least not behave as expected) if they are out of bounds
+                duration = Math.Min(duration, 15);
+                intensity = Math.Min(intensity, 100);
+
                 logger.Information($"PiShock - Sending shock | Duration: {duration} | Intensity: {intensity}");
                 var PayloadData = new
                 {
@@ -74,8 +78,8 @@ namespace PBJKModBase.PiShock
                     Code = apiShareCode,
                     Name = ApiRequestName,
                     Op = 0,
-                    Duration = Math.Min(duration, 15),      // Clamp the values passed to the API as it will error out if they are out of bounds
-                    Intensity = Math.Min(intensity, 100)
+                    Duration = duration,
+                    Intensity = intensity
                 };
                 StringContent JsonContent = new StringContent(JsonConvert.SerializeObject(PayloadData), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync("", JsonContent);
@@ -104,6 +108,11 @@ namespace PBJKModBase.PiShock
 
             try
             {
+                // Clamp the values passed to the API as it will error out (or at least not behave as expected) if they are out of bounds
+                // (Documentation doesn't say vibrates need their duration clamped but testing the device/API it does not behave as expected above 15)
+                duration = Math.Min(duration, 15);
+                intensity = Math.Min(intensity, 100);
+
                 logger.Information($"PiShock - Sending vibration | Duration: {duration} | Intensity: {intensity}");
                 var PayloadData = new
                 {
@@ -113,7 +122,7 @@ namespace PBJKModBase.PiShock
                     Name = ApiRequestName,
                     Op = 1,
                     Duration = duration,
-                    Intensity = Math.Min(intensity, 100)    // Clamp the values passed to the API as it will error out if they are out of bounds
+                    Intensity = intensity
                 };
                 StringContent JsonContent = new StringContent(JsonConvert.SerializeObject(PayloadData), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync("", JsonContent);
@@ -141,6 +150,10 @@ namespace PBJKModBase.PiShock
 
             try
             {
+                // Clamp the values passed to the API as it will error out (or at least not behave as expected) if they are out of bounds
+                // (Documentation doesn't say beeps need their duration clamped but testing the device/API it does not behave as expected above 15)
+                duration = Math.Min(duration, 15);
+
                 logger.Information($"PiShock - Sending beep | Duration: {duration}");
                 var PayloadData = new
                 {
