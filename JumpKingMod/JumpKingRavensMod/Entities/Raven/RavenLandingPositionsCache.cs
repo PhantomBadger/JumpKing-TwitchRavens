@@ -1,6 +1,7 @@
 ﻿using EntityComponent;
 using HarmonyLib;
 using JumpKing;
+using JumpKing.Level;
 using JumpKing.Props.RaymanWall;
 using JumpKingRavensMod.API;
 using Logging.API;
@@ -23,8 +24,8 @@ namespace JumpKingRavensMod.Entities.Raven
     {
         private readonly ILogger logger;
         private readonly ConcurrentDictionary<int, List<Vector2>> floorPositionCache;
-        private readonly Type collisionInfoType;
         private readonly MethodInfo checkCollisionMethod;
+        private readonly LevelScreen[] screens;
         private readonly List<RaymanData> raymanWallDatas;
 
         private const float MinimimXPollingValue = 30;
@@ -44,16 +45,16 @@ namespace JumpKingRavensMod.Entities.Raven
             floorPositionCache = new ConcurrentDictionary<int, List<Vector2>>();
 
             // Set up reflection references
-            collisionInfoType = AccessTools.TypeByName("JumpKing.Level.LevelScreen+CollisionInfo")
-                ?? throw new InvalidOperationException($"Cannot find 'JumpKing.Level.LevelScreen+CollisionInfo' type in Jump King");
-            checkCollisionMethod = AccessTools.Method("JumpKing.Level.LevelManager:CheckCollision")
-                ?? throw new InvalidOperationException($"Cannot find 'JumpKing.Level.LevelManager:CheckCollision' method in Jump King");
+            checkCollisionMethod = AccessTools.Method(typeof(LevelManager), "CheckCollisionInternal")
+                ?? throw new InvalidOperationException($"Cannot find 'JumpKing.Level.LevelManager:CheckCollisionInternal' method in Jump King");
+            FieldInfo screensField = AccessTools.Field(typeof(LevelManager), "m_screens");
+            screens = (LevelScreen[])screensField.GetValue(LevelManager.Instance);
 
             // Get all the Rayman Wall Entities and the means to query them
             raymanWallDatas = new List<RaymanData>();
             Type raymanWallEntityType = AccessTools.TypeByName("JumpKing.Props.RaymanWall.RaymanWallEntity");
             FieldInfo raymanWallDataField = AccessTools.Field(raymanWallEntityType, "m_data");
-            List<Entity> entities = EntityManager.instance.Entities;
+            IReadOnlyList<Entity> entities = EntityManager.instance.Entities;
             for (int i = 0; i < entities.Count; i++)
             {
                 if (entities[i].GetType() == raymanWallEntityType)
@@ -159,7 +160,7 @@ namespace JumpKingRavensMod.Entities.Raven
                     // Providing null in the parameters array will allow the reflection
                     // method info to properly populate it with the out parameters when we invoke
                     Rectangle testHitbox = GetHitbox(testPosition, hitboxWidth, hitboxHeight);
-                    object[] parameters = new object[] { testHitbox, null, null };
+                    object[] parameters = new object[] { Camera.CurrentScreen, screens, LevelManager.TotalScreens, testHitbox, null, null };
                     bool result = (bool)checkCollisionMethod.Invoke(null, parameters);
 
                     // If we've collided with something
@@ -169,9 +170,6 @@ namespace JumpKingRavensMod.Entities.Raven
                         // (ie, we're not stuck inside ONLY collision)
                         if (hasNotCollidedYet)
                         {
-                            Rectangle outOverlap = (Rectangle)parameters[1];
-                            object outCollisionInfo = parameters[2];
-
                             // March back up in smaller increments until we are not colliding with anything
                             // which will mean we're at the 'floor'
                             Vector2 hitLocation = new Vector2(testPosition.X, testPosition.Y);
@@ -179,7 +177,7 @@ namespace JumpKingRavensMod.Entities.Raven
                             do
                             {
                                 hitLocation.Y -= 1;
-                                floorTestParameters = new object[] { new Rectangle(hitLocation.ToPoint(), new Point(1, 1)), null, null };
+                                floorTestParameters = new object[] { Camera.CurrentScreen, screens, LevelManager.TotalScreens, new Rectangle(hitLocation.ToPoint(), new Point(1, 1)), null, null };
                             } while ((bool)checkCollisionMethod.Invoke(null, floorTestParameters));
 
                             // Add our adjusted position to the list

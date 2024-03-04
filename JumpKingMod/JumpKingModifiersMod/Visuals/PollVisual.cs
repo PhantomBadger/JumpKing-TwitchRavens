@@ -179,7 +179,7 @@ namespace JumpKingModifiersMod.Visuals
             descriptionPosition.Y = initialYOffset;
             descriptionPosition.X -= InitialPositionXPadding;
             pollDescriptionEntity = new UITextEntity(modEntityManager, descriptionPosition, descriptionText,
-                Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
+                Color.White, UIEntityAnchor.TopRight, Game1.instance.contentManager.font.MenuFontSmall, zOrder: 2);
             bottomOfOptionsYValue = descriptionPosition.Y + pollDescriptionEntity.TextFont.MeasureString(descriptionText).Y;
 
             // Make the countdown text
@@ -188,7 +188,7 @@ namespace JumpKingModifiersMod.Visuals
             countdownPosition.Y = bottomOfOptionsYValue;
             countdownPosition.X -= InitialPositionXPadding;
             pollCountdownEntity = new UITextEntity(modEntityManager, countdownPosition, countdownText, 
-                Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
+                Color.White, UIEntityAnchor.TopRight, Game1.instance.contentManager.font.MenuFontSmall, zOrder: 2);
             bottomOfOptionsYValue += (CountdownYPadding + pollDescriptionEntity.TextFont.MeasureString(descriptionText).Y);
 
             // Make each of the choices
@@ -201,7 +201,7 @@ namespace JumpKingModifiersMod.Visuals
                 pollOptionPosition.Y = bottomOfOptionsYValue;
                 pollOptionPosition.X -= InitialPositionXPadding;
                 var pollOptionEntity = new UITextEntity(modEntityManager, pollOptionPosition, pollOptionText,
-                    Color.White, UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
+                    Color.White, UIEntityAnchor.TopRight, Game1.instance.contentManager.font.MenuFontSmall, zOrder: 2);
                 pollOptionEntities.Add(new Tuple<ModifierPollOption, UITextEntity>(choicesList[i], pollOptionEntity));
 
                 bottomOfOptionsYValue += (YPadding + pollOptionEntity.TextFont.MeasureString(pollOptionText).Y);
@@ -289,7 +289,7 @@ namespace JumpKingModifiersMod.Visuals
                 for (int i = 0; i < MaxActiveModifiersOnDisplay; i++)
                 {
                     activeModifierEntitiesPool.Add(new UITextEntity(modEntityManager, Vector2.Zero, string.Empty,
-                        new Color(150, 150, 200, 127), UIEntityAnchor.TopRight, JKContentManager.Font.MenuFontSmall, zOrder: 2));
+                        new Color(150, 150, 200, 127), UIEntityAnchor.TopRight, Game1.instance.contentManager.font.MenuFontSmall, zOrder: 2));
                 }
             }
 

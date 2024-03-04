@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JumpKingModifiersMod.API
 {
-    public delegate void JumpTriggeredDelegate(JumpState jumpState);
+    public delegate void JumpTriggeredDelegate(PatchedJumpState jumpState);
 
     /// <summary>
     /// An interface representing an object capable of reading and triggering player jumps
@@ -23,7 +23,7 @@ namespace JumpKingModifiersMod.API
         /// Gets the last jump state, null if none has been recorded yet
         /// </summary>
         /// <returns></returns>
-        JumpState GetPreviousJumpState();
+        PatchedJumpState GetPreviousJumpState();
 
         /// <summary>
         /// Requests the player to jump

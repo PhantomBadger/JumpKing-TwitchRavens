@@ -141,7 +141,7 @@ namespace PBJKModBase.Twitch
             textEntities = new LinkedList<UITextEntity>();
             for (int i = 0; i < NumberOfChatEntities; i++)
             {
-                textEntities.AddLast(new UITextEntity(modEntityManager, ChatBoxBottomLeft, "", Color.White, UIEntityAnchor.BottomLeft, JKContentManager.Font.MenuFontSmall));
+                textEntities.AddLast(new UITextEntity(modEntityManager, ChatBoxBottomLeft, "", Color.White, UIEntityAnchor.BottomLeft, Game1.instance.contentManager.font.MenuFontSmall));
             }
         }
     }

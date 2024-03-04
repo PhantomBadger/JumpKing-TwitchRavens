@@ -9,7 +9,7 @@ namespace JumpKingModifiersMod.Patching
     /// <summary>
     /// An aggregate class of jump data
     /// </summary>
-    public class JumpState
+    public class PatchedJumpState
     {
         /// <summary>
         /// The intensity of the previous jump
@@ -22,11 +22,11 @@ namespace JumpKingModifiersMod.Patching
         public int XValue { get; private set; }
 
         /// <summary>
-        /// Ctor for creating a <see cref="JumpState"/>
+        /// Ctor for creating a <see cref="PatchedJumpState"/>
         /// </summary>
         /// <param name="intensity">The intensity of the jump</param>
         /// <param name="xValue">The X direction to jump in, 1 is right, -1 is left, 0 is up</param>
-        public JumpState(float intensity, int xValue)
+        public PatchedJumpState(float intensity, int xValue)
         {
             Intensity = intensity;
             XValue = xValue;
@@ -36,7 +36,7 @@ namespace JumpKingModifiersMod.Patching
     /// <summary>
     /// An aggregate of jump data for a requested jump
     /// </summary>
-    public class RequestedJumpState : JumpState
+    public class RequestedJumpState : PatchedJumpState
     {
         /// <summary>
         /// If <c>true</c> then the X Value provided will be overridden by any user input as long

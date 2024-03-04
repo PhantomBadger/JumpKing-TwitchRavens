@@ -28,13 +28,13 @@ namespace JumpKingRavensMod
         {
             try
             {
-                ScopeTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/scope");
+                ScopeTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Content/JKMods/Resources/scope");
                 logger.Information($"Loaded Scope Texture");
 
-                RavenStunnedTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/raven_stunned");
+                RavenStunnedTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Content/JKMods/Resources/raven_stunned");
                 logger.Information($"Loaded Raven Stun Texture");
 
-                RavenFallingTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/raven_falling");
+                RavenFallingTexture = JumpKing.Game1.instance.Content.Load<Texture2D>("Content/JKMods/Resources/raven_falling");
                 logger.Information($"Loaded Raven Fall Texture");
 
                 // Constructor for Raven Content is internal, we have to use Activator and reflection to create it
@@ -55,7 +55,7 @@ namespace JumpKingRavensMod
                             Raven = (RavenContent)Activator.CreateInstance(ravenContenType,
                                 BindingFlags.NonPublic | BindingFlags.Instance,
                                 binder: null,
-                                new object[] { JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/raven") },
+                                new object[] { JumpKing.Game1.instance.Content.Load<Texture2D>("Content/JKMods/Resources/raven") },
                                 culture: null);
                         },
                         (Exception e) =>
@@ -65,7 +65,7 @@ namespace JumpKingRavensMod
                     new Tuple<Action, Action<Exception>>(
                         () =>
                         {
-                            Raven = (RavenContent)Activator.CreateInstance(ravenContenType, JumpKing.Game1.instance.Content.Load<Texture2D>("Mods/Resources/raven"));
+                            Raven = (RavenContent)Activator.CreateInstance(ravenContenType, JumpKing.Game1.instance.Content.Load<Texture2D>("JKMods/Resources/raven"));
                         },
                         (Exception e) =>
                         {

@@ -105,7 +105,7 @@ namespace JumpKingRavensMod.Entities.Raven
             if (!string.IsNullOrWhiteSpace(ravenName))
             {
                 ravenNameEntity = new UITextEntity(modEntityManager, Camera.TransformVector2(Transform), 
-                    ravenName, ravenNameColour, UIEntityAnchor.Center, JKContentManager.Font.MenuFontSmall);
+                    ravenName, ravenNameColour, UIEntityAnchor.Center, Game1.instance.contentManager.font.MenuFontSmall);
                 nameYOffset = (ravenNameEntity.Size.Y / 2) + HardcodedNameYOffset;
             }
 
@@ -165,7 +165,7 @@ namespace JumpKingRavensMod.Entities.Raven
                     if (messageEntity == null)
                     {
                         Vector2 messagePosition = Transform + new Vector2(0, -20);
-                        messageEntity = new UITextEntity(modEntityManager, Camera.TransformVector2(messagePosition), landingMessage, Color.White, UIEntityAnchor.Center, JKContentManager.Font.MenuFontSmall);
+                        messageEntity = new UITextEntity(modEntityManager, Camera.TransformVector2(messagePosition), landingMessage, Color.White, UIEntityAnchor.Center, Game1.instance.contentManager.font.MenuFontSmall);
                         Vector2 textSize = messageEntity.Size;
 
                         // Do a rough check to ensure the message is always on screen,

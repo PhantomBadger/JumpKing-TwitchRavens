@@ -83,7 +83,7 @@ namespace PBJKModBase.Entities
         /// <param name="anchorPoint">An enum of possible anchor points of where the position is relative to the text</param>
         /// <param name="zOrder">The z order to display the entity in the foreground queue. Defaults to zero. Higher number is closer to the screen.</param>
         public UITextEntity(ModEntityManager modEntityManager, Vector2 screenSpacePosition, string textValue, Color textColor, UIEntityAnchor anchorPoint, int zOrder = 0)
-            : this(modEntityManager, screenSpacePosition, textValue, textColor, anchorPoint, JKContentManager.Font.MenuFont, zOrder)
+            : this(modEntityManager, screenSpacePosition, textValue, textColor, anchorPoint, Game1.instance.contentManager.font.MenuFont, zOrder)
         {
         }
 

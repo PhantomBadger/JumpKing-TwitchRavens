@@ -37,7 +37,7 @@ namespace JumpKingModifiersMod.Patching
         private static int? overrideDPad;
         private static bool suppressOnJumpEvent;
         private static JumpStateManualPatch instance;
-        private static JumpState prevJumpState;
+        private static PatchedJumpState prevJumpState;
 
         /// <summary>
         /// Ctor for creating a <see cref="JumpStateManualPatch"/>
@@ -122,7 +122,7 @@ namespace JumpKingModifiersMod.Patching
         public static void DoJumpPrefixPatchMethod(object __instance, float p_intensity)
         {
             int num = GetXState(__instance);
-            prevJumpState = new JumpState(p_intensity, num);
+            prevJumpState = new PatchedJumpState(p_intensity, num);
             if (!suppressOnJumpEvent)
             {
                 instance.OnPlayerJumped?.Invoke(prevJumpState);
@@ -172,9 +172,9 @@ namespace JumpKingModifiersMod.Patching
         }
 
         /// <summary>
-        /// An implementation of <see cref="IPlayerJumper.RequestJump(JumpState)"/> which queues up a jump to be performed
+        /// An implementation of <see cref="IPlayerJumper.RequestJump(PatchedJumpState)"/> which queues up a jump to be performed
         /// </summary>
-        /// <param name="requestedJump">The <see cref="JumpState"/> to perform</param>
+        /// <param name="requestedJump">The <see cref="PatchedJumpState"/> to perform</param>
         public void RequestJump(RequestedJumpState requestedJump)
         {
             logger.Information($"Queueing up a fake jump!");
@@ -185,7 +185,7 @@ namespace JumpKingModifiersMod.Patching
         /// An implementation of <see cref="IPlayerJumper.GetPreviousJumpState"/> which returns the state of the last recorded jump
         /// If no jump has been recorded yet this will be null
         /// </summary>
-        public JumpState GetPreviousJumpState()
+        public PatchedJumpState GetPreviousJumpState()
         {
             return prevJumpState;
         }

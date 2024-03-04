@@ -96,7 +96,7 @@ namespace JumpKingModifiersMod.Patching
         {
             if (isWindOverridden && overrideTexture != null)
             {
-                JKContentManager.Shaders.Mask.Draw(overrideTexture, overrideMask);
+                Game1.instance.contentManager.shaders.Mask.Draw(overrideTexture, overrideMask);
                 return false;
             }
             return true;

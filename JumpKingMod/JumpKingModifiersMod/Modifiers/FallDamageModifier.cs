@@ -210,7 +210,7 @@ namespace JumpKingModifiersMod.Modifiers
             //    healthValue.ToString(),
             //    Color.Red,
             //    UIEntityAnchor.Center,
-            //    JKContentManager.Font.MenuFontSmall);
+            //    Game1.instance.contentManager.font.MenuFontSmall);
 
             Vector2? healthBarPosition = GetScreenSpacePositionForHealthBarEntity(playerState);
             if (!healthBarPosition.HasValue)
@@ -435,7 +435,7 @@ namespace JumpKingModifiersMod.Modifiers
                 youDiedAlphaLerpCounter = 0;
 
                 fallModifierState = FallDamageModifierState.DisplayingYouDied;
-                JKContentManager.Audio.RaymanSFX.Play();
+                Game1.instance.contentManager.audio.RaymanSFX.Play();
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
             }
         }
@@ -486,7 +486,7 @@ namespace JumpKingModifiersMod.Modifiers
                     "Press Jump to restart!",
                     Color.White,
                     UIEntityAnchor.Center,
-                    JKContentManager.Font.MenuFontSmall,
+                    Game1.instance.contentManager.font.MenuFontSmall,
                     zOrder: 2);
                 userPromptPulseCounter = 0;
 
@@ -539,7 +539,7 @@ namespace JumpKingModifiersMod.Modifiers
                 fallModifierState = FallDamageModifierState.Playing;
                 logger.Information($"Setting Modifier State to {fallModifierState.ToString()}!");
 
-                JKContentManager.Audio.PressStart.Play();
+                Game1.instance.contentManager.audio.PressStart.Play();
             }
         }
 
@@ -616,7 +616,7 @@ namespace JumpKingModifiersMod.Modifiers
                 startingScreenSpacePosition, 
                 $"-{damageValue.ToString()}", 
                 damageValue > 0 ? Color.Red : Color.Aqua, 
-                JKContentManager.Font.MenuFontSmall, 
+                Game1.instance.contentManager.font.MenuFontSmall, 
                 random);
         }
 

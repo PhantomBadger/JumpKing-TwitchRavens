@@ -21,7 +21,7 @@ namespace PBJKModBase
         {
             try
             {
-                ArialUnicodeMS = JumpKing.Game1.instance.Content.Load<SpriteFont>("Mods/Resources/arial-unicode-ms");
+                ArialUnicodeMS = JumpKing.Game1.instance.Content.Load<SpriteFont>("Content/JKMods/Resources/arial-unicode-ms");
                 ArialUnicodeMS.DefaultCharacter = '#';
                 logger.Information($"Loaded Arial Unicode MS Fallback Font");
             }

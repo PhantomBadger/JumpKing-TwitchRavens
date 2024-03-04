@@ -144,7 +144,7 @@ namespace JumpKingModifiersMod.Visuals
                 Vector2 notificationPosition = JumpGame.GAME_RECT.Size.ToVector2();
                 notificationPosition.X -= InitialPositionXPadding;
                 var notificationEntity = new UITextEntity(modEntityManager, notificationPosition, notificationText, Color.White, 
-                    UIEntityAnchor.BottomRight, JKContentManager.Font.MenuFontSmall, zOrder: 2);
+                    UIEntityAnchor.BottomRight, Game1.instance.contentManager.font.MenuFontSmall, zOrder: 2);
                 float ySize = notificationEntity.Size.Y;
 
                 // Move up all the other notifications

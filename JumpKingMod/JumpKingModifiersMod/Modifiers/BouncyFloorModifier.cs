@@ -33,7 +33,7 @@ namespace JumpKingModifiersMod.Modifiers
         private int bounceCounter;
         private bool isInAir;
         private PlayerState previousPlayerState;
-        private ConcurrentQueue<JumpState> jumpsToProcess;
+        private ConcurrentQueue<PatchedJumpState> jumpsToProcess;
 
         private const float BounceJumpModifier = 0.25f;
         private const int MaxNumberOfBounces = 1;
@@ -60,7 +60,7 @@ namespace JumpKingModifiersMod.Modifiers
             bounceCounter = MaxNumberOfBounces;
             isInAir = false;
             previousPlayerState = null;
-            jumpsToProcess = new ConcurrentQueue<JumpState>();
+            jumpsToProcess = new ConcurrentQueue<PatchedJumpState>();
 
             modifierUpdatingEntity.RegisterModifier(this);
         }
@@ -126,7 +126,7 @@ namespace JumpKingModifiersMod.Modifiers
         /// <summary>
         /// Called when the player jumps
         /// </summary>
-        private void OnPlayerJumped(JumpState jumpState)
+        private void OnPlayerJumped(PatchedJumpState jumpState)
         {
             if (!modifierActive)
             {
@@ -187,7 +187,7 @@ namespace JumpKingModifiersMod.Modifiers
 
                 // If we just landed, trigger a jump
                 if (justLanded && previousPlayerState != null &&
-                    jumpsToProcess.TryDequeue(out JumpState previousJumpState))
+                    jumpsToProcess.TryDequeue(out PatchedJumpState previousJumpState))
                 {
                     // Update the intensity by our modifier
                     float newIntensity = previousJumpState.Intensity * BounceJumpModifier;
