@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using HarmonyLib;
+﻿using HarmonyLib;
+using JumpKing.Mods;
 using JumpKingRavensMod.API;
 using JumpKingRavensMod.Entities;
 using JumpKingRavensMod.Entities.Raven;
 using JumpKingRavensMod.Entities.Raven.Triggers;
 using JumpKingRavensMod.Patching;
 using JumpKingRavensMod.Settings;
-using PBJKModBase.YouTube;
 using Logging;
 using Logging.API;
 using PBJKModBase.API;
 using PBJKModBase.Entities;
 using PBJKModBase.Patching;
+using PBJKModBase.Streaming.Settings;
 using PBJKModBase.Twitch;
 using PBJKModBase.Twitch.Settings;
-using Settings;
-using TwitchLib.Client;
-using JumpKing.Mods;
-using PBJKModBase.Streaming.Settings;
-using PBJKModBase.YouTube.Settings;
+using PBJKModBase.YouTube;
 using PBJKModBase.YouTube.API;
+using PBJKModBase.YouTube.Settings;
+using Settings;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using TwitchLib.Client;
 
 namespace JumpKingRavensMod
 {
@@ -150,7 +149,7 @@ namespace JumpKingRavensMod
                                     var filter = new ExcludedTermListFilter(Logger);
 
                                     // Easter Egg
-                                    string twitchName = ravenModSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                                    string twitchName = twitchSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                                     if (easterEggEnabled &&
                                         TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                     {
@@ -177,7 +176,7 @@ namespace JumpKingRavensMod
                                     var filter = new ExcludedTermListFilter(Logger);
 
                                     // Easter Egg
-                                    string twitchName = ravenModSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
+                                    string twitchName = twitchSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                                     if (easterEggEnabled &&
                                         TryGetAndStartEasterEggTrigger(twitchName, out FakeMessageEasterEggMessengerRavenTrigger easterEggTrigger))
                                     {
