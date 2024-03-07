@@ -38,6 +38,9 @@
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Jump King\JumpKing.exe</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Jump King\MonoGame.Framework.dll</HintPath>
       <Private>False</Private>
@@ -50,18 +53,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="TwitchLib.Client, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Client.3.2.3\lib\netstandard2.0\TwitchLib.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="TwitchLib.Client.Enums, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Client.Enums.3.2.3\lib\netstandard2.0\TwitchLib.Client.Enums.dll</HintPath>
-    </Reference>
-    <Reference Include="TwitchLib.Client.Models, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Client.Models.3.2.3\lib\netstandard2.0\TwitchLib.Client.Models.dll</HintPath>
-    </Reference>
-    <Reference Include="TwitchLib.Communication, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Communication.1.0.3\lib\netstandard2.0\TwitchLib.Communication.dll</HintPath>
-    </Reference>
     <Reference Include="Google.Apis, Version=1.55.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.1.55.0\lib\net45\Google.Apis.dll</HintPath>
     </Reference>
@@ -79,6 +70,18 @@
     </Reference>
     <Reference Include="Google.Apis.YouTube.v3, Version=1.55.0.2449, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.YouTube.v3.1.55.0.2449\lib\net45\Google.Apis.YouTube.v3.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TwitchLib.Client.3.2.3\lib\netstandard2.0\TwitchLib.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client.Enums, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TwitchLib.Client.Enums.3.2.3\lib\netstandard2.0\TwitchLib.Client.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client.Models, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TwitchLib.Client.Models.3.2.3\lib\netstandard2.0\TwitchLib.Client.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Communication, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TwitchLib.Communication.1.0.3\lib\netstandard2.0\TwitchLib.Communication.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -184,6 +187,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\bloodsplat.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
