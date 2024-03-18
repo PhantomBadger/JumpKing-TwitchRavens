@@ -92,11 +92,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj">
-      <Project>{9544190f-5c10-4c4b-8eb7-ffd8bc3de76c}</Project>
-      <Name>JumpKingModifiersMod.Settings</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\JumpKingRavensMod.Settings\JumpKingRavensMod.Settings.csproj">
       <Project>{5d82fbd1-fc33-4116-9355-3d9aa6a17ccc}</Project>
       <Name>JumpKingRavensMod.Settings</Name>

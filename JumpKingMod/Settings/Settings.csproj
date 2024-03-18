@@ -33,7 +33,7 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Jump King\MonoGame.Framework.dll</HintPath>
-	  <Private>false</Private>
+      <Private>false</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -48,7 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JumpKingModInstallerSettingsContext.cs" />
     <Compile Include="UserSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

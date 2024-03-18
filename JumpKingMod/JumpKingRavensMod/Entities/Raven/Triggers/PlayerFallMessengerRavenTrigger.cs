@@ -23,7 +23,7 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
 
         private readonly IInsultGetter insultGetter;
         private readonly UserSettings userSettings;
-        private readonly int spawnCount;
+        private int spawnCount;
 
         private static PlayerFallMessengerRavenTrigger instance;
 
@@ -36,9 +36,15 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
             this.insultGetter = insultGetter ?? throw new ArgumentNullException(nameof(insultGetter));
             this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
 
-            spawnCount = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, 3);
+            ReadSettings();
+            userSettings.OnSettingsInvalidated += (o, e) => ReadSettings();
 
             instance = this;
+        }
+
+        private void ReadSettings()
+        {
+            spawnCount = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenInsultSpawnCountKey, 3);
         }
 
         /// <summary>

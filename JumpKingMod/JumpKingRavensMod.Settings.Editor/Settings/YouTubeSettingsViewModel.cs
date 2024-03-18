@@ -34,6 +34,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     youTubeAccountName = value;
                     RaisePropertyChanged(nameof(YouTubeAccountName));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -54,6 +59,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     youTubeAPIKey = value;
                     RaisePropertyChanged(nameof(YouTubeAPIKey));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -108,13 +118,18 @@ namespace JumpKingRavensMod.Settings.Editor
             }
         }
 
+        private readonly Action restartSettingChanged;
+
+        private bool initialSettingsLoadComplete = false;
+
         /// <summary>
         /// Ctor for creating a <see cref="YouTubeSettingsViewModel"/>
         /// </summary>
         /// <exception cref="ArgumentNullException"></exception>
-        public YouTubeSettingsViewModel(ILogger logger)
+        public YouTubeSettingsViewModel(ILogger logger, Action restartSettingChanged)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.restartSettingChanged = restartSettingChanged ?? throw new ArgumentNullException(nameof(restartSettingChanged));
         }
 
         /// <summary>
@@ -140,6 +155,8 @@ namespace JumpKingRavensMod.Settings.Editor
                 YouTubeAccountName = YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
                 YouTubeAPIKey = YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, string.Empty);
                 ConnectKey = YouTubeBaseSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, Keys.F9);
+
+                initialSettingsLoadComplete = true;
                 return true;
             }
             else

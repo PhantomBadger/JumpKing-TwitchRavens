@@ -65,6 +65,11 @@ namespace JumpKingRavensMod.Settings.Editor
                     ravenEnabled = value;
                     RaisePropertyChanged(nameof(RavenEnabled));
                     RaisePropertyChanged(nameof(GunSettingsVisible));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -145,6 +150,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     ravenTriggerType = value;
                     RaisePropertyChanged(nameof(RavenTriggerType));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -165,6 +175,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     youTubeRavenTriggerType = value;
                     RaisePropertyChanged(nameof(YouTubeRavenTriggerType));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -276,6 +291,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     excludedTerms = value;
                     RaisePropertyChanged(nameof(ExcludedTerms));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -336,6 +356,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     ravenInsults = value;
                     RaisePropertyChanged(nameof(RavenInsults));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -432,6 +457,11 @@ namespace JumpKingRavensMod.Settings.Editor
                     gunEnabled = value;
                     RaisePropertyChanged(nameof(GunEnabled));
                     RaisePropertyChanged(nameof(GunSettingsVisible));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -501,6 +531,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     freeFlyingEnabled = value;
                     RaisePropertyChanged(nameof(FreeFlyingEnabled));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -555,17 +590,24 @@ namespace JumpKingRavensMod.Settings.Editor
             }
         }
 
+        private readonly Action restartSettingChanged;
+
+        private bool initialSettingsLoadComplete = false;
+
         /// <summary>
         /// Constructor for creating a <see cref="RavensSettingsViewModel"/>
         /// </summary>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to use for logging</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public RavensSettingsViewModel(ILogger logger)
+        public RavensSettingsViewModel(ILogger logger, Action restartSettingChanged)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.restartSettingChanged = restartSettingChanged;
 
             ExcludedTerms = new ObservableCollection<string>();
             RavenInsults = new ObservableCollection<string>();
+
+            InitialiseCommands();
         }
 
         /// <summary>
@@ -573,17 +615,39 @@ namespace JumpKingRavensMod.Settings.Editor
         /// </summary>
         public void InitialiseCommands()
         {
-            AddExcludedTermCommand = new DelegateCommand(_ => { AddToCollection(ExcludedTerms, CandidateExcludedItem); });
+            AddExcludedTermCommand = new DelegateCommand(_ => 
+            { 
+                AddToCollection(ExcludedTerms, CandidateExcludedItem);
+                if (initialSettingsLoadComplete)
+                {
+                    restartSettingChanged?.Invoke();
+                }
+            });
             RemoveExcludedTermCommand = new DelegateCommand(_ =>
             {
                 RemoveFromCollection(ExcludedTerms, SelectedExcludedItemIndex);
                 SelectedExcludedItemIndex = 0;
+                if (initialSettingsLoadComplete)
+                {
+                    restartSettingChanged?.Invoke();
+                }
             });
-            AddRavenInsultCommand = new DelegateCommand(_ => { AddToCollection(RavenInsults, CandidateRavenInsult); });
+            AddRavenInsultCommand = new DelegateCommand(_ => 
+            { 
+                AddToCollection(RavenInsults, CandidateRavenInsult);
+                if (initialSettingsLoadComplete)
+                {
+                    restartSettingChanged?.Invoke();
+                }
+            });
             RemoveRavenInsultCommand = new DelegateCommand(_ =>
             {
                 RemoveFromCollection(RavenInsults, SelectedRavenInsultIndex);
                 SelectedRavenInsultIndex = 0;
+                if (initialSettingsLoadComplete)
+                {
+                    restartSettingChanged?.Invoke();
+                }
             });
         }
 
@@ -723,6 +787,8 @@ namespace JumpKingRavensMod.Settings.Editor
                 return false;
             }
             RavenInsults = new ObservableCollection<string>(ravenInsultsFileContent);
+
+            initialSettingsLoadComplete = true;
             return true;
         }
 

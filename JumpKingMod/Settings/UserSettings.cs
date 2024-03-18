@@ -1,6 +1,7 @@
 ﻿using Logging.API;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -16,10 +17,12 @@ namespace Settings
     public class UserSettings
     {
         private readonly string settingsFilePath;
-        private readonly Dictionary<string, string> defaultSettings;
+        private readonly ConcurrentDictionary<string, string> defaultSettings;
         private readonly ILogger logger;
 
-        private Dictionary<string, string> currentSettings;
+        private ConcurrentDictionary<string, string> currentSettings;
+
+        public event EventHandler OnSettingsInvalidated;
 
         /// <summary>
         /// Ctor for creating a <see cref="UserSettings"/>
@@ -27,12 +30,12 @@ namespace Settings
         /// <param name="settingsFilePath">The file path to store and read the settings from. Can be a partial path or a full path</param>
         /// <param name="defaultSettings">The default settings to populate the file with in the event of a fatal event</param>
         /// <param name="logger">An <see cref="ILogger"/> implementation to use for logging</param>
-        public UserSettings(string settingsFilePath, Dictionary<string, string> defaultSettings, ILogger logger)
+        public UserSettings(string settingsFilePath, ConcurrentDictionary<string, string> defaultSettings, ILogger logger)
         {
             this.settingsFilePath = settingsFilePath ?? throw new ArgumentNullException(nameof(settingsFilePath));
             this.defaultSettings = defaultSettings ?? throw new ArgumentNullException(nameof(defaultSettings));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            currentSettings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            currentSettings = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             if (File.Exists(settingsFilePath))
             {
@@ -170,15 +173,26 @@ namespace Settings
         /// <param name="value">The value to use for the setting</param>
         public void SetOrCreateSetting(string key, string value)
         {
-            if (currentSettings.ContainsKey(key))
-            {
-                currentSettings[key] = value;
-            }
-            else
-            {
-                currentSettings.Add(key, value);
-            }
+            currentSettings[key] = value;
             SaveSettings();
+        }
+
+        /// <summary>
+        /// Called when the settings on disk have been invalidated, prompts a reload and calls <see cref="OnSettingsInvalidated"/>
+        /// </summary>
+        public void OnDiskSettingsInvalidated(object sender, EventArgs args)
+        {
+            try
+            {
+                ConcurrentDictionary<string, string> newSettings = LoadSettingsInternal();
+                currentSettings = newSettings;
+
+                OnSettingsInvalidated?.Invoke(this, args);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Encountered Exception when reloading settings: {e.ToString()}\nSettings have not been updated!");
+            }
         }
 
         /// <summary>
@@ -189,6 +203,7 @@ namespace Settings
             try
             {
                 string jsonString = JsonConvert.SerializeObject(currentSettings);
+                Directory.CreateDirectory(Path.GetDirectoryName(settingsFilePath));
                 File.WriteAllText(settingsFilePath, jsonString);
             }
             catch (Exception e)
@@ -205,13 +220,19 @@ namespace Settings
             try
             {
                 string jsonString = File.ReadAllText(settingsFilePath);
-                currentSettings = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonString);
+                currentSettings = JsonConvert.DeserializeObject<ConcurrentDictionary<string, string>>(jsonString);
             }
             catch (Exception e)
             {
                 logger.Error($"Encountered Exception when loading settings: {e.ToString()}\nSetting them to the defaults instead");
                 currentSettings = defaultSettings;
             }
+        }
+
+        private ConcurrentDictionary<string, string> LoadSettingsInternal()
+        {
+            string jsonString = File.ReadAllText(settingsFilePath);
+            return JsonConvert.DeserializeObject<ConcurrentDictionary<string, string>>(jsonString);
         }
     }
 }

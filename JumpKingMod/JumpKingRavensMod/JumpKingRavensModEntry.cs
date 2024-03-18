@@ -85,6 +85,15 @@ namespace JumpKingRavensMod
 
                 // YouTube Chat Client
                 youtubeChatClientFactory = new YouTubeChatClientFactory(youtubeSettings, Logger);
+
+                // Add settings menu
+                SettingsMenuManualPatch settingsManualPatch = new SettingsMenuManualPatch(Logger);
+                settingsManualPatch.SetUpManualPatch(harmony);
+
+                SettingsMenuManualPatch.OnSettingsChanged += ravenModSettings.OnDiskSettingsInvalidated;
+                SettingsMenuManualPatch.OnSettingsChanged += streamingSettings.OnDiskSettingsInvalidated;
+                SettingsMenuManualPatch.OnSettingsChanged += twitchSettings.OnDiskSettingsInvalidated;
+                SettingsMenuManualPatch.OnSettingsChanged += youtubeSettings.OnDiskSettingsInvalidated;
             }
             catch (Exception e)
             {
@@ -159,7 +168,7 @@ namespace JumpKingRavensMod
                                     TwitchClient client = twitchClientFactory.GetTwitchClient();
                                     if (client != null)
                                     {
-                                        var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), ravenModSettings, filter, Logger);
+                                        var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), filter, Logger);
                                         ravenTriggers.Add(chatTrigger);
                                     }
                                     else

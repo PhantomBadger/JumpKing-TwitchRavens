@@ -29,7 +29,6 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
 
         private readonly ILogger logger;
         private readonly IExcludedTermFilter excludedTermFilter;
-        private readonly UserSettings userSettings;
         private readonly BlockingCollection<OnMessageReceivedArgs> relayRequestQueue;
         private readonly TwitchClient twitchClient;
         private readonly Thread processingThread;
@@ -43,12 +42,11 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
         /// Constructor for creating a <see cref="TwitchChatMessengerRavenTrigger"/>
         /// </summary>
         /// <param name="logger">An <see cref="ILogger"/> implementation to use for logging</param>
-        public TwitchChatMessengerRavenTrigger(TwitchClient twitchClient, UserSettings userSettings, IExcludedTermFilter excludedTermFilter, ILogger logger)
+        public TwitchChatMessengerRavenTrigger(TwitchClient twitchClient, IExcludedTermFilter excludedTermFilter, ILogger logger)
         {
             // Keep track of the logger
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.excludedTermFilter = excludedTermFilter ?? throw new ArgumentNullException(nameof(excludedTermFilter));
-            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.relayRequestQueue = new BlockingCollection<OnMessageReceivedArgs>();
             this.twitchClient = twitchClient ?? throw new ArgumentNullException(nameof(twitchClient));
             twitchClient.OnMessageReceived += OnMessageReceived;

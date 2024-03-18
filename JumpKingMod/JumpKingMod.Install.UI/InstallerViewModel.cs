@@ -1,5 +1,4 @@
 ﻿using JumpKingRavensMod.Settings;
-using JumpKingModifiersMod.Settings;
 using Logging;
 using Logging.API;
 using Microsoft.WindowsAPICodePack.Dialogs;

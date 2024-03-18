@@ -8,7 +8,6 @@
         xmlns:Input="clr-namespace:Microsoft.Xna.Framework.Input;assembly=MonoGame.Framework"
         xmlns:local="clr-namespace:JumpKingRavensMod.Settings.Editor"
         xmlns:ravenSettings="clr-namespace:JumpKingRavensMod.Settings;assembly=JumpKingRavensMod.Settings"
-        xmlns:modifierSettings="clr-namespace:JumpKingModifiersMod.Settings;assembly=JumpKingModifiersMod.Settings"
         mc:Ignorable="d"
         Title="Jump King Chat Ravens Settings Editor" SizeToContent="WidthAndHeight" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
@@ -72,7 +71,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <ToggleButton Grid.Row="0" Content="Streaming Platform:" Margin="2,2,10,2" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Style="{StaticResource ToggleFlipSwitchStyle}" IsChecked="{Binding StreamingSettings.IsStreamingOnTwitch, Mode=TwoWay}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Unchecked"/>
-                <TabControl Grid.Row="1" x:Name="tabControl" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Padding="5" SelectedIndex="0">
+                <TabControl Grid.Row="1" x:Name="tabControl" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Padding="5" SelectedIndex="{Binding StreamingSettings.SelectedIndex}">
                     <TabItem x:Name="tabItemTwitch" Header="Twitch" Visibility="{Binding StreamingSettings.IsStreamingOnTwitch, Converter={StaticResource boolToVisibilityConverter}}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -534,7 +533,14 @@
                 </TabControl>
                 <!-- Update Settings Button-->
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Apply Settings" MaxWidth="100" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding UpdateSettingsCommand}"/>
+                    <Label FontStyle="Italic" FontWeight="Bold" Foreground="DarkRed" FontSize="12" Visibility="{Binding ShowRestartMessage, Converter={StaticResource boolToVisibilityConverter}}">
+                        <TextBlock>
+                            You must exit to the main menu for
+                            <LineBreak/>
+                            change to work!
+                        </TextBlock>
+                    </Label>
+                    <Button Content="Apply Settings" Padding="0,8" MaxWidth="100" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding UpdateSettingsCommand}" CommandParameter="{Binding ElementName=SettingsWindow}"/>
                 </StackPanel>
             </Grid>
         </GroupBox>

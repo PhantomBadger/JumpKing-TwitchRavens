@@ -128,10 +128,6 @@
       <Project>{d7318c86-51ea-40a6-a541-ac5d0d46d95a}</Project>
       <Name>JumpKingMod.Install</Name>
     </ProjectReference>
-    <ProjectReference Include="..\JumpKingModifiersMod.Settings\JumpKingModifiersMod.Settings.csproj">
-      <Project>{9544190F-5C10-4C4B-8EB7-FFD8BC3DE76C}</Project>
-      <Name>JumpKingModifiersMod.Settings</Name>
-    </ProjectReference>
     <ProjectReference Include="..\JumpKingRavensMod.Settings\JumpKingRavensMod.Settings.csproj">
       <Project>{5d82fbd1-fc33-4116-9355-3d9aa6a17ccc}</Project>
       <Name>JumpKingRavensMod.Settings</Name>

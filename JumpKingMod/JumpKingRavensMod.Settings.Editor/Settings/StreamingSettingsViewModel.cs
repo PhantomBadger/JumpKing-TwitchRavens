@@ -23,6 +23,23 @@ namespace JumpKingRavensMod.Settings.Editor
 
         private readonly ILogger logger;
 
+        public int SelectedIndex
+        {
+            get
+            {
+                return selectedIndex;
+            }
+            set
+            {
+                if (selectedIndex != value)
+                {
+                    selectedIndex = value;
+                    RaisePropertyChanged(nameof(SelectedIndex));
+                }
+            }
+        }
+        private int selectedIndex;
+
         /// <summary>
         /// What streaming platform is selected for use with the Mod
         /// </summary>
@@ -40,6 +57,20 @@ namespace JumpKingRavensMod.Settings.Editor
                     RaisePropertyChanged(nameof(SelectedStreamingPlatform));
                     RaisePropertyChanged(nameof(IsStreamingOnTwitch));
                     RaisePropertyChanged(nameof(IsStreamingOnYouTube));
+
+                    if (IsStreamingOnTwitch && SelectedIndex == 1)
+                    {
+                        SelectedIndex = 0;
+                    }
+                    else if (IsStreamingOnYouTube && SelectedIndex == 0)
+                    {
+                        SelectedIndex = 1;
+                    }
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -105,14 +136,19 @@ namespace JumpKingRavensMod.Settings.Editor
             }
         }
 
+        private readonly Action restartSettingChanged;
+
+        private bool initialSettingsLoadComplete = false;
+
         /// <summary>
         /// Constructor for creating a <see cref="StreamingSettingsViewModel"/>
         /// </summary>
         /// <param name="logger">An implementation of <see cref="ILogger"/> to use for logging</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public StreamingSettingsViewModel(ILogger logger)
+        public StreamingSettingsViewModel(ILogger logger, Action restartSettingChanged)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.restartSettingChanged = restartSettingChanged ?? throw new ArgumentNullException(nameof(restartSettingChanged));
         }
 
         /// <inheritdoc/>
@@ -141,6 +177,7 @@ namespace JumpKingRavensMod.Settings.Editor
                 return false;
             }
 
+            initialSettingsLoadComplete = true;
             return true;
         }
 

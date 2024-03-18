@@ -28,7 +28,7 @@ namespace JumpKingRavensMod.Entities
         private readonly MessengerRavenSpawningEntity spawningEntity;
         private readonly ModEntityManager modEntityManager;
         private readonly UserSettings userSettings;
-        private readonly Keys toggleGunKey;
+        private Keys toggleGunKey;
         private readonly ILogger logger;
         private readonly Sprite scopeSprite;
         private readonly MethodInfo getPrefsMethodInfo;
@@ -63,7 +63,10 @@ namespace JumpKingRavensMod.Entities
 
             isGunActive = false;
             gunToggleCooldown = false;
-            toggleGunKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunToggleKeyKey, Keys.F8);
+
+            ReadSettings();
+            userSettings.OnSettingsInvalidated += (o, e) => ReadSettings();
+
             shootCooldownCounter = CooldownMaxInSeconds;
 
             scopeSprite = Sprite.CreateSpriteWithCenter(RavensModContentManager.ScopeTexture,
@@ -84,6 +87,11 @@ namespace JumpKingRavensMod.Entities
             {
                 logger.Error(e.ToString());
             }
+        }
+
+        private void ReadSettings()
+        {
+            toggleGunKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.GunToggleKeyKey, Keys.F8);
         }
 
         /// <summary>

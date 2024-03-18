@@ -36,10 +36,29 @@ namespace JumpKingRavensMod.Settings.Editor
         /// </summary>
         public StreamingSettingsViewModel StreamingSettings { get; set; }
 
+        /// <summary>
+        /// If enabled, a message will be shown saying that a restart if required for a setting to be changed
+        /// </summary>
+        public bool ShowRestartMessage
+        {
+            get
+            {
+                return showRestartMessage;
+            }
+            set
+            {
+                if (showRestartMessage != value)
+                {
+                    showRestartMessage = value;
+                    RaisePropertyChanged(nameof(ShowRestartMessage));
+                }
+            }
+        }
+        private bool showRestartMessage;
+
         public ICommand UpdateSettingsCommand { get; private set; }
 
         private readonly ILogger logger;
-        private readonly UserSettings installerSettings;
         private readonly List<ISettingsViewModel> registeredSettings;
         private readonly string gameDirectory;
 
@@ -47,7 +66,6 @@ namespace JumpKingRavensMod.Settings.Editor
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.gameDirectory = gameDirectory ?? throw new ArgumentNullException(nameof(gameDirectory));
-            installerSettings = new UserSettings(JumpKingModInstallerSettingsContext.SettingsFileName, JumpKingModInstallerSettingsContext.GetDefaultSettings(), logger);
             registeredSettings = new List<ISettingsViewModel>();
 
             UpdateSettingsCommand = new DelegateCommand((window) =>
@@ -59,10 +77,10 @@ namespace JumpKingRavensMod.Settings.Editor
                 }
             });
 
-            RavensSettings = new RavensSettingsViewModel(logger);
-            TwitchSettings = new TwitchSettingsViewModel(logger);
-            YouTubeSettings = new YouTubeSettingsViewModel(logger);
-            StreamingSettings = new StreamingSettingsViewModel(logger);
+            RavensSettings = new RavensSettingsViewModel(logger, () => ShowRestartMessage = true);
+            TwitchSettings = new TwitchSettingsViewModel(logger, () => ShowRestartMessage = true);
+            YouTubeSettings = new YouTubeSettingsViewModel(logger, () => ShowRestartMessage = true);
+            StreamingSettings = new StreamingSettingsViewModel(logger, () => ShowRestartMessage = true);
 
             registeredSettings.Add(RavensSettings);
             registeredSettings.Add(TwitchSettings);

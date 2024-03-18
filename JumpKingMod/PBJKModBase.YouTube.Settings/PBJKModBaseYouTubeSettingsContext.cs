@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,21 +10,20 @@ namespace PBJKModBase.YouTube.Settings
 {
     public abstract class PBJKModBaseYouTubeSettingsContext
     {
-        public const string SettingsFileName = "PBJKModBase.YouTube.settings";
+        public const string SettingsFileName = "PBJK/PBJKModBase.YouTube.settings";
 
         // YouTube
         public const string YouTubeApiKeyKey = "YouTubeAPIKey";
         public const string YouTubeChannelNameKey = "YouTubeChannelName";
         public const string YouTubeConnectKeyKey = "YouTubeConnectKey";
 
-        public static Dictionary<string, string> GetDefaultSettings()
+        public static ConcurrentDictionary<string, string> GetDefaultSettings()
         {
-            return new Dictionary<string, string>()
-            {
-                { YouTubeApiKeyKey, "" },
-                { YouTubeChannelNameKey, "" },
-                { YouTubeConnectKeyKey, Keys.F9.ToString() },
-            };
+            var dict = new ConcurrentDictionary<string, string>();
+            dict[YouTubeApiKeyKey] = "";
+            dict[YouTubeChannelNameKey] = "";
+            dict[YouTubeConnectKeyKey] = Keys.F9.ToString();
+            return dict;
         }
     }
 }

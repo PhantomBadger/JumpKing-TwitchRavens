@@ -1,13 +1,14 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace JumpKingRavensMod.Settings
 {
     public abstract class JumpKingRavensModSettingsContext
     {
-        public const string SettingsFileName = "JumpKingMod.settings";
-        public const string ExcludedTermFilePath = "Content/Mods/ExcludedTermList.txt";
-        public const string RavenInsultsFilePath = "Content/Mods/RavenInsultsList.txt";
+        public const string SettingsFileName = "PBJK/ChatRavens.settings";
+        public const string ExcludedTermFilePath = "PBJK/ExcludedTermList.txt";
+        public const string RavenInsultsFilePath = "PBJK/RavenInsultsList.txt";
         public const char CommentCharacter = '#';
 
         // YouTube
@@ -38,40 +39,41 @@ namespace JumpKingRavensMod.Settings
         public const string GunEnabledKey = "GunEnabled";
         public const string GunToggleKeyKey = "GunToggleKey";
 
-        public static Dictionary<string, string> GetDefaultSettings()
+        public static ConcurrentDictionary<string, string> GetDefaultSettings()
         {
-;           return new Dictionary<string, string>()
-            {
-                // YouTube
-                { YouTubeRavenTriggerTypeKey, YouTubeRavenTriggerTypes.ChatMessage.ToString() },
+;           var dict = new ConcurrentDictionary<string, string>();
+            // YouTube
+            dict[YouTubeRavenTriggerTypeKey] = YouTubeRavenTriggerTypes.ChatMessage.ToString();
 
-                // Twitch Chat
-                { RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage.ToString() },
+            // Twitch Chat
+            dict[RavenTriggerTypeKey] = TwitchRavenTriggerTypes.ChatMessage.ToString();
 
-                // Chat Display
-                { TwitchRelayEnabledKey, false.ToString() },
+            // Chat Display
+            dict[TwitchRelayEnabledKey] = false.ToString();
 
-                // Ravens
-                // General
-                { RavensEnabledKey, true.ToString() },
-                { RavensClearDebugKeyKey, Keys.F2.ToString() },
-                { RavensToggleDebugKeyKey, Keys.F3.ToString() },
-                { RavensSubModeToggleKeyKey, Keys.F4.ToString() },
-                { RavensMaxCountKey, 5.ToString() },
-                // Message
-                // Channel Point
-                { RavenChannelPointRewardIDKey, "" },
-                // Insult
-                { RavenInsultSpawnCountKey, 3.ToString() },
-                // Easter Egg
-                { RavenEasterEggEnabledKey, true.ToString() },
-                // Free Fly
-                { FreeFlyEnabledKey, false.ToString() },
-                { FreeFlyToggleKeyKey, Keys.F1.ToString() },
-                // Gun
-                { GunEnabledKey, false.ToString() },
-                { GunToggleKeyKey, Keys.F8.ToString() }
-            };
+            // Ravens
+            // General
+            dict[RavensEnabledKey] = true.ToString();
+            dict[RavensClearDebugKeyKey] = Keys.F2.ToString();
+            dict[RavensToggleDebugKeyKey] = Keys.F3.ToString();
+            dict[RavensSubModeToggleKeyKey] = Keys.F4.ToString();
+            dict[RavensMaxCountKey] = 5.ToString();
+
+            // Message
+            // Channel Point
+            dict[RavenChannelPointRewardIDKey] = "";
+            // Insult
+            dict[RavenInsultSpawnCountKey] = 3.ToString();
+            // Easter Egg
+            dict[RavenEasterEggEnabledKey] = true.ToString();
+            // Free Fly
+            dict[FreeFlyEnabledKey] = false.ToString();
+            dict[FreeFlyToggleKeyKey] = Keys.F1.ToString();
+            // Gun
+            dict[GunEnabledKey] = false.ToString();
+            dict[GunToggleKeyKey] = Keys.F8.ToString();
+
+            return dict;
         }
 
         public static string[] GetDefaultInsults()

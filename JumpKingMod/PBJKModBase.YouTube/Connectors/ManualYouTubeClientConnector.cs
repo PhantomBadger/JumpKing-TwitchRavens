@@ -33,6 +33,7 @@ namespace PBJKModBase.YouTube
 
         private readonly YouTubeChatClient youtubeClient;
         private readonly ModEntityManager modEntityManager;
+        private readonly UserSettings userSettings;
         private readonly ILogger logger;
 
         private ManualConnectorStates manualConnectorState;
@@ -49,6 +50,7 @@ namespace PBJKModBase.YouTube
         {
             this.youtubeClient = youtubeClient ?? throw new ArgumentNullException(nameof(youtubeClient));
             this.modEntityManager = modEntityManager ?? throw new ArgumentNullException(nameof(modEntityManager));
+            this.userSettings = userSettings ?? throw new ArgumentNullException(nameof(userSettings));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             connectionRequests = new BlockingCollection<ManualConnectionRequest>();
 
@@ -56,7 +58,9 @@ namespace PBJKModBase.YouTube
             youtubeClient.OnDisconnected += OnYouTubeClientDisconnected;
 
             // Prime the UI Text
-            connectKey = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, Keys.F9);
+            ReadSettings();
+            userSettings.OnSettingsInvalidated += (o, e) => ReadSettings();
+
             connectionStatusText = new UITextEntity(modEntityManager, new Vector2(472, 0), string.Empty, Color.Red,
                             UIEntityAnchor.TopRight, Game1.instance.contentManager.font.MenuFontSmall);
 
@@ -70,6 +74,11 @@ namespace PBJKModBase.YouTube
 
             // Add ourselves to the Mod Entity Manager
             modEntityManager.AddEntity(this, 0);
+        }
+
+        private void ReadSettings()
+        {
+            connectKey = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, Keys.F9);
         }
 
         /// <summary>

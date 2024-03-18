@@ -30,7 +30,7 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
         private readonly TwitchClient twitchClient;
         private readonly BlockingCollection<OnMessageReceivedArgs> relayRequestQueue;
         private readonly Thread processingThread;
-        private readonly string channelRewardID;
+        private string channelRewardID;
 
         /// <summary>
         /// Ctor for creating a <see cref="TwitchChannelPointMessengerRavenTrigger"/>
@@ -44,6 +44,18 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
             this.relayRequestQueue = new BlockingCollection<OnMessageReceivedArgs>();
 
             // Get the Channel Reward ID we intend to use
+            ReadSettings();
+            settings.OnSettingsInvalidated += (o, e) => ReadSettings();
+
+            twitchClient.OnMessageReceived += OnMessageReceived;
+
+            // Kick off the processing thread
+            processingThread = new Thread(ProcessRelayRequests);
+            processingThread.Start();
+        }
+
+        private void ReadSettings()
+        {
             channelRewardID = settings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
             if (string.IsNullOrWhiteSpace(channelRewardID))
             {
@@ -54,12 +66,6 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
             {
                 logger.Information($"Listening for Channel Point ID '{channelRewardID}' to spawn Ravens");
             }
-
-            twitchClient.OnMessageReceived += OnMessageReceived;
-
-            // Kick off the processing thread
-            processingThread = new Thread(ProcessRelayRequests);
-            processingThread.Start();
         }
 
         /// <summary>

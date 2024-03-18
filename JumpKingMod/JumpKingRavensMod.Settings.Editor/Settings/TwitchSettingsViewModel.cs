@@ -36,6 +36,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     twitchAccountName = value;
                     RaisePropertyChanged(nameof(TwitchAccountName));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -56,6 +61,11 @@ namespace JumpKingRavensMod.Settings.Editor
                 {
                     twitchOAuth = value;
                     RaisePropertyChanged(nameof(TwitchOAuth));
+
+                    if (initialSettingsLoadComplete)
+                    {
+                        restartSettingChanged?.Invoke();
+                    }
                 }
             }
         }
@@ -90,13 +100,18 @@ namespace JumpKingRavensMod.Settings.Editor
             }
         }
 
+        private readonly Action restartSettingChanged;
+
+        private bool initialSettingsLoadComplete = false;
+
         /// <summary>
         /// Ctor for creating a <see cref="TwitchSettingsViewModel"/>
         /// </summary>
         /// <exception cref="ArgumentNullException"></exception>
-        public TwitchSettingsViewModel(ILogger logger)
+        public TwitchSettingsViewModel(ILogger logger, Action restartSettingChanged)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.restartSettingChanged = restartSettingChanged ?? throw new ArgumentNullException(nameof(restartSettingChanged));
         }
 
         /// <summary>
@@ -122,6 +137,7 @@ namespace JumpKingRavensMod.Settings.Editor
                 TwitchAccountName = TwitchBaseSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.ChatListenerTwitchAccountNameKey, string.Empty);
                 TwitchOAuth = TwitchBaseSettings.GetSettingOrDefault(PBJKModBaseTwitchSettingsContext.OAuthKey, string.Empty);
 
+                initialSettingsLoadComplete = true;
                 return true;
             }
             else

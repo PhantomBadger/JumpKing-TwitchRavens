@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,16 +9,15 @@ namespace PBJKModBase.Streaming.Settings
 {
     public abstract class PBJKModBaseStreamingSettingsContext
     {
-        public const string SettingsFileName = "PBJKModBase.Streaming.settings";
+        public const string SettingsFileName = "PBJK/PBJKModBase.Streaming.settings";
 
         public const string SelectedStreamingPlatformKey = "SelectedStreamingPlatform";
 
-        public static Dictionary<string, string> GetDefaultSettings()
+        public static ConcurrentDictionary<string, string> GetDefaultSettings()
         {
-            return new Dictionary<string, string>()
-            {
-                { SelectedStreamingPlatformKey, AvailableStreamingPlatforms.Twitch.ToString() }
-            };
+            var dict = new ConcurrentDictionary<string, string>();
+            dict[SelectedStreamingPlatformKey] = AvailableStreamingPlatforms.Twitch.ToString();
+            return dict;
         }
     }
 }

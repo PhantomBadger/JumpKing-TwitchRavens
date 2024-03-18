@@ -30,10 +30,10 @@ namespace JumpKingRavensMod.Entities
         private readonly IRavenLandingPositionsCache ravenLandingPositionsCache;
         private readonly ConcurrentDictionary<MessengerRavenEntity, byte> messengerRavens;
         private readonly Random random;
-        private readonly int maxRavenCount;
-        private readonly Keys clearRavensKey;
-        private readonly Keys toggleRavenSpawningKey;
-        private readonly Keys toggleSubModeKey;
+        private int maxRavenCount;
+        private Keys clearRavensKey;
+        private Keys toggleRavenSpawningKey;
+        private Keys toggleSubModeKey;
 
         private bool clearRavensCooldown;
         private bool toggleRavensCooldown;
@@ -62,10 +62,9 @@ namespace JumpKingRavensMod.Entities
             isRavenSpawningActive = true;
             this.isGameLoopRunning = isGameLoopRunning;
 
-            maxRavenCount = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensMaxCountKey, 5);
-            clearRavensKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
-            toggleRavenSpawningKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
-            toggleSubModeKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
+            ReadSettings();
+            userSettings.OnSettingsInvalidated += (o, e) => ReadSettings();
+
             isInSubMode = false;
 
             for (int i = 0; i < messengerRavenTriggers.Count; i++)
@@ -73,6 +72,14 @@ namespace JumpKingRavensMod.Entities
                 messengerRavenTriggers[i].OnMessengerRavenTrigger += OnMessengerRavenTrigger;
             }
             modEntityManager.AddEntity(this, 0);
+        }
+
+        private void ReadSettings()
+        {
+            maxRavenCount = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensMaxCountKey, 5);
+            clearRavensKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensClearDebugKeyKey, Keys.F2);
+            toggleRavenSpawningKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensToggleDebugKeyKey, Keys.F3);
+            toggleSubModeKey = userSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavensSubModeToggleKeyKey, Keys.F4);
         }
 
         /// <summary>

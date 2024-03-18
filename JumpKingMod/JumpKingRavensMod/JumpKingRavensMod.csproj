@@ -97,6 +97,7 @@
     <Compile Include="API\IInsultGetter.cs" />
     <Compile Include="API\IMessengerRavenTrigger.cs" />
     <Compile Include="API\IRavenLandingPositionsCache.cs" />
+    <Compile Include="Button\DelegateButton.cs" />
     <Compile Include="Entities\GunEntity.cs" />
     <Compile Include="Entities\MessengerRavenSpawningEntity.cs" />
     <Compile Include="Entities\RavenDebugSpawningEntity.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Entities\Raven\Triggers\YouTubeChatMessengerRavenTrigger.cs" />
     <Compile Include="Entities\Raven\RavenLandingPositionsCache.cs" />
     <Compile Include="Entities\Raven\ExcludedTermListFilter.cs" />
+    <Compile Include="Patching\SettingsMenuManualPatch.cs" />
     <Compile Include="RavensModContentManager.cs" />
     <Compile Include="Patching\AchievementRegisterDisableManualPatch.cs" />
     <Compile Include="JumpKingRavensModEntry.cs" />
@@ -120,6 +122,10 @@
     <Compile Include="Entities\Raven\Triggers\TwitchChatMessengerRavenTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JumpKingRavensMod.Settings.Editor\JumpKingRavensMod.Settings.Editor.csproj">
+      <Project>{1738E970-BEAF-4B6F-A9BC-F9AF671BCAC8}</Project>
+      <Name>JumpKingRavensMod.Settings.Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JumpKingRavensMod.Settings\JumpKingRavensMod.Settings.csproj">
       <Project>{5d82fbd1-fc33-4116-9355-3d9aa6a17ccc}</Project>
       <Name>JumpKingRavensMod.Settings</Name>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,19 +9,18 @@ namespace PBJKModBase.Twitch.Settings
 {
     public abstract class PBJKModBaseTwitchSettingsContext
     {
-        public const string SettingsFileName = "PBJKModBase.Twitch.settings";
+        public const string SettingsFileName = "PBJK/PBJKModBase.Twitch.settings";
 
         // Twitch
         public const string ChatListenerTwitchAccountNameKey = "ChatListenerTwitchAccountName";
         public const string OAuthKey = "OAuth";
 
-        public static Dictionary<string, string> GetDefaultSettings()
+        public static ConcurrentDictionary<string, string> GetDefaultSettings()
         {
-            return new Dictionary<string, string>()
-            {
-                { ChatListenerTwitchAccountNameKey, "" },
-                { OAuthKey, "" },
-            };
+            var dict = new ConcurrentDictionary<string, string>();
+            dict[ChatListenerTwitchAccountNameKey] = "";
+            dict[OAuthKey] = "";
+            return dict;
         }
     }
 }
