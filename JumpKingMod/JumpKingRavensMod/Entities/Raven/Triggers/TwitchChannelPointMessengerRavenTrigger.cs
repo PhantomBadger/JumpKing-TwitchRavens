@@ -56,15 +56,19 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
 
         private void ReadSettings()
         {
-            channelRewardID = settings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
-            if (string.IsNullOrWhiteSpace(channelRewardID))
+            var triggerMode = settings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
+            if (triggerMode == TwitchRavenTriggerTypes.ChannelPointReward)
             {
-                logger.Error($"Unable to identify a valid Channel Reward ID for Raven Spawning from the Settings File!");
-                return;
-            }
-            else
-            {
-                logger.Information($"Listening for Channel Point ID '{channelRewardID}' to spawn Ravens");
+                channelRewardID = settings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenChannelPointRewardIDKey, string.Empty);
+                if (string.IsNullOrWhiteSpace(channelRewardID))
+                {
+                    logger.Error($"Unable to identify a valid Channel Reward ID for Raven Spawning from the Settings File!");
+                    return;
+                }
+                else
+                {
+                    logger.Information($"Listening for Channel Point ID '{channelRewardID}' to spawn Ravens");
+                }
             }
         }
 

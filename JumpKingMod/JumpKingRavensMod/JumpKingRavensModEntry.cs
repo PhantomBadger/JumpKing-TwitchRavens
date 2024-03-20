@@ -34,6 +34,7 @@ namespace JumpKingRavensMod
         private static IGameStateObserver gameStateObserver;
         private static TwitchClientFactory twitchClientFactory;
         private static YouTubeChatClientFactory youtubeChatClientFactory;
+        private static IYouTubeClientConnector clientController;
 
         private static UserSettings ravenModSettings;
         private static UserSettings streamingSettings;
@@ -147,6 +148,11 @@ namespace JumpKingRavensMod
                         // Read in the trigger type from the settings file, create the appropriate trigger, then create the spawning entity
                         // using that trigger
                         TwitchRavenTriggerTypes ravenTriggerType = ravenModSettings.GetSettingOrDefault(JumpKingRavensModSettingsContext.RavenTriggerTypeKey, TwitchRavenTriggerTypes.ChatMessage);
+                        TwitchClient client = null;
+                        if (ravenTriggerType != TwitchRavenTriggerTypes.Insult)
+                        {
+                            client = twitchClientFactory.GetTwitchClient(forceRemake: true);
+                        }
 
                         switch (ravenTriggerType)
                         {
@@ -165,7 +171,6 @@ namespace JumpKingRavensMod
                                         ravenTriggers.Add(easterEggTrigger);
                                     }
 
-                                    TwitchClient client = twitchClientFactory.GetTwitchClient();
                                     if (client != null)
                                     {
                                         var chatTrigger = new TwitchChatMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), filter, Logger);
@@ -192,7 +197,7 @@ namespace JumpKingRavensMod
                                         ravenTriggers.Add(easterEggTrigger);
                                     }
 
-                                    var channelPointTrigger = new TwitchChannelPointMessengerRavenTrigger(twitchClientFactory.GetTwitchClient(), ravenModSettings, filter, Logger);
+                                    var channelPointTrigger = new TwitchChannelPointMessengerRavenTrigger(client, ravenModSettings, filter, Logger);
                                     ravenTriggers.Add(channelPointTrigger);
                                     break;
                                 }
@@ -238,7 +243,7 @@ namespace JumpKingRavensMod
 
                                     // Create the YouTube Client and kick off the connection process
                                     YouTubeChatClient youtubeClient = youtubeChatClientFactory.GetYouTubeClient();
-                                    IYouTubeClientConnector clientController = new ManualYouTubeClientConnector(youtubeClient, ModEntityManager.Instance, youtubeSettings, Logger);
+                                    clientController = new ManualYouTubeClientConnector(youtubeClient, ModEntityManager.Instance, youtubeSettings, Logger);
                                     clientController.StartAttemptingConnection();
 
                                     // Create the Trigger
@@ -283,7 +288,9 @@ namespace JumpKingRavensMod
         [OnLevelEnd]
         public static void OnLevelEnd()
         {
-            // Your code here
+            twitchClientFactory?.ClearTwitchClient();
+            youtubeChatClientFactory?.ClearYouTubeClient();
+            clientController?.Dispose();
         }
 
         private static bool TryGetAndStartEasterEggTrigger(string channelId, out FakeMessageEasterEggMessengerRavenTrigger trigger)

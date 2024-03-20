@@ -24,6 +24,7 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
         private readonly IInsultGetter insultGetter;
         private readonly UserSettings userSettings;
         private int spawnCount;
+        private static bool isSetUp = false;
 
         private static PlayerFallMessengerRavenTrigger instance;
 
@@ -52,9 +53,13 @@ namespace JumpKingRavensMod.Entities.Raven.Triggers
         /// </summary>
         public void SetUpManualPatch(Harmony harmony)
         {
-            var onPlayerFallMethod = AccessTools.Method("JumpKing.MiscSystems.Achievements.AchievementManager:OnPlayerFall");
-            var postfixMethod = AccessTools.Method($"JumpKingRavensMod.Entities.Raven.Triggers.{this.GetType().Name}:PostfixTriggerMethod");
-            harmony.Patch(onPlayerFallMethod, postfix: new HarmonyMethod(postfixMethod));
+            if (!isSetUp)
+            {
+                var onPlayerFallMethod = AccessTools.Method("JumpKing.MiscSystems.Achievements.AchievementManager:OnPlayerFall");
+                var postfixMethod = AccessTools.Method($"JumpKingRavensMod.Entities.Raven.Triggers.{this.GetType().Name}:PostfixTriggerMethod");
+                harmony.Patch(onPlayerFallMethod, postfix: new HarmonyMethod(postfixMethod));
+                isSetUp = true;
+            }
         }
 
         /// <summary>

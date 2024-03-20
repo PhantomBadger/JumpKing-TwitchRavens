@@ -31,37 +31,61 @@ namespace PBJKModBase.YouTube
         /// <summary>
         /// Creates or gets a cached version of a <see cref="YouTubeChatClient"/>
         /// </summary>
-        public YouTubeChatClient GetYouTubeClient()
+        public YouTubeChatClient GetYouTubeClient(bool forceRemake = false)
         {
             if (youtubeClient != null)
             {
-                return youtubeClient;
+                if (forceRemake)
+                {
+                    ClearYouTubeClient();
+                }
+                else
+                {
+                    return youtubeClient;
+                }
             }
-            else
+
+            // Initialise the settings and attempt to load the api key
+            string channelId = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
+            string apiKey = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, string.Empty);
+
+            // Check if any of the data is bad, exit now
+            if (string.IsNullOrWhiteSpace(channelId))
             {
-                // Initialise the settings and attempt to load the api key
-                string channelId = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeChannelNameKey, string.Empty);
-                string apiKey = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeApiKeyKey, string.Empty);
+                logger.Error($"No valid YouTube ChannelName found in the {PBJKModBaseYouTubeSettingsContext.SettingsFileName} file!");
+                return null;
+            }
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                logger.Error($"Invalid API Key Provided!");
+                return null;
+            }
 
-                // Check if any of the data is bad, exit now
-                if (string.IsNullOrWhiteSpace(channelId))
+            channelId = channelId.Trim();
+            apiKey = apiKey.Trim();
+            logger.Information($"Setting up YouTube Chat Client for '{channelId}'");
+
+            youtubeClient = new YouTubeChatClient(channelId, apiKey, logger);
+
+            return youtubeClient;
+        }
+
+        public void ClearYouTubeClient()
+        {
+            if (youtubeClient != null)
+            {
+                try
                 {
-                    logger.Error($"No valid YouTube ChannelName found in the {PBJKModBaseYouTubeSettingsContext.SettingsFileName} file!");
-                    return null;
+                    youtubeClient.Disconnect();
                 }
-                if (string.IsNullOrWhiteSpace(apiKey))
+                catch (ObjectDisposedException de)
                 {
-                    logger.Error($"Invalid API Key Provided!");
-                    return null;
+                    // ignore
                 }
-
-                channelId = channelId.Trim();
-                apiKey = apiKey.Trim();
-                logger.Information($"Setting up YouTube Chat Client for '{channelId}'");
-
-                youtubeClient = new YouTubeChatClient(channelId, apiKey, logger);
-
-                return youtubeClient;
+                finally
+                {
+                    youtubeClient = null;
+                }
             }
         }
     }

@@ -31,7 +31,7 @@ namespace PBJKModBase.YouTube
             } 
         }
 
-        private readonly YouTubeChatClient youtubeClient;
+        private YouTubeChatClient youtubeClient;
         private readonly ModEntityManager modEntityManager;
         private readonly UserSettings userSettings;
         private readonly ILogger logger;
@@ -79,6 +79,11 @@ namespace PBJKModBase.YouTube
         private void ReadSettings()
         {
             connectKey = userSettings.GetSettingOrDefault(PBJKModBaseYouTubeSettingsContext.YouTubeConnectKeyKey, Keys.F9);
+
+            if (connectionStatusText != null)
+            {
+                ChangeState(manualConnectorState);
+            }
         }
 
         /// <summary>
@@ -279,6 +284,18 @@ namespace PBJKModBase.YouTube
                 }
             }
             manualConnectorState = newState;
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                youtubeClient = null;
+                modEntityManager.RemoveEntity(this);
+                connectionStatusText.Dispose();
+                connectionThread.Abort();
+            }
+            catch { }
         }
     }
 }

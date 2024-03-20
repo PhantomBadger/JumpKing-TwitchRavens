@@ -132,6 +132,11 @@ namespace JumpKingRavensMod.Entities.Raven
         /// </summary>
         public override void Update(float delta)
         {
+            if (landingPositionsCache == null)
+            {
+                return;
+            }
+
             switch (ravenLogicState)
             {
                 case RavenLogicState.Starting:
