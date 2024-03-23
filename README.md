@@ -1,3 +1,5 @@
+# This is now outdated and will not work - please use the [Steam Workshop version](https://steamcommunity.com/sharedfiles/filedetails/?id=3197746608)
+
 # Please read our [Getting Started Guide](https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/GettingStarted.md) to install the Ravens or Modifier/Chaos Mode Mods
 
 # Jump King Chat Raven Mod
