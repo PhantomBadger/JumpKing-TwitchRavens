@@ -104,15 +104,19 @@
                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource twitchAccountTooltip}" Text="Twitch Account Name:" />
                             <TextBox Grid.Row="1" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchSettings.TwitchAccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ToolTip="{StaticResource twitchAccountTooltip}"/>
                             <!-- OAuth -->
-                            <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource oAuthTooltip}" Text="Twitch OAuth:" />
-                            <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,0,10,0" FontSize="9" ToolTip="{StaticResource oAuthTooltip}">
-                                <Italic>
-                                    You shouldn't show this to anyone!
-                                    To generate an OAuth Token,
-                                    <Hyperlink NavigateUri="https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#twitch" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
-                                </Italic>
-                            </TextBlock>
-                            <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchSettings.TwitchOAuth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ToolTip="{StaticResource oAuthTooltip}"/>
+                            <Expander Grid.Row="2" Header="OAuth Token (Don't show on stream!)...">
+                                <StackPanel>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource oAuthTooltip}" Text="Twitch OAuth:" />
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,0,10,0" FontSize="9" ToolTip="{StaticResource oAuthTooltip}">
+                                    <Italic>
+                                        You shouldn't show this to anyone!
+                                        To generate an OAuth Token,
+                                        <Hyperlink NavigateUri="https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#twitch" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
+                                    </Italic>
+                                    </TextBlock>
+                                    <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding TwitchSettings.TwitchOAuth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ToolTip="{StaticResource oAuthTooltip}"/>
+                                </StackPanel>
+                            </Expander>
                         </Grid>
                     </TabItem>
                     <TabItem x:Name="tabItemYouTube" Header="YouTube" Visibility="{Binding StreamingSettings.IsStreamingOnYouTube, Converter={StaticResource boolToVisibilityConverter}}">
@@ -147,15 +151,19 @@
                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource youTubeAccountTooltip}" Text="YouTube Account Name:" />
                             <TextBox Grid.Row="1" Grid.Column="0" Margin="0,2,0,2" Text="{Binding YouTubeSettings.YouTubeAccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ToolTip="{StaticResource youTubeAccountTooltip}"/>
                             <!-- API Key -->
-                            <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource youTubeAPITooltip}" Text="YouTube API Key:" />
-                            <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,0,10,0" FontSize="9" ToolTip="{StaticResource youTubeAPITooltip}">
-                                <Italic>
-                                    You shouldn't show this to anyone!
-                                    To generate this API key
-                                    <Hyperlink NavigateUri="https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#youtube" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
-                                </Italic>
-                            </TextBlock>
-                            <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding YouTubeSettings.YouTubeAPIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ToolTip="{StaticResource youTubeAPITooltip}"/>
+                            <Expander Grid.Row="2" Header="API Key (Don't show on stream!)...">
+                                <StackPanel>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5,2,10,2" ToolTip="{StaticResource youTubeAPITooltip}" Text="YouTube API Key:" />
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="5,0,10,0" FontSize="9" ToolTip="{StaticResource youTubeAPITooltip}">
+                                    <Italic>
+                                        You shouldn't show this to anyone!
+                                        To generate this API key
+                                        <Hyperlink NavigateUri="https://github.com/PhantomBadger/JumpKing-TwitchRavens/blob/main/docs/HowToGenerateCredentials.md#youtube" RequestNavigate="Hyperlink_RequestNavigate">click here</Hyperlink>
+                                    </Italic>
+                                    </TextBlock>
+                                    <TextBox Grid.Row="4" Grid.Column="0" Margin="0,2,0,2" Text="{Binding YouTubeSettings.YouTubeAPIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ToolTip="{StaticResource youTubeAPITooltip}"/>
+                                </StackPanel>
+                            </Expander>
                             <!-- Connect Key -->
                             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,2,10,2" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" Text="Connect Key:" ToolTip="When pressed this will cause the mod to connect/disconnect from the YouTube Stream" />
                             <ComboBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="{Binding RavensSettings.AreRavenModSettingsLoaded}" ItemsSource="{Binding Source={StaticResource keysEnumValues}}" SelectedItem="{Binding YouTubeSettings.ConnectKey, Mode=TwoWay}" ToolTip="When pressed this will cause the mod to connect/disconnect from the YouTube Stream"/>
